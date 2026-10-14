@@ -1,11 +1,36 @@
 <a id="topo"></a>
 <a id="sobre-o-projeto"></a>
 
+<p align="center">
+  <picture>
+    <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/hero-still.svg" />
+    <img src="docs/assets/readme/hero.svg" alt="Vibe Coding Toolkit — da ideia ao primeiro commit. Abertura cinematográfica em carvão e âmbar." width="1600" height="680" />
+  </picture>
+</p>
+
 # Vibe Coding Toolkit
 
-Uma base para desenvolvimento com IA e para iniciar projetos Next.js a partir de uma descrição de produto. Use o conjunto completo ou adote apenas a ferramenta que precisa.
+**Sua próxima ideia começa com uma base bem preparada.**
+
+Descreva o produto. Prepare o projeto. Comece a construir. O toolkit reúne o bootstrap Next.js, as skills e os acordos de desenvolvimento com IA — com caminhos para usar tudo ou adotar uma peça por vez.
+
+<p align="center">
+  <a href="#comece-por-aqui"><strong>INICIAR UM PROJETO →</strong></a>
+  &nbsp; · &nbsp;
+  <a href="docs/03-environment-setup.md">PREPARAR A MÁQUINA</a>
+  &nbsp; · &nbsp;
+  <a href="#documentacao-completa">EXPLORAR O TOOLKIT</a>
+</p>
+
+<p align="center">
+  <strong>Next.js</strong> / TypeScript / Tailwind / ESLint
+  <br />
+  <strong>Claude Code + Codex</strong> / instruções portáveis / skills locais
+</p>
 
 O toolkit funciona com agentes que tenham acesso a arquivos e terminal. Os guias cobrem **Claude Code e Codex** separadamente; instruções compartilhadas também orientam outras LLMs e clientes compatíveis.
+
+---
 
 <a id="como-usar-este-repositorio"></a>
 
@@ -14,12 +39,32 @@ O toolkit funciona com agentes que tenham acesso a arquivos e terminal. Os guias
 
 ## Escolha seu ponto de entrada
 
-| Objetivo | Caminho |
-|---|---|
-| **Começar um projeto Next.js** | [Bootstrap](docs/04-project-bootstrap.md) e [prompt curto](docs/prompts/11-next-project-bootstrap.md) |
-| Preparar ou atualizar a máquina | [Ambiente global](docs/03-environment-setup.md) e [prompt 10](docs/prompts/10-development-environment-setup.md) |
-| Instalar uma peça específica | [Instalação](docs/01-installation.md), [ferramentas](docs/tools/) e [prompts](docs/prompts/) |
-| Adotar o fluxo em projeto existente | [Playbook Claude](docs/02-playbook-onboarding.md), [guia Codex](docs/tools/15-codex-workflow.md) e [AGENTS](templates/AGENTS.md.template) |
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>01 / Um projeto novo</h3>
+      <p>Da descrição do produto à base Next.js configurada, com skills locais e checks reais.</p>
+      <p><a href="docs/04-project-bootstrap.md"><strong>Abrir o bootstrap →</strong></a> · <a href="docs/prompts/11-next-project-bootstrap.md">Prompt curto</a></p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>02 / Sua máquina pronta</h3>
+      <p>Prepare o ambiente global e reutilize ferramentas entre projetos, com o escopo de cada cliente.</p>
+      <p><a href="docs/03-environment-setup.md"><strong>Configurar o ambiente →</strong></a> · <a href="docs/prompts/10-development-environment-setup.md">Prompt 10</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>03 / Uma peça de cada vez</h3>
+      <p>Escolha lint, skills, contexto ou outra ferramenta para uma necessidade concreta.</p>
+      <p><a href="docs/01-installation.md"><strong>Ver a instalação →</strong></a> · <a href="docs/tools/">Ferramentas</a> · <a href="docs/prompts/">Prompts</a></p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>04 / Um projeto existente</h3>
+      <p>Incorpore o fluxo e as instruções compartilhadas à base que você já tem.</p>
+      <p><a href="docs/02-playbook-onboarding.md"><strong>Playbook Claude →</strong></a> · <a href="docs/tools/15-codex-workflow.md">Guia Codex</a> · <a href="templates/AGENTS.md.template">AGENTS</a></p>
+    </td>
+  </tr>
+</table>
 
 <a id="comece-por-aqui"></a>
 
@@ -43,9 +88,15 @@ O setup entrega:
 - Ponytail, Caveman, Superpowers, RTK, Context7 e Graphify, reutilizando o que já está global.
 - Lint, tipos, self-check das regras, build e `docs/setup.md` com evidências e pendências.
 
-O toolkit é uma **receita com templates**. `create-next-app` fornece a base estável na execução. Banco, autenticação e integrações são escolhidos pelo produto; o bootstrap prepara a base antes de implementar o MVP.
+> **Ideia → produto → base → skills → checks → MVP.**
+>
+> O toolkit é uma receita com templates. `create-next-app` fornece a base estável na execução. Banco, autenticação e integrações são escolhidos pelo produto; o bootstrap prepara a base antes de implementar o MVP.
 
 Não instala travas de push em `main`, não exige branch e não adiciona hooks de commit/push. Instalar skills de deploy não publica a aplicação. Veja [o fluxo completo](docs/04-project-bootstrap.md) para escopos e validação.
+
+**Base verificada em macOS, Linux e Windows.** Lint, tipos, regras, build e HTTP fazem parte da [validação reproduzível](docs/05-toolkit-validation.md); o relatório também registra limites e riscos conhecidos.
+
+---
 
 ## Global e local
 
@@ -98,6 +149,8 @@ Delegue quando houver benefício e suporte, com tarefas independentes e responsa
 <a id="índice"></a>
 
 ## Referências
+
+O mapa completo para entrar em qualquer parte do toolkit. Cada guia e prompt funciona como uma porta de entrada independente.
 
 <a id="fundamentos"></a>
 
@@ -172,3 +225,9 @@ Templates são pontos de partida. Incorpore configurações, preencha campos e v
 Fontes: [Superpowers](https://github.com/obra/superpowers), [RTK](https://github.com/rtk-ai/rtk), [Ponytail](https://github.com/DietrichGebert/ponytail), [Caveman](https://github.com/JuliusBrussee/caveman), [Graphify](https://github.com/Graphify-Labs/graphify), [Context7](https://github.com/upstash/context7), [agent-browser](https://github.com/vercel-labs/agent-browser), [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills) e [Skills CLI](https://github.com/vercel-labs/skills). Cada ferramenta mantém sua licença e distribuição.
 
 Toolkit sob [MIT](LICENSE). Por [Matheus Gomes](https://instagram.com/matheusgomes). [Issues e PRs](https://github.com/soumatheusgomes/vibe-coding-toolkit).
+
+<p align="center">
+  <strong>BUILD WITH INTENT. SHIP WITH FLOW.</strong>
+  <br />
+  <a href="#topo">Voltar ao topo ↑</a>
+</p>
