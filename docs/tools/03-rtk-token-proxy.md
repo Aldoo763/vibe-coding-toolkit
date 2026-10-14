@@ -1,382 +1,112 @@
 # RTK — proxy de tokens para CLI
 
-## O que é
+RTK significa **Rust Token Killer**. É uma ferramenta pública em [rtk-ai/rtk](https://github.com/rtk-ai/rtk), distribuída como binário de linha de comando. Ela executa comandos suportados e filtra a saída antes de o agente recebê-la, reduzindo texto repetitivo na janela de contexto.
 
-**RTK** é o nome usado neste documento — como espaço reservado
-(*placeholder*), não como produto publicado — para um **proxy** de
-**CLI** (*Command Line Interface*, interface de linha de comando: os
-comandos que você digita num terminal). Um proxy, aqui, é um programa que
-fica no meio do caminho entre duas pontas — neste caso, entre o agente de
-IA e o terminal — interceptando o que passa por ele e podendo alterar
-antes de deixar seguir.
+Um **hook** é uma integração executada antes ou depois de uma ação do agente. No RTK, o hook pode reescrever o comando proposto para usar o binário. Isso permite usar comandos comuns sem depender de o modelo lembrar do prefixo em toda chamada.
 
-O RTK reescreve comandos comuns de leitura — `status`, `log`, `diff`,
-`grep`, `find`, listar arquivos — para equivalentes mais compactos em
-**tokens** (a unidade de texto que um modelo de linguagem usa pra medir, e
-cobrar, o que lê e escreve; grosso modo, um pedaço de palavra) antes deles
-rodarem de verdade. É transparente pro agente: nenhuma sobrecarga de
-prompt, nenhuma ida e volta extra — só um resultado mais barato pro mesmo
-pedido.
+Esta página substitui o antigo exemplo de proxy personalizado. Prefira a integração oficial: ela conhece os formatos de cada cliente e evita manter um parser de shell e um hook próprios. Veja [boas práticas para hooks](10-hooks-best-practices.md) quando precisar de uma integração adicional.
 
-A peça que faz isso funcionar é um **hook** — explicado em detalhe em
-[Boas práticas para hooks](10-hooks-best-practices.md); resumindo, um
-pedacinho de código que roda automaticamente antes de qualquer chamada de
-terminal — que intercepta o comando proposto antes dele ser executado de
-verdade.
+## Instale pelo método oficial
 
-Esta página documenta uma ferramenta pessoal que **não está publicada
-publicamente** até o momento. Em vez de "instale isso", o que segue é o
-**padrão** por trás dela — o desenho geral, não uma biblioteca — pra quem
-quiser construir a própria versão.
-
-Além de reescrever comandos, o proxy expõe seus próprios comandos de
-**meta** (comandos sobre o proxy em si, não comandos que ele repassa para
-o terminal) — e esses nunca devem ser reescritos:
-
-- um comando de **estatísticas**, reportando a economia acumulada de
-  tokens;
-- um comando de **histórico**, mostrando quais comandos foram reescritos e
-  quanto cada um economizou;
-- uma **via de escape sem filtro** (*raw*/*passthrough*), que roda um
-  comando completamente sem alteração, ignorando toda a lógica de
-  reescrita.
-
-## Por que usar
-
-Sessões longas com um agente de IA rodam repetidamente o mesmo punhado de
-comandos de leitura — `git status`, `git diff`, `git log`, buscas em
-arquivos. Rodados sem filtro, esses comandos despejam facilmente milhares
-de tokens de saída que o agente lê uma vez, aproveita uma fração, e
-descarta. Isso custa duas coisas: dinheiro (a maioria dos modelos cobra
-por token processado) e espaço de contexto (a "memória de curto prazo" da
-conversa, que é finita — quanto mais espaço ocupado por saída de comando
-que ninguém vai reler, menos sobra pro que realmente importa).
-
-Um proxy de tokens intercepta exatamente esses comandos e devolve só o que
-é útil — um resumo, uma contagem, as linhas que mudaram — em vez do
-despejo completo. E porque a reescrita acontece dentro de um hook, fora da
-conversa em si, mantê-lo ativo não custa nada em tokens de prompt: não
-existe uma instrução no *system prompt* (as instruções permanentes que
-moldam o comportamento do agente) que precise ser relida a cada turno, nem
-o risco de o agente "esquecer" de usar o proxy — o comando original nunca
-chega a rodar sem passar por ele primeiro.
-
-Os comandos de meta também têm valor prático próprio: estatísticas e
-histórico transformam "eu acho que isso está economizando tokens" num
-número que você pode olhar. E a via de escape sem filtro é o que torna o
-resto seguro de usar — veja a pegadinha, mais abaixo.
-
-## Tutorial passo a passo — construindo seu próprio proxy de tokens
-
-Um esboço de como montar esse hook do zero. Nomes de campos reais dependem
-da API de hooks do seu agente — o que segue é a forma geral, não uma
-cópia exata de nenhuma implementação específica.
-
-### Passo 1 — escolha os comandos seguros pra reescrever
-
-Comece só com leituras puras, sem efeito colateral e sem ambiguidade sobre
-o que fazem: `git status`, `git diff`, `git log`, `grep`, `find`, `ls`. Não
-inclua nada que escreva, apague, ou possa se comportar de formas
-diferentes dependendo de flags menos comuns — isso vira a pegadinha
-discutida mais abaixo.
-
-### Passo 2 — tenha o binário compacto
-
-O proxy em si — o programa que de fato roda o comando original e devolve
-uma versão condensada da saída — fica fora do escopo deste tutorial (pode
-ser um binário compilado, um script, o que for). O hook só precisa saber
-invocá-lo; a lógica de "como compactar a saída de um `git diff`" é
-implementação sua.
-
-### Passo 3 — leia o comando proposto
-
-```javascript
-#!/usr/bin/env node
-// Hook de PreToolUse — ilustrativo, não é o código-fonte real de nenhuma
-// ferramenta específica.
-import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
-
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // sem evento utilizável — falha aberta, comando original roda
-}
-
-const comando = evento?.tool_input?.command ?? "";
-```
-
-O hook recebe o comando proposto como JSON pela entrada padrão (*stdin*) —
-o mesmo par de helpers de leitura segura discutido em
-[Boas práticas para hooks](10-hooks-best-practices.md) se aplica aqui
-integralmente. Um proxy de comandos é, antes de qualquer outra coisa, um
-hook, e herda a mesma obrigação de nunca travar a sessão por causa de um
-evento mal formado.
-
-### Passo 4 — reconheça comandos conhecidos e seguros
-
-```javascript
-const REESCREVIVEL = /^(git status|git diff|git log|grep|find|ls)\b/;
-
-if (!REESCREVIVEL.test(comando)) {
-  process.exit(0); // não reconhecido — comando original roda sem alteração
-}
-```
-
-`REESCREVIVEL` é uma **regex** (expressão regular — um padrão de texto
-usado pra casar strings que seguem um formato específico) funcionando como
-uma **allowlist** (lista de permissões: só o que está explicitamente
-listado é afetado; tudo o mais passa direto, sem alteração). Qualquer
-coisa fora dela — incluindo os próprios comandos de meta do proxy — segue
-pro terminal sem nenhuma modificação.
-
-### Passo 5 — confira se o proxy está disponível
-
-```javascript
-import { access } from "node:fs/promises";
-
-const PROXY_BIN = "/usr/local/bin/rtk-proxy";
-
-try {
-  await access(PROXY_BIN);
-} catch {
-  process.exit(0); // proxy não instalado — falha aberta
-}
-```
-
-Esse é o ponto mais importante do hook inteiro: se o binário do proxy não
-existir — máquina nova, instalação incompleta, o que for — o hook não pode
-travar o desenvolvedor por isso. Ele simplesmente deixa o comando original
-rodar, exatamente como se o proxy não existisse. Veja
-[Boas práticas para hooks](10-hooks-best-practices.md) para a política
-geral de fail-open (falhar aberto — deixar a ação original seguir diante
-de um erro, em vez de travar) que essa checagem segue.
-
-### Passo 6 — rode o proxy e devolva o resultado compacto
-
-```javascript
-import { execFile } from "node:child_process";
-
-execFile(PROXY_BIN, ["run", comando], (erro, saida) => {
-  if (erro) {
-    process.exit(0); // proxy deu erro — falha aberta, comando original roda
-    return;
-  }
-
-  // Bloqueia o comando original (caro) e devolve o resultado compacto
-  // diretamente — o agente recebe uma resposta, não um pedido de nova tentativa.
-  console.log(JSON.stringify({ decision: "block", reason: saida }));
-  process.exit(0);
-});
-```
-
-Bloquear aqui não significa "recusar e travar" — significa "impedir que o
-comando caro rode, e entregar a resposta equivalente por outro caminho".
-Do ponto de vista do agente, ele pediu um comando e recebeu uma resposta;
-só não foi o comando original que gerou essa resposta.
-
-### Passo 7 — o hook completo
-
-Juntando os passos 3 a 6:
-
-```javascript
-#!/usr/bin/env node
-import { access } from "node:fs/promises";
-import { execFile } from "node:child_process";
-import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
-
-const PROXY_BIN = "/usr/local/bin/rtk-proxy";
-const REESCREVIVEL = /^(git status|git diff|git log|grep|find|ls)\b/;
-
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // sem evento utilizável — falha aberta
-}
-
-const comando = evento?.tool_input?.command ?? "";
-
-if (!REESCREVIVEL.test(comando)) {
-  process.exit(0); // não reconhecido — comando original roda sem alteração
-}
-
-try {
-  await access(PROXY_BIN);
-} catch {
-  process.exit(0); // proxy não instalado — falha aberta
-}
-
-execFile(PROXY_BIN, ["run", comando], (erro, saida) => {
-  if (erro) {
-    process.exit(0); // proxy deu erro — falha aberta
-    return;
-  }
-  console.log(JSON.stringify({ decision: "block", reason: saida }));
-  process.exit(0);
-});
-```
-
-### Passo 8 — registre o hook
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "node .claude/hooks/rtk-proxy-hook.mjs" }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### Passo 9 — verifique a via de escape
-
-Confirme que existe, e funciona, um jeito de rodar qualquer comando sem
-passar pela reescrita — antes de confiar no hook em produção:
+Com Homebrew disponível, a [documentação de instalação](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/installation.md) indica:
 
 ```bash
-# Com o hook ativo, isso deveria sair reescrito:
-git status
-
-# Isso, mesmo com o hook ativo, deveria rodar cru, sem interceptação —
-# o nome exato do comando de meta é escolha sua, mas ele precisa existir:
-rtk proxy git status
+brew install rtk-ai/tap/rtk
+rtk --version
 ```
 
-Se não existir um caminho assim, qualquer erro de reescrita — como o do
-Exemplo 3, logo abaixo — vira um beco sem saída: não tem como o agente
-(nem você) recuperar o comportamento original a não ser desativando o
-hook inteiro.
+Em outros ambientes, use o instalador ou binário de release indicado pelo projeto para o sistema e a arquitetura. Confirme a origem antes de instalar: um pacote chamado `rtk` em outro ecossistema pode ser uma ferramenta diferente.
 
-## Exemplos concretos
+Se já houver RTK instalado, identifique caminho, versão e gerenciador responsável antes de atualizar. Para uma instalação pelo tap acima, use `brew upgrade rtk-ai/tap/rtk`. Não instale outra cópia só para trocar o método.
 
-### Exemplo 1 — `git status`
+## Configure cada agente
 
-Sem o proxy, o agente roda o comando cru e recebe a saída completa do
-Git — cabeçalho de branch, cada arquivo modificado, staged, untracked,
-linha por linha. Com o proxy ativo, o mesmo pedido do agente é
-interceptado e reescrito:
+Faça backup das configurações existentes antes de inicializar a integração. A [lista oficial de agentes suportados](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/supported-agents.md) diferencia os mecanismos de cada cliente.
+
+### Claude Code
 
 ```bash
-# O agente propõe:
-git status
-
-# O hook reescreve para (ilustrativo):
-rtk-proxy run "git status"
-
-# E a resposta que volta pro agente, no lugar da saída bruta do Git, é
-# algo como:
-# 3 arquivos modificados, 1 novo, 0 staged — branch: feature/checkout-retry
+rtk init --global
+rtk init --show
 ```
 
-O agente pediu `git status`; o que ele recebeu é semanticamente a mesma
-informação, só que resumida numa linha em vez de um bloco inteiro de
-saída formatada pra leitura humana.
+Esse fluxo instala o hook e atualiza a configuração do Claude Code. Abra uma nova sessão e confira o registro. Se já houver um hook de proxy personalizado para a mesma finalidade, remova ou concilie apenas a integração redundante depois de confirmar suas referências.
 
-### Exemplo 2 — `grep` numa árvore grande
+### Codex CLI
 
 ```bash
-# O agente propõe:
-grep -r "TODO" src/
-
-# O hook reescreve para (ilustrativo):
-rtk-proxy run "grep -r \"TODO\" src/"
-
-# E a resposta compacta é algo como:
-# 12 ocorrências de "TODO" em 7 arquivos — use rtk history pra ver a lista completa
+rtk init --global --codex
 ```
 
-Em vez de despejar as 12 linhas de contexto de cada ocorrência, o proxy
-devolve a contagem — e deixa o histórico (`rtk history`, um dos comandos
-de meta) disponível caso o agente realmente precise da lista completa
-depois.
+O mecanismo atual registra o hook nativo de `PreToolUse` do Codex. O processador `rtk hook codex` devolve o comando reescrito por `updatedInput`; o Codex executa o comando e aplica suas próprias permissões. O hook não precisa executar uma cópia do comando antes disso.
 
-### Exemplo 3 — quando a reescrita erra: a pegadinha da flag
+A alternativa `rtk init --codex` instala no projeto atual. Escolha um escopo por necessidade: não registre o mesmo hook globalmente e no projeto sem conferir o efeito combinado. No setup da máquina, prefira o escopo global para preservar os projetos.
+
+Reinicie o Codex e conclua a confiança de hooks quando o cliente pedir. Confira `rtk init --help` e a documentação da versão instalada se a opção não existir. O suporte da CLI não comprova que todas as superfícies desktop ou remotas executem o mesmo hook.
+
+## Use comandos suportados ou saída completa
+
+Sem hook ativo, prefixe os comandos suportados explicitamente:
 
 ```bash
-# Comando real, proposto pelo agente:
-git log -h
+rtk git status
+rtk git diff
+rtk git log -5 --oneline
 ```
 
-Se o **parser** (o componente que interpreta os argumentos de um comando)
-do proxy também trata `-h` como a flag de ajuda **dele mesmo** — antes de
-sequer examinar qual comando está sendo reescrito — o resultado é a ajuda
-do `rtk-proxy`, não o log do Git:
+Com um hook nativo ativo, proponha os comandos normais e deixe a integração reescrevê-los. Não acrescente um segundo wrapper ou outro hook de reescrita.
+
+Para preservar a saída inteira ou usar um comando que não tem filtro específico, use `rtk proxy`:
 
 ```bash
-rtk-proxy run "git log -h"
-# → imprime a ajuda do rtk-proxy (texto explicando os comandos do proxy)
-# → NÃO imprime o log do Git, que era o que o agente queria
+rtk proxy git diff
+rtk proxy git log -5 --oneline
 ```
 
-Nada quebra. Não existe mensagem de erro nenhuma. O agente recebe uma
-resposta com aparência completamente válida — só que é a resposta errada,
-pra uma pergunta que ele nunca fez.
+Essa é a via de escape quando um resumo omite o detalhe necessário ao diagnóstico. Não use uma saída condensada como prova de que uma linha, aviso ou arquivo não existe sem conferir os dados completos quando a decisão depende disso.
 
-## Dicas e pegadinhas
+Não prefixe cegamente pipelines, redirecionamentos, heredocs ou comandos compostos. O suporte de sintaxe varia; preserve a semântica do shell e consulte `rtk --help` para os comandos disponíveis.
 
-- **Uma reescrita transparente pode mudar o significado de uma flag sem
-  avisar.** Se o parser do proxy usa alguma flag que coincide com uma flag
-  da ferramenta original, a reescrita pode disparar o comportamento
-  errado — como no Exemplo 3 acima. É uma limitação conhecida do próprio
-  padrão de "reescrever comandos de forma transparente", não um bug de
-  uma implementação específica.
-- **Sempre tenha uma via de escape sem filtro.** É o que torna o resto do
-  padrão seguro de usar: se uma reescrita específica se mostrar errada, o
-  desenvolvedor (ou o próprio agente) precisa de um jeito de rodar o
-  comando original, cru, sob demanda — sem precisar desativar o hook
-  inteiro pra isso.
-- **Nunca presuma que a saída reescrita é equivalente à original sem
-  checar** — principalmente pra flags incomuns, que o parser do proxy
-  provavelmente nunca foi testado contra. A reescrita é uma aposta
-  informada, não uma garantia matemática.
-- **Os comandos de meta precisam ficar fora da allowlist de reescrita.**
-  Se o padrão que reconhece comandos reescrevíveis (Passo 4 do tutorial)
-  também casar com os comandos de estatísticas, histórico ou passthrough
-  do próprio proxy, ele acaba tentando reescrever a si mesmo — exclua-os
-  explicitamente.
-- **O proxy é um hook antes de qualquer outra coisa** — toda a disciplina
-  de fail-open de [Boas práticas para hooks](10-hooks-best-practices.md)
-  se aplica sem exceção: binário ausente, erro do proxy, evento mal
-  formado — tudo isso deve deixar o comando original rodar, nunca travar
-  o desenvolvedor.
+## Meça e valide
+
+```bash
+rtk gain
+rtk gain --history
+```
+
+As métricas mostram o histórico de uso observado pelo RTK. Elas descrevem redução de saída dos comandos, não o total de tokens da sessão, economia garantida na assinatura ou custo de todo o trabalho do modelo. Chamadas via `rtk proxy` preservam a saída e podem aparecer sem redução.
+
+Para testar a integração:
+
+1. Abra um terminal e uma sessão de agente novos.
+2. Confirme `rtk --version` e o caminho do executável resolvido pelo shell.
+3. Peça um `git status` em um repositório conhecido e confira que a chamada foi reescrita uma vez.
+4. Confira o registro em `rtk gain --history`.
+5. Execute `rtk proxy git status` e confira a saída completa.
+
+Se o histórico não mostrar uso, investigue descoberta do binário, escopo do hook, confiança e suporte da superfície. Instalação no disco não comprova integração ativa.
+
+## Pegadinhas que importam
+
+- **Duplicação de hooks:** dois interceptadores podem aplicar wrappers duas vezes ou executar trabalho repetido. Inventarie configurações globais e do projeto antes de consolidar.
+- **Saída incompleta:** filtros são úteis para leitura rotineira; diagnósticos, flags incomuns e verificações exatas podem exigir `rtk proxy`.
+- **Permissões:** compactar saída não autoriza instalar, publicar, apagar ou acessar um recurso. O agente e o sistema continuam responsáveis pelas permissões.
+- **Erro de comando:** preserve códigos de saída e evidência suficiente da falha. Um resumo aparentemente normal não transforma uma execução malsucedida em sucesso.
+- **Atualização:** atualize o binário pelo gerenciador responsável e confira as instruções de integração da release. Preserve hooks personalizados com outra finalidade.
 
 ## Perguntas frequentes
 
-**Onde eu baixo o RTK?**
-Em lugar nenhum, por enquanto — não é uma ferramenta publicada. O que este
-documento oferece é o padrão por trás dela, pra você construir sua própria
-versão adaptada ao seu fluxo de trabalho.
+**Preciso construir meu próprio proxy?**
+Não. Instale o RTK público e use o mecanismo documentado para seu agente. Um hook personalizado só se justifica por uma necessidade que a integração oficial não cobre.
 
-**Isso funciona com comandos que escrevem ou apagam alguma coisa?**
-O padrão, do jeito descrito aqui, é pensado só pra comandos de
-**leitura** — `status`, `diff`, `log`, `grep`, `find`, listar arquivos.
-Reescrever um comando de escrita (um `git commit`, um `rm`) introduz um
-risco totalmente diferente: um parser errado ali não devolve uma resposta
-errada, pode executar a ação errada. Fica fora do escopo deste padrão, de
-propósito.
+**Funciona sem hook?**
+Sim. Use o prefixo explícito nos comandos suportados e `rtk proxy` quando precisar de saída completa.
 
-**E se a reescrita der uma resposta errada, tipo no exemplo da flag `-h`?**
-É exatamente pra isso que a via de escape sem filtro existe — rode o
-comando original diretamente, sem passar pelo proxy, e trate a regra de
-reescrita que causou o problema como um bug a corrigir no parser do proxy
-(por exemplo, ignorando flags de uma letra só quando vêm depois do nome de
-um comando já reconhecido).
+**Instalar no Claude configura o Codex?**
+Não. Configure e valide os dois clientes separadamente.
 
-**Preciso reescrever pra um binário separado, ou dá pra fazer tudo dentro
-do próprio hook?**
-Dá pra fazer tudo dentro do hook se a compactação for simples — por
-exemplo, rodar o comando original e cortar a saída pras últimas N linhas.
-Um binário separado compensa quando a lógica de compactação fica complexa
-o bastante pra merecer testes e versionamento próprios, independentes do
-hook que só faz o roteamento.
+**Isso troca meu modelo ou provedor?**
+O fluxo de CLI e hooks descrito aqui filtra saída de comandos. Não exige trocar o modelo, a autenticação ou o provedor do agente.
 
-**Isso economiza tokens de verdade, ou só parece?**
-Depende inteiramente de quanto da saída bruta dos comandos reescritos o
-agente de fato usa. Comandos como `git status` num repositório grande, ou
-`grep` numa árvore de milhares de arquivos, tendem a ter a maior
-diferença — a saída bruta é grande, e o que importa geralmente cabe num
-resumo. É exatamente pra medir isso que os comandos de meta de
-estatísticas e histórico existem: sem eles, "economiza tokens" é uma
-hipótese; com eles, é um número.
+**Como entra no setup completo?**
+RTK é obrigatório no [prompt de ambiente](../prompts/10-development-environment-setup.md). O agente deve instalar, integrar e validar, sem duplicar wrappers ou hooks.

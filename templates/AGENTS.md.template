@@ -1,0 +1,52 @@
+# [PROJECT NAME]
+
+> Shared project instructions. Fill in the placeholders and merge into an existing AGENTS.md instead of replacing it. Keep client-specific settings in that client's configuration.
+
+## Stack
+
+[PLACEHOLDER: languages, frameworks, supported runtime versions, package manager]
+
+## Canonical commands
+
+Use the project's actual commands. Mark unavailable checks explicitly rather than inventing commands.
+
+- **Install:** `[PLACEHOLDER]`
+- **Lint:** `[PLACEHOLDER]`
+- **Typecheck:** `[PLACEHOLDER]`
+- **Test:** `[PLACEHOLDER]`
+- **Build:** `[PLACEHOLDER]`
+- **Run/Dev:** `[PLACEHOLDER]`
+
+## Working agreements
+
+- Read the affected code and instructions before editing. State assumptions that change scope or behavior.
+- Complete the requested work with the smallest change that fully solves it. Reuse existing patterns and dependencies.
+- Preserve local changes, credentials, project dependencies, runtime requirements and lockfiles unless the task explicitly calls for changing them.
+- Keep validation, error handling, security, accessibility and explicit requirements intact.
+- Verify behavior with the checks appropriate to the change. Report commands, results and any checks that could not run.
+- Ask for missing information when it affects correctness. Continue independent work and respect authorization already granted.
+- Publishing, messaging others, destructive actions, new costs and unrelated changes require authorization for that action.
+
+## Agent preferences
+
+- **Ponytail:** use the installed plugin or skill at `full` intensity for coding. Preserve explicit requirements and meaningful verification.
+- **Caveman:** keep conversation concise in Portuguese. Give complete technical explanations when requested. Write code, documentation and commits normally. `stop caveman` disables the conversation style; `stop ponytail` disables the coding mode.
+- **Superpowers:** use installed process skills when applicable, scaling the workflow to the task and respecting user instructions.
+- **Context7:** fetch current library and API documentation when needed. Resolve the library ID first, then query one concept at a time. Never send secrets or private project content.
+- **RTK:** use supported command integrations. With a native rewrite hook, avoid adding a second wrapper. Without one, prefix supported commands explicitly. Use `rtk proxy <command>` for raw output or unsupported commands.
+- **Graphify:** use an existing project graph when it helps answer structural questions. Record stale or incomplete evidence; do not invent relationships.
+- **LLM work for Graphify and Caveman:** use native Codex, the current session model and ChatGPT authentication. Pass that exact model explicitly when supported delegation is used. Never silently switch provider, choose a cheaper model, enable API billing or insert a proxy.
+
+These preferences assume the named tools are installed and discovered. If an integration is missing, report it; the environment setup prompt handles installation.
+
+## Parallel work
+
+Use delegation when requested and supported. Parallel tasks need separate file ownership and no dependency on unfinished work in the same wave. Do not invent available agents or tool APIs. Keep commits under the coordinator's control when that workflow is authorized.
+
+## Conventions
+
+[PLACEHOLDER: import style, formatting, testing, error handling, architecture boundaries]
+
+## Project context
+
+[PLACEHOLDER: links to architecture, domain rules, runbooks and the location of project memory]

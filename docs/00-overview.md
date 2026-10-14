@@ -118,9 +118,7 @@ do proxy — ver quanto já foi economizado, ver o histórico do que foi
 reescrito, ou rodar um comando bruto sem filtro algum — ficam de fora da
 reescrita, senão o proxy acabaria filtrando a si mesmo.
 
-Ver [Padrão de proxy de tokens](tools/03-rtk-token-proxy.md) pro desenho
-completo do hook e pras pegadinhas de reescrever um comando sem
-acidentalmente mudar o que ele faz.
+Use o [RTK público](tools/03-rtk-token-proxy.md) e sua integração oficial para o cliente. A página cobre instalação, hooks nativos, métricas e saída completa quando o filtro não for adequado. A redução da saída não comprova economia total de uma sessão.
 
 ## 4. Duas camadas de personalidade compostas
 
@@ -303,6 +301,8 @@ em cada etapa? O [Guia de instalação](01-installation.md) é a referência
 rápida de comandos; o [Playbook de onboarding](02-playbook-onboarding.md) é
 o caminho recomendado — o passo a passo completo, narrado do zero até o
 fluxo inteiro rodando de verdade no seu projeto.
+
+Para preparar ou atualizar o **computador inteiro**, use o [setup do ambiente](03-environment-setup.md) e seu prompt executável. Para trabalhar com **Codex**, use o [guia específico](tools/15-codex-workflow.md). O manifesto de ambiente registra versões, fontes e integrações para reproduzir a máquina; instruções do projeto ficam no `AGENTS.md` ou `CLAUDE.md` correspondente.
 
 ## Leitura complementar oficial
 

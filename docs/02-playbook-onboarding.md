@@ -16,6 +16,8 @@ disso já está rodando no seu ambiente, pule direto pra parte que falta.
 
 ## Como usar este playbook
 
+Este guia cobre o **fluxo dentro do projeto**, principalmente no Claude Code. Para preparar ou atualizar a máquina, comece pelo [setup do ambiente](03-environment-setup.md). Para usar Codex, veja o [guia do cliente](tools/15-codex-workflow.md) e o [template compartilhado de `AGENTS.md`](../templates/AGENTS.md.template).
+
 Duas formas, as duas válidas:
 
 - **Do início ao fim, na primeira vez.** Cada parte assume que a anterior
@@ -31,9 +33,7 @@ Duas formas, as duas válidas:
 
 Antes de abrir o terminal, confira se você tem:
 
-- **Node.js instalado.** É o único requisito real pra instalar o Claude
-  Code — o instalador via `npm` cuida do resto. Confira com
-  `node --version`; qualquer versão LTS recente serve.
+- **Runtime exigido pelo projeto.** Para projetos Node.js, confira `node --version` e respeite `.node-version`, `.nvmrc` e `engines`. O instalador nativo do Claude Code não exige Node.js previamente.
 - **Um terminal.** macOS, Linux ou Windows (nativo ou WSL) — tudo neste
   playbook roda em linha de comando.
 - **`gh` CLI (opcional).** Só necessário se você for usar os fluxos de
@@ -48,8 +48,10 @@ Antes de abrir o terminal, confira se você tem:
 ### Instale o Claude Code
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
 ```
+
+Esse é o instalador nativo para macOS, Linux e WSL. Para Windows nativo e alternativas de instalação, use a [documentação oficial](https://code.claude.com/docs/en/setup). Se já houver instalação funcional, preserve seu método quando suportado em vez de adicionar outra cópia.
 
 Confirme que a instalação funcionou e está no seu `PATH`:
 
@@ -57,10 +59,7 @@ Confirme que a instalação funcionou e está no seu `PATH`:
 claude --version
 ```
 
-Se o comando não for encontrado, feche e reabra o terminal (o `npm` às
-vezes precisa disso pra atualizar o `PATH`), ou confira a documentação
-oficial de instalação e autenticação em
-[docs.claude.com/en/docs/claude-code](https://docs.claude.com/en/docs/claude-code).
+Se o comando não for encontrado, abra um terminal novo e confira o PATH indicado pelo instalador. Use `claude doctor` e a [documentação de instalação](https://code.claude.com/docs/en/setup) para diagnosticar a integração.
 
 ### A filosofia em um parágrafo
 
@@ -213,7 +212,7 @@ o tom da resposta antes/depois de instalar — ou simplesmente rode:
 /caveman-stats
 ```
 
-pra ver a economia de tokens acumulada na sessão. Se as respostas do
+para ver os contadores observados da sessão, quando disponíveis. Uso de tokens não comprova economia causada pelo Caveman; consulte as [limitações da medição](tools/05-caveman.md#6-meça-uso-sem-inventar-economia). Se as respostas do
 agente continuam cheias de "Vou verificar isso pra você!" e parágrafos de
 introdução antes de qualquer fato, o plugin não pegou — confira a
 instalação com `/plugin list`.
@@ -256,8 +255,10 @@ gerado e por quê, em vez de montar cada arquivo do zero.
 ### 1. Copie e preencha o `CLAUDE.md`
 
 ```bash
-cp templates/CLAUDE.md.template CLAUDE.md
+cp -n templates/CLAUDE.md.template CLAUDE.md
 ```
+
+No exemplo de shell POSIX, `-n` evita sobrescrever um arquivo existente. Se já houver `CLAUDE.md`, leia e incorpore somente as instruções desejadas. Para Windows nativo, use o equivalente do seu shell que preserve o destino existente.
 
 Abra o arquivo e substitua cada placeholder — `[PROJECT NAME]`, a seção de
 Stack, os seis comandos canônicos (install, lint, typecheck, test, build,
@@ -302,30 +303,23 @@ subagentes](tools/02-subagent-orchestration.md).
 
 ```bash
 mkdir -p .claude
-cp templates/settings.json.example .claude/settings.json
+cp -n templates/settings.json.example .claude/settings.json
 ```
+
+Se já houver configurações, faça backup e incorpore apenas os hooks necessários. O arquivo de exemplo não é um setup pronto: não ative um hook cujo script ainda não exista.
 
 O exemplo já vem com dois **hooks** — scripts que rodam automaticamente em
 pontos específicos da sessão (antes de uma ferramenta executar, depois
 dela, no início ou fim da sessão) — registrados: um `PreToolUse` no `Bash`
-e um `SessionStart`, além de um bloco `env` pra variáveis como chaves de
-API. Os nomes `example-command-proxy.mjs` e `example-session-banner.mjs`
+e um `SessionStart`. Os nomes `example-command-proxy.mjs` e `example-session-banner.mjs`
 são propositalmente placeholders — você escreve os `.mjs` de verdade,
 seguindo a disciplina de "falhar aberto" (nunca travar a sessão inteira
 por causa de um bug num hook) descrita em [Hooks — boas
 práticas](tools/10-hooks-best-practices.md).
 
-Se o hook do `PreToolUse` for um proxy de comandos — reescrever
-`git status`/`git diff`/etc. pra uma versão mais barata em tokens antes de
-rodar, o padrão que este toolkit chama de RTK — a explicação completa,
-incluindo o leitor de stdin JSON que evita o bug clássico do
-`JSON.parse("null")`, está em [Token proxy
-pattern](tools/03-rtk-token-proxy.md), com o helper pronto pra copiar em
-[`templates/hooks/hook-io.mjs.example`](../templates/hooks/hook-io.mjs.example).
+Para compactar comandos, prefira o [RTK oficial](tools/03-rtk-token-proxy.md), que instala sua própria integração. Não registre também o proxy de exemplo para a mesma finalidade. O helper de leitura segura de stdin continua disponível em [`templates/hooks/hook-io.mjs.example`](../templates/hooks/hook-io.mjs.example) para hooks personalizados.
 
-Nunca hardcode uma chave de API dentro do `settings.json` — use a
-substituição de variável de ambiente (`${EXEMPLO_API_KEY}`) e mantenha o
-valor real num arquivo `.env`/`.env.local` fora do controle de versão.
+Nunca grave chaves de API no `settings.json` versionado. Use o mecanismo de credenciais ou de ambiente documentado pelo componente. Um arquivo `.env` não é carregado automaticamente por todo cliente, e uma string `${VARIAVEL}` não garante expansão fora dos campos que a suportam.
 
 ### 3. (Recomendado) copie a regra de ondas paralelas
 
@@ -721,12 +715,14 @@ agent-browser install
 
 Saiba mais: [agent-browser](tools/11-agent-browser.md).
 
-## Checklist final: setup completo
+## Checklist final: fluxo de projeto
 
-- [ ] Claude Code instalado e autenticado (`npm install -g @anthropic-ai/claude-code`, `claude --version` funcionando)
+O checklist abaixo permite adoção modular. Para o setup da máquina, a base inteira do [prompt 10](prompts/10-development-environment-setup.md) é obrigatória, incluindo Graphify, RTK, Context7 e ambos os agentes.
+
+- [ ] Claude Code instalado pelo método escolhido, autenticado e com `claude --version` funcionando em terminal novo
 - [ ] Superpowers instalado e testado com um pedido ambíguo
 - [ ] Ponytail instalado e testado com um pedido que convida over-engineering
-- [ ] Caveman instalado e testado (`/caveman-stats` mostrando economia de tokens)
+- [ ] Caveman descoberto e comunicação concisa testada; contadores de uso separados de estimativas de economia
 - [ ] `CLAUDE.md` copiado do template e preenchido — stack, comandos canônicos, tabela de agentes ajustada ao seu projeto
 - [ ] `.claude/settings.json` copiado do exemplo, hooks reais escritos (ou removidos, se ainda não forem usados)
 - [ ] (Se for usar ondas paralelas) `parallel-subagent-driven-development.md` copiado pra `.claude/rules/` e referenciado no `CLAUDE.md`
@@ -759,15 +755,7 @@ garante que o resto do fluxo (planejar antes de implementar, revisar antes
 de fechar) realmente acontece em vez de ser pulado sob pressão de tempo.
 
 **Funciona com Codex também?**
-Boa parte sim. Os prompts em `docs/prompts/` e as regras em
-`templates/rules/` não dependem de ferramenta nenhuma — funcionam com
-qualquer agente que leia um arquivo de instruções e execute comandos,
-Codex incluso. O que não porta direto são os plugins, hooks e skills
-específicos do Claude Code (Superpowers, Ponytail, Caveman, os hooks da
-Parte 3) — isso é a implementação, não a ideia. Mas a ideia por trás de
-cada um — brainstorm antes de codar, uma persona de lazy-engineering, um
-`CLAUDE.md` equivalente — dá pra replicar manualmente em qualquer agente
-que aceite instruções persistentes.
+Sim. Use o [guia do Codex](tools/15-codex-workflow.md): ele cobre instalação nativa, `AGENTS.md`, plugins oficiais, skills, MCP e hooks suportados. Configure cada cliente separadamente; não copie `.claude/settings.json` como configuração do Codex. Os prompts de projeto continuam úteis, respeitando as ferramentas disponíveis e as permissões do agente usado.
 
 **Isso deixa o Claude Code mais lento?**
 No fluxo do dia a dia, não — o efeito líquido costuma ser o oposto. A
@@ -808,10 +796,7 @@ erro mais comum.
 Esse playbook cobre o caminho principal — dá pra rodar um projeto inteiro
 só com o que está aqui. Pra ir além:
 
-- **[Token proxy — o padrão do RTK](tools/03-rtk-token-proxy.md)** — não é
-  algo que se instala (é um padrão, não um pacote publicado), mas é o
-  hook que fecha o assunto "sessões longas ficam caras" mencionado na
-  Parte 1. Vale ler antes de escrever seus próprios hooks na Parte 3.
+- **[RTK — proxy de tokens](tools/03-rtk-token-proxy.md)** — CLI pública com integração oficial por agente, métricas de saída e escape sem filtro. Use esse fluxo antes de manter um proxy personalizado.
 - **[Sanitização de projeto](prompts/01-project-sanitation.md)** — um bom
   segundo prompt pra rodar depois que o fluxo da Parte 4 já é rotina: uma
   passada de limpeza no projeto que mede antes de agir, em vez de assumir

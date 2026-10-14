@@ -2,7 +2,7 @@
 
 Graphify é uma CLI (interface de linha de comando — um programa que você controla digitando comandos no terminal, sem tela gráfica) standalone escrita em Python. O pacote no PyPI (o repositório oficial de pacotes Python — de lá vem o `pip install`) se chama `graphifyy`, com dois "y" mesmo — não é erro de digitação neste documento. O comando que fica disponível no seu terminal depois de instalado, porém, tem só um "y": `graphify`.
 
-**Graphify não é um plugin do Claude Code.** É uma ferramenta separada e funciona do mesmo jeito não importa qual agente de IA (Claude Code, Cursor, Codex CLI, Gemini CLI, ou nenhum agente — só você, no terminal) está por trás do comando.
+**Graphify combina uma CLI com uma skill para agentes compatíveis.** O pacote é independente, mas instalação, descoberta e extração semântica precisam ser verificadas no cliente usado. A origem é [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify); não instale um pacote de nome parecido.
 
 ## O que é
 
@@ -33,23 +33,22 @@ A instalação tem duas etapas: instalar o pacote Python e, depois, conectar o c
 **1. Instale o pacote.** `uv` (gerenciador de pacotes Python mais rápido que o `pip`) é a opção preferida — o próprio README do projeto avisa que `pip install` pode instalar o pacote num Python diferente daquele que o comando `graphify` resolve em tempo de execução, causando erro de módulo não encontrado:
 
 ```bash
-uv tool install graphifyy   # preferida
-pipx install graphifyy      # alternativa, também isola o ambiente
-pip install graphifyy       # funciona, mas é a menos recomendada das três
+uv tool install graphifyy   # escolha este método
+# OU: pipx install graphifyy, alternativa com ambiente isolado
 ```
 
 **2. Conecte ao seu agente de IA:**
 
 ```bash
-graphify install          # detecta e registra em todos os agentes de IA instalados
+graphify install          # detecta agentes compatíveis e instala a skill
 graphify claude install   # ou, especificamente pro Claude Code
 ```
 
-Isso grava a seção do Graphify no `CLAUDE.md` do projeto e configura automaticamente o hook de orientação (o mesmo tipo descrito na seção **Hook de orientação**, mais abaixo) — sem precisar editar nada manualmente. Duas variantes úteis:
+`graphify install` instala a skill para os agentes detectados; `graphify claude install` configura especificamente instruções e hook de orientação do Claude Code. Confira o suporte da versão com `graphify install --help`. Duas variantes para adoção no projeto:
 
 ```bash
 graphify install --project           # escopo do projeto atual, em vez do perfil global do usuário
-graphify install --project --strict  # modo estrito: bloqueia a primeira leitura crua de um arquivo antes de consultar o grafo
+graphify install --project --strict  # hook estrito do Claude Code; consulte a versão instalada
 ```
 
 Confirme que instalou certo:
@@ -59,6 +58,14 @@ graphify --version
 ```
 
 Não precisa de nenhuma chave de API pra indexar um corpus (o conjunto de arquivos analisados) que seja só código — a extração aí é baseada em AST (*Abstract Syntax Tree*, "árvore de sintaxe abstrata": a representação estruturada que um compilador ou parser gera a partir do código-fonte) e roda 100% local, sem chamar nenhuma IA. Uma LLM (*Large Language Model*, modelo de linguagem grande — o tipo de IA por trás do Claude, GPT e afins) só entra em cena pra extração semântica de material que **não** é código — documentação, artigos, imagens. E mesmo aí, o Graphify pode usar o próprio agente de IA que está chamando ele (o Claude Code, por exemplo) em vez de exigir que você configure uma chave de API separada só pra isso.
+
+### Codex, modelo e autenticação
+
+No setup deste toolkit, trabalhos com LLM de Graphify usam **Codex nativo, o modelo da sessão e autenticação ChatGPT**. Quando houver delegação suportada, passe esse modelo explicitamente. Não habilite outro backend, modelo mais barato, cobrança por API ou proxy como fallback silencioso.
+
+Para material com documentação ou mídia, execute a skill descoberta pelo Codex, como `$graphify`, preservando essa política. Não suponha que `graphify extract` executado sozinho no terminal herde a autenticação ou o modelo da conversa. Se a versão não suportar o caminho exigido, registre a limitação e preserve as demais etapas.
+
+Abra uma nova sessão depois da instalação e confirme a descoberta da skill. Veja o [guia do Codex](15-codex-workflow.md). No [prompt de ambiente](../prompts/10-development-environment-setup.md), Graphify faz parte da base obrigatória, mesmo que sua adoção seja opcional no toolkit modular.
 
 ## Comandos principais
 

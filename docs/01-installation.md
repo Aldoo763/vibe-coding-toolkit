@@ -1,87 +1,96 @@
 # Instalação
 
-Referência rápida — comandos, sem enrolação. Para o passo a passo narrado,
-com exemplo em cada etapa, veja o
-[Playbook de onboarding](02-playbook-onboarding.md).
+Referência rápida para instalar os agentes e as peças do toolkit. Para **preparar ou atualizar o computador inteiro**, use o [guia de setup](03-environment-setup.md) e o [prompt 10](prompts/10-development-environment-setup.md): ele inclui a base de sistema, Node.js, Docker, todas as integrações obrigatórias, backups e validação.
 
-> Comandos e nomes de marketplace verificados em **15 de agosto de 2026**. Esse
-> ecossistema muda em semanas, não em anos — se algum comando abaixo não bater
-> com o que seu agente realmente executa, [abra uma
-> issue](https://github.com/soumatheusgomes/vibe-coding-toolkit/issues) em vez
-> de assumir que o erro é seu.
+Comandos conferidos em **14 de outubro de 2026**. Confirme a documentação da versão e do sistema usados. Escolha um método por ferramenta e preserve instalações existentes quando suportadas.
 
-## 1. Claude Code
+## 1. Codex e Claude Code
 
-O Claude Code é o CLI (interface de linha de comando) que roda tudo daqui
-pra frente — plugins, hooks, subagentes. É o pré-requisito antes de qualquer
-outro passo abaixo.
+Os dois agentes oferecem instaladores nativos que não exigem Node.js previamente. Em macOS, Linux ou WSL, escolha o comando do agente que deseja instalar:
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+# Codex
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+
+# Claude Code
+curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-Confirme que ficou disponível no seu `PATH`:
+No Windows nativo, use as instruções de PowerShell das páginas oficiais. Para Homebrew ou uma instalação npm já existente, confira os métodos suportados antes de migrar. Fontes: [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) e [Claude Code](https://code.claude.com/docs/en/setup).
+
+Depois, em terminal novo:
 
 ```bash
+codex --version
 claude --version
 ```
 
-Detalhes completos de instalação e autenticação:
-[documentação oficial do Claude Code](https://docs.claude.com/en/docs/claude-code).
+Abra `codex` ou `claude` e conclua a autenticação no fluxo oficial. No Codex, a preferência do prompt de setup é login com ChatGPT. Credenciais não entram no chat nem em arquivos do projeto.
+
+`claude doctor` ajuda a verificar instalação e atualização do Claude Code. Atualize cada CLI pelo método responsável; por exemplo, uma instalação Homebrew exige atualização pelo Homebrew, enquanto o instalador nativo do Claude gerencia atualizações próprias.
 
 ## 2. Plugins e CLIs independentes
 
-> 💬 **O jeito mais fácil: peça pro seu agente instalar.**
->
-> ```
-> Instale [nome da ferramenta] pra mim: rode `[comando 1]`[, depois `[comando 2]`].
-> ```
->
-> O Claude Code tem acesso a terminal (Bash) — ele roda os comandos por você e confirma que funcionou. Você não precisa abrir um terminal separado nem saber a diferença entre `pip`, `uv` e `npm`. Prefere fazer você mesmo? Os comandos abaixo são exatamente os mesmos, é só rodar direto no seu terminal.
+### Claude Code: comandos dentro da sessão
 
-Linhas com `/plugin` rodam de dentro de uma sessão `claude` — ou seja, já
-são o pedido pro agente, direto. Graphify e agent-browser não são plugins
-— são CLIs independentes, instaladas fora da sessão, com o gerenciador de
-pacote de cada um.
+`/plugin` é comando do Claude Code, **não do shell**. Abra `claude` antes de usar:
 
-| Ferramenta | Fonte | Instalação |
+```text
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install superpowers@claude-plugins-official
+
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail
+
+/plugin marketplace add JuliusBrussee/caveman
+/plugin install caveman@caveman
+```
+
+Fontes: [Superpowers](https://github.com/obra/superpowers#claude-code), [Ponytail](https://github.com/DietrichGebert/ponytail#install) e [Caveman](https://github.com/JuliusBrussee/caveman). Confira carregamento em uma nova conversa; diretório instalado não comprova ativação.
+
+### Codex: plugins próprios
+
+Para Superpowers, abra `/plugins` na sessão e instale a distribuição oficial. Para Ponytail, os comandos de terminal documentados são:
+
+```bash
+codex plugin marketplace add DietrichGebert/ponytail
+codex plugin add ponytail@ponytail
+```
+
+Confira os hooks pelo fluxo do cliente e abra uma nova conversa. Para Caveman, use a distribuição de skills documentada e a descoberta do Codex, mantendo a preferência por comunicação concisa sem ativar proxy ou roteamento de modelos. Veja o [guia do Codex](tools/15-codex-workflow.md) para os caminhos, comandos e precedência das instruções.
+
+### RTK, Context7 e Graphify
+
+| Ferramenta | Instalação ou conexão | Integração |
 |---|---|---|
-| Superpowers | `anthropics/claude-plugins-official` | `/plugin marketplace add anthropics/claude-plugins-official` → `/plugin install superpowers@claude-plugins-official` |
-| Ponytail | `DietrichGebert/ponytail` | `/plugin marketplace add DietrichGebert/ponytail` → `/plugin install ponytail@ponytail` |
-| Caveman | `JuliusBrussee/caveman` | `/plugin marketplace add JuliusBrussee/caveman` → `/plugin install caveman@caveman` |
-| aia-harness | `leandrosilvaferreira/claude-plugins-registry` | `/plugin marketplace add leandrosilvaferreira/claude-plugins-registry` → `/plugin install aia-harness@leandro-plugins-registry` |
-| hookify, pr-review-toolkit, commit-commands, claude-code-setup, feature-dev, code-review, claude-md-management | `anthropics/claude-plugins-official` | `/plugin install <nome>@claude-plugins-official` |
-| ui-ux-pro-max | `nextlevelbuilder/ui-ux-pro-max-skill` | `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill` → `/plugin install ui-ux-pro-max@ui-ux-pro-max-skill` |
-| Graphify | pacote Python `graphifyy` (não é plugin) | `uv tool install graphifyy` → `graphify claude install` |
-| agent-browser | CLI npm (não é plugin) | `npm i -g agent-browser && agent-browser install` |
+| [RTK](tools/03-rtk-token-proxy.md) | Com Homebrew: `brew install rtk-ai/tap/rtk`; outros sistemas seguem as releases oficiais | Claude: `rtk init --global`; Codex: `rtk init --global --codex` |
+| [Context7](tools/12-context7.md) | Plugin do cliente ou MCP remoto em `https://mcp.context7.com/mcp` | Configure em cada cliente e faça uma consulta real; evite servidor duplicado |
+| [Graphify](tools/07-graphify.md) | `uv tool install graphifyy` **ou** `pipx install graphifyy` | `graphify install`, depois confira descoberta da skill no agente |
 
-A linha `hookify, pr-review-toolkit, ...` reaproveita a mesma marketplace do
-Superpowers (`anthropics/claude-plugins-official`) — se você já rodou aquele
-`/plugin marketplace add` lá em cima, não precisa rodar de novo, é só trocar
-`<nome>` pelo plugin desejado.
+Graphify exige Python e um mecanismo de instalação compatível; configure essas dependências se ausentes. O pacote é `graphifyy`, com dois “y”; a CLI é `graphify`. Escolha um dos métodos isolados, sem instalar ambos. RTK e Graphify são CLIs; não são pacotes npm com o mesmo nome.
 
-O pacote no PyPI é `graphifyy`, com dois "y" — o comando instalado é
-`graphify`, com um só. `uv` (ou `pipx`) é preferido a um `pip install`
-solto: o próprio README do projeto avisa que `pip install` sozinho pode
-instalar o pacote num Python diferente daquele que o comando `graphify`
-resolve depois, causando erro de módulo não encontrado. Depois de instalar
-o pacote, conecte ao agente: `graphify claude install` (grava a seção do
-Graphify no `CLAUDE.md` e configura o hook, específico pro Claude Code) ou
-`graphify install` (detecta e registra em qualquer agente de IA instalado).
+Context7 remoto é um serviço, não um pacote local a atualizar. O plugin pode já incluir MCP e skill de consulta. Instalar também uma segunda conexão para a mesma finalidade cria sobreposição.
 
-> ⚡ **Atalho: deixe o aia-harness montar a base pra você.**
->
-> O plugin `aia-harness` (linha acima) tem o comando `/aia-harness:init`, que escaneia o projeto e monta boa parte dessa estrutura sozinho — agentes especialistas, regras, hooks, memória, `settings.json`:
->
-> ```
-> /aia-harness:init
-> ```
->
-> Não quer montar tudo manualmente, peça por peça? Instale o plugin primeiro (tabela acima) e deixe ele fazer o trabalho pesado — depois use o resto deste repositório pra entender o que foi montado e por quê.
+### Extras do fluxo de projeto
+
+No toolkit modular, você pode escolher peças. No **prompt 10**, RTK, Ponytail, Caveman, Superpowers, Context7 e Graphify são obrigatórios. Os itens abaixo continuam sendo extras novos sujeitos à sua escolha:
+
+| Ferramenta | Referência | Uso |
+|---|---|---|
+| agent-browser | [Guia](tools/11-agent-browser.md) | Automatizar fluxos de navegador |
+| Chrome DevTools MCP | [Guia](tools/14-chrome-devtools-mcp.md) | Investigar rede, console e performance |
+| Anthropic Skills | [Guia](tools/13-anthropics-skills.md) | Trabalhar com artefatos e criar skills |
+| aia-harness | [Marketplace](https://github.com/leandrosilvaferreira/claude-plugins-registry) | Onboarding de projeto; confirme opções e suporte no próprio marketplace |
+| Plugins oficiais do Claude | [Marketplace](https://github.com/anthropics/claude-plugins-official) | Escolha ferramentas de revisão, commits ou hooks conforme a necessidade |
+
+## 3. Instruções do projeto
+
+Use [AGENTS.md.template](../templates/AGENTS.md.template) para instruções compartilhadas e [CLAUDE.md.template](../templates/CLAUDE.md.template) para o cliente Claude. Preencha comandos e convenções reais; incorpore ao arquivo existente em vez de sobrescrevê-lo.
+
+O [settings.json.example](../templates/settings.json.example) mostra o formato de hooks personalizados. Os scripts citados são exemplos: só registre hooks cujos arquivos existam e cujo comportamento tenha sido verificado. RTK e plugins devem usar sua instalação oficial, sem duplicar interceptadores.
 
 ## Quer o passo a passo completo?
 
-Essa página é só o cheat sheet. Para entender o motivo de cada peça, ver
-exemplo de uso, e configurar hooks, memória de longo prazo e o template de
-projeto com calma, vá para o
-[Playbook de onboarding](02-playbook-onboarding.md).
+- [Setup da máquina](03-environment-setup.md): execução, retomada, relatório e reprodução.
+- [Playbook do Claude Code](02-playbook-onboarding.md): fluxo de projeto narrado.
+- [Fluxo do Codex](tools/15-codex-workflow.md): instruções, skills, MCP e permissões.

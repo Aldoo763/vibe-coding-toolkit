@@ -21,8 +21,5 @@
         ]
       }
     ]
-  },
-  "env": {
-    "EXAMPLE_API_KEY": "${EXAMPLE_API_KEY}"
   }
 }

@@ -50,6 +50,19 @@ a conversa, basta escrever "stop ponytail" ou "normal mode" — não precisa
 desinstalar o plugin. O nível escolhido vale só para a sessão atual; uma
 sessão nova volta para o padrão.
 
+### Codex e instruções persistentes
+
+O [Ponytail oficial](https://github.com/DietrichGebert/ponytail#install) também fornece plugin para Codex. No terminal:
+
+```bash
+codex plugin marketplace add DietrichGebert/ponytail
+codex plugin add ponytail@ponytail
+```
+
+Abra `/hooks` no Codex, confira os hooks do plugin e conclua o fluxo de confiança. Inicie uma nova conversa. Se usar apenas a skill, confira a descoberta nos caminhos documentados do cliente; uma distribuição já instalada não precisa de outra cópia.
+
+Para registrar a preferência de intensidade, use o [template de `AGENTS.md`](../../templates/AGENTS.md.template) ou incorpore ao arquivo existente: “Ponytail ativo em `full` para programação, preservando requisitos, segurança e acessibilidade.” O [guia do Codex](15-codex-workflow.md) explica a instalação e a precedência das instruções.
+
 ## Tutorial passo a passo
 
 ### 1. Entenda o problema antes de subir a escada
@@ -86,7 +99,7 @@ que a chama — e corrigir só o caminho que o relato original descreve deixa
 toda função irmã ainda quebrada. Corrige uma vez, no lugar por onde todo
 mundo passa.
 
-### 4. Marque simplificações deliberadas com um comentário `ponytail:`
+### 4. Marque simplificações deliberadas com um comentário `shortcut:`
 
 Quando um corte de canto é intencional e tem um teto conhecido (um lock —
 trava de concorrência — global em vez de um por registro, uma varredura que
@@ -94,13 +107,15 @@ cresce mal com o tamanho da entrada, uma heurística simples), ele fica
 marcado com um comentário nomeando o teto e o caminho de upgrade:
 
 ```js
-// ponytail: lock global; trocar por lock por conta se a taxa de
+// shortcut: lock global; trocar por lock por conta se a taxa de
 // processamento virar gargalo
 ```
 
 Isso é diferente de deixar uma limitação escondida — o comentário existe
 para a próxima pessoa (ou o próprio agente, numa sessão futura) saber que
 aquilo foi uma escolha, não um esquecimento.
+
+O marcador atual é `shortcut:`. `/ponytail-debt` reúne esses comentários como dívida rastreável; instalações mais antigas também podem reconhecer `ponytail:`. Preserve limites e critérios de revisão ao atualizar comentários existentes.
 
 ### 5. Feche com uma verificação mínima, quando a lógica não é trivial
 

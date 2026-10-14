@@ -2,12 +2,12 @@
 
 ## O que é
 
-Context7 é um servidor MCP (sigla de *Model Context Protocol* — o protocolo que conecta um agente de IA a ferramentas e fontes de dado externas, expondo cada uma como uma operação com nome, parâmetros e validação, em vez de deixar o agente adivinhar como usá-la) mantido pela [Upstash](https://upstash.com). O repositório é [`upstash/context7`](https://github.com/upstash/context7) — **60.791 estrelas e 2.929 forks** no GitHub, um dos números mais altos entre qualquer servidor MCP público hoje. A descrição atual do próprio repositório já fala em "Context7 Platform" — o projeto cresceu de um servidor MCP isolado pra uma plataforma maior, mas "Context7" continua sendo como todo mundo se refere a ele no dia a dia.
+Context7 é um servidor MCP (sigla de *Model Context Protocol* — o protocolo que conecta um agente de IA a ferramentas e fontes de dado externas, expondo cada uma como uma operação com nome, parâmetros e validação) mantido pela [Upstash](https://upstash.com). A origem é [`upstash/context7`](https://github.com/upstash/context7). Use a documentação do cliente e da versão em execução para configurar a integração.
 
 Ele resolve um problema bem concreto: um modelo de linguagem tem uma data de corte de conhecimento (o ponto até onde o treinamento dele enxergou informação), mas bibliotecas de código continuam mudando depois disso — uma assinatura de função muda, um hook novo aparece, uma opção de configuração passa a se chamar outra coisa ou muda de lugar. Sem ajuda externa, o agente preenche essa lacuna "alucinando": inventa, com total confiança, uma API que parece plausível mas não existe mais (ou nunca existiu daquele jeito). Context7 fecha essa lacuna injetando documentação real, atual e específica da versão certa, direto no contexto do agente, através de duas ferramentas:
 
-- **`resolve-library-id`** — recebe um nome de biblioteca em linguagem natural (ex.: "react", "next.js") e devolve o identificador exato que o Context7 usa internamente pra ela.
-- **`query-docs`** — recebe esse identificador (e, opcionalmente, um tópico específico) e devolve os trechos de documentação relevantes daquela versão.
+- **`resolve-library-id`** — recebe `libraryName` e `query`, o objetivo da consulta, e devolve candidatos a identificador da biblioteca.
+- **`query-docs`** — recebe `libraryId` e `query`, com uma pergunta específica, e devolve os trechos relevantes. Confira a versão instalada no projeto ao escolher o identificador.
 
 (Documentação e tutoriais mais antigos às vezes chamam a segunda ferramenta de `get-library-docs` — veja "Dicas e pegadinhas" mais abaixo.)
 
@@ -38,13 +38,28 @@ Sem o Context7, corrigir isso vira um ciclo de tentativa e erro: o agente escrev
 /plugin install context7@context7-marketplace
 ```
 
-Uma API key é **opcional**, mas recomendada: sem ela, o Context7 conecta de forma anônima e compartilha um limite de taxa (rate limit) coletivo com todo mundo nesse modo; com uma chave gratuita, gerada em [context7.com/dashboard](https://context7.com/dashboard), o limite passa a ser individual e mais alto:
-
-```bash
-export CONTEXT7_API_KEY="sua-chave-aqui"
-```
+Autenticação e limites dependem do método e do plano vigentes. Prefira o fluxo oficial de OAuth quando fornecido pelo plugin/setup. Se optar por uma chave, configure o cliente pelo mecanismo documentado e mantenha o segredo fora do projeto e do chat. Exportar uma variável chamada `CONTEXT7_API_KEY` por si só não garante que a conexão MCP a utilize.
 
 Confirme que a conexão funcionou pedindo pro agente listar as ferramentas MCP disponíveis, ou simplesmente fazendo uma pergunta que dependa de doc de biblioteca (próxima seção) e reparando se ele consulta o Context7 antes de responder.
+
+### Codex: plugin ou conexão direta
+
+O [guia oficial de clientes](https://context7.com/docs/resources/all-clients) inclui plugin para Codex. No terminal:
+
+```bash
+codex plugin marketplace add upstash/context7
+codex plugin add context7@context7-marketplace
+```
+
+Uma alternativa é registrar diretamente o servidor remoto:
+
+```bash
+codex mcp add context7 --url https://mcp.context7.com/mcp
+```
+
+Escolha um dos métodos quando ambos fornecerem o mesmo servidor. No Claude Code, a alternativa remota usa `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp`. Complete a autenticação exigida pelo serviço e abra uma nova sessão. Uma conexão listada ainda precisa responder a uma consulta real para ser validada.
+
+Veja também o [guia do Codex](15-codex-workflow.md). Para clientes sem suporte ao método escolhido, use a alternativa documentada em vez de copiar a configuração de outro agente.
 
 ## Tutorial passo a passo
 
@@ -72,10 +87,13 @@ um componente, na versão mais recente?
 Antes de responder, o agente chama `resolve-library-id` pra encontrar o identificador exato:
 
 ```
-resolve-library-id({ libraryName: "react" })
+resolve-library-id({
+  libraryName: "React",
+  query: "Como ler uma Promise com use em um componente React?"
+})
 ```
 
-Formato típico de saída:
+Exemplo ilustrativo de candidatos; use os identificadores realmente retornados:
 
 ```
 /reactjs/react.dev  — React — a documentação oficial
@@ -89,8 +107,8 @@ Com o identificador em mãos, ele chama `query-docs`, geralmente com um tópico 
 
 ```
 query-docs({
-  context7CompatibleLibraryID: "/reactjs/react.dev",
-  topic: "use hook promise suspense"
+  libraryId: "/reactjs/react.dev",
+  query: "Como ler uma Promise com use e tratar a suspensão do componente?"
 })
 ```
 
@@ -115,6 +133,8 @@ Exemplo:
 ### 5. A resposta final já vem apoiada na doc real
 
 O agente responde citando a assinatura e o comportamento exatos que acabou de buscar — não uma lembrança de treinamento, uma consulta feita na hora, contra a documentação de verdade.
+
+Faça uma consulta por conceito. Se a pergunta envolver assuntos independentes, como rotas e autenticação, consulte cada um separadamente. Nunca inclua segredos, dados pessoais ou código privado na busca; descreva o comportamento público da biblioteca.
 
 ## Exemplos concretos
 
@@ -179,7 +199,7 @@ export async function minhaAction() {
 
 **Sem chave de API, o limite de requisições é compartilhado com todo mundo no modo anônimo.** Numa sessão de uso intenso, ou num time inteiro atrás do mesmo IP, isso pode significar respostas mais lentas ou negadas por limite de taxa. A chave é gratuita — vale gerar uma antes de bater nesse limite, não depois.
 
-**O Context7 só sabe o que já indexou.** Uma biblioteca extremamente nova, um pacote interno da sua empresa, ou algo obscuro o suficiente pra nunca ter sido rastreado, simplesmente não resolve — `resolve-library-id` não acha nada, e o agente cai de volta no próprio conhecimento de treinamento (com todos os riscos de alucinação que isso implica).
+**O Context7 só sabe o que já indexou.** Se a biblioteca não resolver, tente um nome ou consulta mais preciso. Persistindo a ausência, consulte a documentação oficial do projeto e identifique essa fonte alternativa; não trate uma resposta de memória como documentação verificada.
 
 **O motor por trás da busca é fechado.** O cliente MCP (o que você instala e conecta) é MIT — código aberto. O backend que faz o rastreamento, o parsing e a busca de verdade é da Upstash, hospedado, e não é código aberto. Isso não muda como você usa a ferramenta no dia a dia, mas explica por que não dá pra simplesmente rodar "sua própria instância" do Context7 inteiro.
 

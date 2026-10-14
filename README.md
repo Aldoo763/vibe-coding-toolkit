@@ -9,6 +9,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Feito para Claude Code](https://img.shields.io/badge/feito%20para-Claude%20Code-CC785C.svg)](https://docs.claude.com/en/docs/claude-code)
+[![Feito para Codex](https://img.shields.io/badge/feito%20para-Codex-412991.svg)](https://learn.chatgpt.com/docs/codex/cli)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/soumatheusgomes/vibe-coding-toolkit/pulls)
 [![Feito no Brasil](https://img.shields.io/badge/feito%20no-Brasil%20%F0%9F%87%A7%F0%9F%87%B7-009c3b.svg)](https://instagram.com/matheusgomes)
 
@@ -39,18 +40,24 @@ Dois outros documentos merecem destaque igual, mesmo sem holofote de ferramenta 
 
 ## <a id="comece-por-aqui"></a>🚀 Comece por aqui
 
-Se é sua primeira vez por aqui, não tente ler tudo em ordem — vá direto pro **[Playbook completo](docs/02-playbook-onboarding.md)**. É o guia de onboarding do zero até um projeto real com o setup inteiro funcionando, com um exemplo ponta a ponta em vez de teoria solta.
+Escolha pelo objetivo:
 
-Um teaser do que te espera lá — os primeiros comandos, antes de qualquer coisa mais sofisticada. Repare que isso é "copie o arquivo certo, digite o comando certo" — não existe (ainda) um instalador que detecta sua stack sozinho e escreve tudo por você. Se é exatamente isso que você quer, pule direto pro atalho do `aia-harness` (`/aia-harness:init`) descrito em [`docs/01-installation.md`](docs/01-installation.md#2-plugins-e-clis-independentes) — ele monta a base sozinho; o resto deste repositório vira material pra entender o que foi montado, não pra montar do zero:
+- **Preparar ou atualizar o computador inteiro:** use o [guia de setup do ambiente](docs/03-environment-setup.md) e o [prompt completo](docs/prompts/10-development-environment-setup.md). Ele cobre Node.js, Docker, Codex, Claude Code, RTK, Ponytail, Caveman, Superpowers, Context7 e Graphify, com backups, validação e manifesto para outra máquina.
+- **Adotar o fluxo em um projeto com Claude Code:** siga o [Playbook completo](docs/02-playbook-onboarding.md), com exemplo ponta a ponta.
+- **Adotar o fluxo em um projeto com Codex:** siga o [guia do Codex](docs/tools/15-codex-workflow.md), com `AGENTS.md`, plugins, skills, MCP e permissões por contexto.
+- **Instalar uma ferramenta específica:** consulte a [referência rápida de instalação](docs/01-installation.md).
 
-```bash
-npm install -g @anthropic-ai/claude-code
-/plugin marketplace add anthropics/claude-plugins-official
-/plugin install superpowers@claude-plugins-official
-cp templates/CLAUDE.md.template CLAUDE.md
+### Setup completo, com o projeto aberto no agente
+
+Cole na conversa do Codex ou Claude Code que tenha acesso a este computador:
+
+```text
+Leia docs/prompts/10-development-environment-setup.md deste repositório e execute integralmente o bloco da seção “Prompt” neste computador.
+Use templates/environment-manifest.json.example como formato inicial do manifesto, acrescentando os componentes globais encontrados.
+Grave relatório, manifesto e backups fora dos projetos e informe os caminhos finais.
 ```
 
-Isso já deixa o Claude Code instalado, a ferramenta mais importante do toolkit ativa, e o template de instruções de projeto no lugar certo. O resto — orquestração de subagentes, quality gates, memória entre sessões — o Playbook mostra em ordem, com o porquê de cada peça antes do como.
+Para usar sem clonar, o [prompt 10](docs/prompts/10-development-environment-setup.md#como-usar) também traz um atalho por URL. O [guia de uso](docs/03-environment-setup.md) explica a primeira instalação do agente, autenticação, retomada e reprodução em outra máquina. O prompt autoriza mudanças globais de desenvolvimento e preserva dependências e lockfiles dos projetos.
 
 ### Ou: só o ESLint, numa linha
 
@@ -129,7 +136,7 @@ flowchart LR
     Ship -. registra aprendizados .-> Memory
 ```
 
-Repare que **RTK**, **Ponytail**, **Caveman**, o grafo do **Graphify** (com o **Context7** ao lado, orientando antes de codar) e os **Quality gates** não são paradas do caminho — são camadas ativas o tempo todo. Uma ressalva sobre o RTK especificamente: ele está aqui porque é parte real do fluxo diário do autor, mas [é documentado como padrão pra replicar](docs/tools/03-rtk-token-proxy.md), não como binário público pra instalar — os outros nós deste diagrama, sim. Já a memória (**sistema do Claude** + **Obsidian**) entra dos dois lados: carrega contexto no início da sessão e grava o que valeu a pena aprender no final.
+Repare que **RTK**, **Ponytail**, **Caveman**, o grafo do **Graphify** (com o **Context7** ao lado, orientando antes de codar) e os **Quality gates** não são paradas do caminho — são camadas do fluxo. O [RTK público](docs/tools/03-rtk-token-proxy.md) tem binário e integrações documentadas para Claude Code e Codex. Já a memória (**sistema do Claude** + **Obsidian**) carrega contexto no início da sessão e grava o que valeu a pena aprender no final.
 
 <div align="right"><a href="#topo">▲ voltar ao topo</a></div>
 
@@ -140,13 +147,14 @@ Não existe um único jeito "certo" de percorrer este repositório — depende d
 - **Quer o setup completo, do zero?** Vá direto pro [Playbook](docs/02-playbook-onboarding.md) — é o caminho guiado, passo a passo, terminando com um projeto real rodando o fluxo inteiro.
 - **Já conhece o fluxo e só quer consultar uma ferramenta específica?** [`docs/tools/`](docs/tools/) é a referência — cada arquivo é autocontido, sem depender de você ter lido os outros antes.
 - **Só quer copiar um prompt pronto e adaptar pro seu caso?** [`docs/prompts/`](docs/prompts/) tem templates prontos pra colar e ajustar — sanitização de projeto, burndown de lint, code review multi-agente, e mais.
-- **Quer só os arquivos de configuração pra colar no seu projeto?** [`templates/`](templates/) tem o `CLAUDE.md.template`, um `settings.json.example` de hooks, e a regra de ondas paralelas pronta pra copiar.
+- **Quer os arquivos de configuração para adaptar ao projeto?** [`templates/`](templates/) tem `AGENTS.md.template` compartilhado, `CLAUDE.md.template`, exemplo de hooks e regra de ondas paralelas. Incorpore ao que já existe, preservando instruções personalizadas.
+- **Quer reproduzir o ambiente em outra máquina?** Use o [manifesto de ambiente](templates/environment-manifest.json.example), preenchido e sanitizado conforme o [guia de setup](docs/03-environment-setup.md#6-reproduza-em-outra-máquina).
 - **Quer o ESLint configurado, com teto de 350 linhas por arquivo, sem configurar nada à mão?** Cole no seu agente:
   > Leia `https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md` e execute o prompt que está nesse arquivo neste projeto. Use MAX_LINES=350.
 
   Ele baixa as regras prontas de [`templates/eslint/`](templates/eslint/), adapta pro seu projeto e reporta quantos arquivos passaram do teto — sem consertar nada. Depois, a mesma linha trocando `08-` por [`09-file-size-refactor.md`](docs/prompts/09-file-size-refactor.md) faz ele quebrar esses arquivos em módulos menores, um por vez, com teste rodando entre cada um.
 
-Um detalhe de idioma, pra não confundir: este README e toda a explicação dentro de `docs/` (o "como", o "por quê", os tutoriais) estão em português — pra você, que me acompanha por aqui, entender tudo sem esforço. A única parte que fica em inglês de propósito são os blocos de prompt prontos pra colar em `docs/prompts/` (o texto que você copia e cola direto num agente de IA) — isso funciona melhor em inglês, universalmente, independente do idioma de quem está lendo a explicação ao redor. Onde um conceito é específico do Claude Code (plugins, hooks, skills), o doc deixa isso explícito — boa parte do resto funciona igual no Codex ou em qualquer outro agente que leia um arquivo de instruções e execute comandos.
+Este README e os tutoriais estão em português. Os prompts antigos mantêm seus blocos em inglês; o novo prompt de setup está integralmente em português. Use o idioma que comunica os requisitos com clareza — o toolkit não depende de trocar para inglês. Onde instalação, hooks ou comandos são específicos de um cliente, confira o guia correspondente: configurar Claude Code não configura automaticamente Codex.
 
 ---
 
@@ -159,6 +167,7 @@ Um detalhe de idioma, pra não confundir: este README e toda a explicação dent
 | [Visão geral](docs/00-overview.md) | A filosofia por trás de todo o fluxo, pra ler antes de instalar qualquer coisa. Explica por que orquestração, personas, quality gates e memória só fazem sentido de verdade quando funcionam juntos, não isolados. |
 | [Instalação](docs/01-installation.md) | Referência rápida e direta: os comandos de instalação de cada plugin e CLI, sem narrativa longa no meio. Use quando já souber o que quer instalar e só precisar do comando exato pra copiar e colar. |
 | [Playbook de onboarding](docs/02-playbook-onboarding.md) | **(comece por aqui)** O livro de onboarding completo, passo a passo, do zero até um projeto real com o setup inteiro rodando — com um exemplo ponta a ponta em vez de teoria solta. |
+| [Setup do ambiente](docs/03-environment-setup.md) | Como executar o prompt completo em máquina nova ou existente, retomar pendências, conferir a validação e reproduzir o ambiente com um manifesto. |
 
 ### 🛠️ Ferramentas
 
@@ -166,7 +175,7 @@ Um detalhe de idioma, pra não confundir: este README e toda a explicação dent
 |---|---|
 | ⭐ [Superpowers](docs/tools/01-superpowers.md) | A ferramenta mais poderosa de todo o toolkit: impõe o fluxo brainstorm → plano → implementação → revisão antes de qualquer linha de código. A regra que muda tudo é sutil — invocar a skill certa antes até de fazer uma pergunta de esclarecimento. |
 | [Orquestração de subagentes](docs/tools/02-subagent-orchestration.md) | O padrão por trás de tudo: uma sessão principal que só planeja e delega, nunca implementa sozinha, para um time de subagentes especialistas. Inclui o protocolo de ondas paralelas — como rodar tarefas independentes ao mesmo tempo sem dois agentes brigando pelo mesmo arquivo. |
-| [RTK — proxy de tokens](docs/tools/03-rtk-token-proxy.md) | Um proxy de linha de comando (CLI) que reescreve comandos repetitivos — status, diff, log — em versões compactas antes de rodar, economizando tokens (a unidade que mede o custo de cada troca de mensagem com o modelo) em sessões longas. Documentado aqui como padrão replicável, não como produto pronto pra baixar. |
+| [RTK — proxy de tokens](docs/tools/03-rtk-token-proxy.md) | CLI pública para reduzir saída de comandos, com instalação oficial, hooks por agente, métricas e saída completa via `rtk proxy`. |
 | [Ponytail](docs/tools/04-ponytail.md) | A persona do "engenheiro sênior preguiçoso": uma escada de decisão que para na opção mais simples que resolve o problema de verdade, antes de escrever qualquer código. Preguiça aqui é sinônimo de eficiência — nunca de descuido com segurança ou validação. |
 | [Caveman](docs/tools/05-caveman.md) | A camada de comunicação: corta enrolação, gentileza forçada e hedging das respostas do agente, sem perder nenhuma informação real. Independente do Ponytail — um governa o que é construído, o outro como o agente fala sobre isso. |
 | [Quality gates ESLint/Biome](docs/tools/06-eslint-biome-quality-gates.md) | A documentação mais rica do toolkit: como dividir o trabalho entre dois linters sem sobreposição de regras, e subir um aviso pra erro como migração rastreada em vez de travar o time do dia pro outro. Cobre até os limites de arquitetura entre camadas do código. |
@@ -175,9 +184,10 @@ Um detalhe de idioma, pra não confundir: este README e toda a explicação dent
 | [Sistema de memória do Claude](docs/tools/09-claude-memory-system.md) | Um índice sempre carregado (`MEMORY.md`) para as lições caras de aprender de novo — um erro corrigido, uma regra de negócio que o código não deixa óbvia. Vem com política de crescimento clara pra ele nunca inchar até virar ruído que ninguém lê. |
 | [Hooks — boas práticas](docs/tools/10-hooks-best-practices.md) | Como escrever um hook (um pedacinho de código que roda automaticamente antes ou depois de uma ação do agente) que falha de forma segura em vez de travar a sessão inteira. Cobre um bug sutil e recorrente: `JSON.parse("null")` não lança erro, e isso engana até guarda defensiva. |
 | [agent-browser](docs/tools/11-agent-browser.md) | CLI de automação de navegador construída para agentes de IA, não adaptada de ferramenta de teste feita pra humano — trabalha com árvore de acessibilidade em vez de screenshot ou seletor CSS frágil. Aguenta re-renderização de página muito melhor que scraping tradicional. |
-| [Context7](docs/tools/12-context7.md) | Servidor MCP que injeta documentação de biblioteca atualizada e versionada direto no contexto do agente — evita a API alucinada de um modelo com data de corte enquanto o código do mundo real seguiu evoluindo. 60 mil+ estrelas, citado em praticamente toda lista de "MCP essencial". |
+| [Context7](docs/tools/12-context7.md) | MCP para consultar documentação atual por biblioteca e versão. Inclui integração com Codex e Claude Code, parâmetros das ferramentas e cuidados com segredos. |
 | [Anthropic Skills](docs/tools/13-anthropics-skills.md) | O repositório oficial da Anthropic com as Skills de referência — geração real de `docx`/`pdf`/`pptx`/`xlsx`, e duas skills "meta" que ensinam a criar suas próprias skills e servidores MCP. Um dos repositórios de IA mais estrelados do GitHub inteiro. |
 | [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) | Servidor MCP oficial do time do Chrome — dá ao agente acesso a uma sessão real do navegador pra diagnosticar performance, rede e console ao vivo. Complementa o agent-browser: um automatiza um fluxo, o outro investiga o que está acontecendo nele. |
+| [Codex: fluxo e integrações](docs/tools/15-codex-workflow.md) | Instalação, login ChatGPT, precedência de `AGENTS.md`, plugins, skills, MCPs e verificação de permissões em novas sessões. |
 
 ### 📋 Prompts prontos
 
@@ -192,6 +202,7 @@ Um detalhe de idioma, pra não confundir: este README e toda a explicação dent
 | [Setup completo de ESLint](docs/prompts/07-eslint-complete-setup.md) | Prompt extenso e opinativo pra montar um `eslint.config.mjs` (ESLint 9, flat config) do zero: erro só pro que é sempre bug, aviso pro que é pressão de refatoração, regras caseiras pra invariante de domínio, lint consciente de tipo isolado num tier separado não-bloqueante. Complementa o burndown acima — use este primeiro pra ter uma config boa, aquele depois pra zerar avisos acumulados. |
 | [Instalar os quality gates (teto de 350 linhas)](docs/prompts/08-eslint-quality-gates-install.md) | **(o atalho)** Prompt que aponta o agente pras três regras já escritas e testadas em `templates/eslint/` — ele copia em vez de escrever, então o resultado é sempre o mesmo código. Instala, adapta pros caminhos reais do seu projeto e mede quantas violações existem por regra; deliberadamente não conserta nenhuma. |
 | [Quebrar os arquivos gigantes](docs/prompts/09-file-size-refactor.md) | O segundo tempo do 08: pega os arquivos que estouraram o teto e os divide em módulos menores. O que faz funcionar é cortar por responsabilidade e não por contagem de linha — e mandar o agente dizer "sem costura natural" e parar, em vez de inventar abstração só pra satisfazer o linter. |
+| [Setup completo do ambiente](docs/prompts/10-development-environment-setup.md) | Instala, atualiza e configura toda a base de desenvolvimento e agentes. Exige backups, preservação dos projetos, testes de Docker/Compose e manifesto reutilizável. |
 
 <div align="right"><a href="#topo">▲ voltar ao topo</a></div>
 
@@ -206,12 +217,14 @@ Um detalhe de idioma, pra não confundir: este README e toda a explicação dent
 
 Esse toolkit não nasceu do zero. Ele empacota, documenta e amarra num fluxo só o trabalho de outras pessoas — vale a pena conhecer os projetos originais:
 
-- **[Superpowers](https://github.com/anthropics/claude-plugins-official)** — Anthropic
+- **[Superpowers](https://github.com/obra/superpowers)** — Jesse Vincent / obra; distribuído também nos marketplaces oficiais dos clientes
+- **[RTK](https://github.com/rtk-ai/rtk)** — rtk-ai
 - **[Ponytail](https://github.com/DietrichGebert/ponytail)** — Dietrich Gebert
 - **[Caveman](https://github.com/JuliusBrussee/caveman)** — Julius Brussee
 - **[aia-harness](https://github.com/leandrosilvaferreira/claude-plugins-registry)** — Leandro Silva Ferreira
 - **[Graphify](https://github.com/Graphify-Labs/graphify)** — Graphify Labs ([`graphifyy` no PyPI](https://pypi.org/project/graphifyy/))
 - **[agent-browser](https://github.com/vercel-labs/agent-browser)** — Vercel Labs
+- **[Context7](https://github.com/upstash/context7)** — Upstash
 
 </details>
 

@@ -39,11 +39,11 @@ Dentro de uma sessão do Claude Code:
 O primeiro comando registra o repositório do GitHub como fonte de plugins; o
 segundo instala o plugin `caveman` a partir dela.
 
-Depois de instalado, a intensidade da compressão pode ser ajustada a
-qualquer momento com `/caveman`, valendo para a sessão atual. Para deixar a
-compressão sempre ligada em qualquer agente de IDE que leia esse repositório
-— não só nessa sessão do Claude Code —, `/caveman-init` grava a regra de
-ativação direto no repositório (mais detalhes no tutorial abaixo).
+Depois de instalado, a intensidade pode ser ajustada com `/caveman` no Claude Code ou pela skill correspondente no cliente. No Codex, use `$caveman` ou o nome descoberto na lista de skills. Para persistir a preferência, incorpore a regra ao `AGENTS.md` ou `CLAUDE.md`, sem substituir instruções existentes.
+
+O [projeto oficial](https://github.com/JuliusBrussee/caveman) também distribui CLI, proxy e recursos de Cloud. As skills de comunicação podem ser usadas separadamente. No setup deste toolkit, preserve Codex nativo, modelo da sessão e login ChatGPT para trabalhos com LLM de Caveman; não ative roteamento, outro provedor ou cobrança por API como efeito da instalação.
+
+Para descoberta de skills e plugins no Codex, veja o [guia do cliente](15-codex-workflow.md). Configure cada agente separadamente e evite copiar skills já fornecidas por outra distribuição.
 
 ## Tutorial passo a passo
 
@@ -66,6 +66,8 @@ Quatro categorias ficam fora da compressão, sempre:
   idioma — se a conversa é em português, a resposta comprimida continua em
   português.
 
+Texto persistido fora da conversa também deve ter redação normal: documentação, comentários de código, commits e descrições de PR. Quando o usuário pedir uma explicação completa, clareza e completude prevalecem sobre a compressão.
+
 ### 3. A sobreposição de clareza automática
 
 A compressão desliga sozinha em três situações, porque nelas clareza vale
@@ -83,9 +85,15 @@ próprio plugin.
 `/caveman` troca o nível de compressão para a sessão atual, de forma
 independente do comando equivalente do Ponytail (`/ponytail
 lite|full|ultra`) — cada plugin tem seu próprio controle de intensidade.
-Para a ativação sobreviver além da sessão atual — valendo para qualquer
-agente de IDE que abrir esse repositório, não só para o Claude Code —,
-`/caveman-init` grava a regra de ativação num arquivo do próprio projeto.
+Para a ativação sobreviver além da sessão atual, incorpore ao arquivo de instruções carregado pelo cliente:
+
+```markdown
+- Caveman ativo por padrão: conversa concisa em português, preservando clareza.
+- Explicações completas quando solicitadas; código, documentação e commits com redação normal.
+- “stop caveman” desativa o estilo nesta conversa.
+```
+
+Use o [template de `AGENTS.md`](../../templates/AGENTS.md.template) como ponto de partida. Não dependa de um comando de inicialização ausente na versão instalada.
 
 ### 5. Comandos complementares
 
@@ -93,9 +101,15 @@ agente de IDE que abrir esse repositório, não só para o Claude Code —,
   preenchimento.
 - **`/caveman-review`** — comentários de revisão de código em uma linha
   cada.
-- **`/caveman-stats`** — uso de tokens da sessão atual e economia acumulada.
-- **`/caveman-init`** — grava a regra de ativação permanente no repositório
-  (ver passo 4).
+- **`/caveman-stats`** — contadores observados da sessão, quando disponíveis. Não prova quanto o Caveman economizou; medições do runtime devem ser identificadas separadamente.
+
+Os nomes acima são comandos/skills do cliente, não executáveis do shell. No Codex, use a skill descoberta com `$nome`, que pode incluir namespace.
+
+### 6. Meça uso sem inventar economia
+
+No Codex nativo, use contadores da sessão atual quando expostos pelo cliente. Se não estiverem disponíveis, informe essa limitação; não escolha o log de outra sessão por ser o mais recente.
+
+Separe uso observado, redução de texto por ferramenta e economia medida contra uma execução comparável. Contadores acumulados não devem ser somados a cada atualização. Percentuais de divulgação não medem sua sessão, e tokens de uma assinatura ChatGPT não equivalem automaticamente a cobranças em dólares.
 
 ## Exemplos concretos
 
@@ -168,9 +182,7 @@ de palavras.
   diferente.** Ponytail decide quanto código é escrito; Caveman decide
   quantas palavras descrevem esse código. Usar os dois juntos comprime nos
   dois eixos sem criar ambiguidade em nenhum.
-- **`/caveman-init` é o único comando que sai da sessão atual.** Os outros
-  (`/caveman`, `/caveman-commit`, `/caveman-review`, `/caveman-stats`) valem
-  só enquanto a conversa dura.
+- **Persistência depende de instruções carregadas.** Uma preferência no `AGENTS.md` ou `CLAUDE.md` deve ser conferida em uma nova sessão. Instalação do plugin e configuração persistente são verificações diferentes.
 - **Idioma nunca muda com o nível de intensidade.** Aumentar a compressão
   não troca o idioma da resposta — só corta o que sobra ao redor da
   informação.
@@ -198,4 +210,4 @@ se combinam.
 
 **Preciso escolher um nível toda sessão?**
 Não. `/caveman` ajusta quando quiser, e o nível vale para a sessão atual;
-para deixar ativo permanentemente no repositório, use `/caveman-init`.
+para deixar ativo por padrão no repositório, registre a preferência no arquivo de instruções carregado pelo cliente e confira em nova sessão.
