@@ -1,9 +1,1 @@
 @AGENTS.md
-
-## Claude Code
-
-Produto, comandos e acordos compartilhados ficam em `AGENTS.md`. Preserve também instruções do framework já presentes neste arquivo.
-
-Use plugins, skills, MCPs e hooks descobertos por este cliente. Não copie configurações de outro agente nem duplique conteúdo compartilhado aqui.
-
-[Acrescente apenas instruções específicas do Claude necessárias ao projeto; remova este campo ao finalizar.]

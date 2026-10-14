@@ -1,0 +1,21 @@
+# [Nome do projeto]
+
+[O que o produto resolve e para quem, conforme PRODUCT.md.]
+
+## Executar
+
+[Runtime, gerenciador e comandos reais de instalação, desenvolvimento e verificação. Indique ambiente e banco necessários; não exponha credenciais.]
+
+## Documentação
+
+- [Produto e escopo](PRODUCT.md).
+- [Preparação local](docs/onboarding.md).
+- [Estrutura e decisões técnicas](docs/architecture.md).
+- [Design e acessibilidade](docs/design.md).
+- [Checks de qualidade](docs/quality.md).
+- [Instruções para agentes](AGENTS.md).
+- [Setup e evidências](docs/setup.md).
+
+## Próxima entrega
+
+[A menor tarefa que avança o MVP e seu critério observável. Pendências externas ficam explícitas.]

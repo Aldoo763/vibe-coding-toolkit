@@ -1,0 +1,21 @@
+# Design e acessibilidade
+
+## Direção
+
+[Público, idioma, dispositivos e tom visual ligados a PRODUCT.md. Decisões ainda não implementadas ficam identificadas como direção.]
+
+## Sistema existente
+
+[Tokens, tipografia, cores, espaçamento e componentes presentes. Aponte seus arquivos e a fonte de verdade; não mantenha valores divergentes neste documento.]
+
+## Interação
+
+Use HTML semântico, navegação por teclado, foco visível e contraste adequado. Dê nome a controles e campos. Erros de validação ficam junto do campo; operações assíncronas exibem espera e resultado. Respeite movimento reduzido.
+
+## Layout e revisão
+
+[Breakpoints e critérios reais de leitura em celular e desktop. Liste estados de vazio, erro e carregamento pertinentes. Registre revisão de interface feita e o que ainda não existe.]
+
+## Manutenção
+
+Mudanças visuais e de interação atualizam a fonte de tokens/componentes e esta orientação quando houver alteração de regra. Consulte as skills de UI instaladas nas revisões pertinentes.

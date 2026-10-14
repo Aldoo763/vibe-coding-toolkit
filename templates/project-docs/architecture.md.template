@@ -1,0 +1,25 @@
+# Código e arquitetura
+
+## Stack efetiva
+
+[Framework, runtime, gerenciador, ORM, driver e versões observadas. Registre razões e exceções aos padrões; versões efetivas também ficam no lockfile.]
+
+## Mapa do código
+
+[Árvore curta dos diretórios e arquivos que realmente existem. Indique a responsabilidade de cada um; não apresente uma arquitetura futura como implementada.]
+
+## Fronteiras e fluxo
+
+[Caminho real entre apresentação, validação, lógica e dados. Código servidor guarda ambiente, logger e cliente de banco. Crie módulos por funcionalidade conforme a necessidade; evite camadas vazias.]
+
+## Dados e migrations
+
+[Schema Drizzle, inferência de tipos, destino das migrations e ciclo de geração/revisão/aplicação. Registre pool, driver, runtime, consultas limitadas e uso de transação quando necessário. Se não houver persistência, explique essa decisão.]
+
+## Decisões
+
+[Decisão, motivo, alternativa pertinente, fonte/data e condição para revisar. Não duplique os requisitos de PRODUCT.md.]
+
+## Manutenção
+
+Atualize este mapa ao alterar diretórios, dependências relevantes, contratos ou fronteiras. Registre comportamento comprovado; remova decisões que deixaram de valer.

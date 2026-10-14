@@ -5,14 +5,14 @@ O toolkit tem dois usos: consultar ferramentas e práticas separadamente, ou ini
 ## Três caminhos
 
 - **Máquina:** [setup global](03-environment-setup.md), com instalação, integração dos clientes, backups e manifesto.
-- **Projeto novo:** [bootstrap Next](04-project-bootstrap.md), com `product.md`, scaffold oficial, skills locais, lint e evidências.
+- **Projeto novo:** [bootstrap Next](04-project-bootstrap.md), com `PRODUCT.md`, scaffold oficial, skills locais, lint e evidências.
 - **Adoção parcial:** [instalação](01-installation.md), [ferramentas](tools/) e [prompts](prompts/), escolhendo somente o necessário.
 
 O agente precisa de acesso ao ambiente para executar e validar. Claude Code e Codex usam configurações próprias; outras LLMs podem seguir os requisitos com capacidades equivalentes, sem assumir compatibilidade de formatos.
 
 ## Produto antes da base
 
-A descrição define problema, público, fluxos essenciais e restrições. `product.md` registra MVP, hipóteses e critérios de aceitação. A stack serve esse escopo: Next/App Router, TypeScript, Tailwind e ESLint formam a base; banco, autenticação e serviços entram quando existir necessidade definida.
+A descrição define problema, público, fluxos essenciais e restrições. `PRODUCT.md` registra MVP, hipóteses e critérios de aceitação. A stack serve esse escopo: Next/App Router, TypeScript, Tailwind, ESLint, Drizzle/PostgreSQL, Zod, Pino e Vitest formam o núcleo. Autenticação e serviços dependem do produto; uma aplicação sem persistência pode omitir banco com justificativa. Veja os [padrões e critérios de adaptação](06-project-defaults.md).
 
 O scaffold vem da versão estável de `create-next-app`, consultada no momento do setup. O toolkit mantém a receita e os complementos, evitando carregar uma aplicação de exemplo com domínio, credenciais ou dependências particulares.
 
@@ -56,7 +56,7 @@ Transições, operação Vercel, deploy e otimização dependem de tarefa pertin
 
 ## Checks explícitos
 
-[ESLint e quality gates](tools/06-eslint-biome-quality-gates.md) verificam código e contratos relevantes. O starter Next combina os presets oficiais com teto de 350 linhas; regras de logger e acesso a dados são adotadas quando essas decisões existirem.
+[ESLint e quality gates](tools/06-eslint-biome-quality-gates.md) verificam código e contratos relevantes. O starter usa o perfil completo de ESLint: presets oficiais, teto de 350 linhas, logger, fronteira de dados e guardas Drizzle. O perfil leve continua disponível para adoção parcial.
 
 Lint, tipos, regras e build rodam por comandos canônicos. Testes cobrem comportamento relevante e regressões. O toolkit não instala bloqueios de push em `main`, nem exige branch/worktree, nem adiciona hooks de commit/push. Hooks próprios do cliente, como [RTK](tools/03-rtk-token-proxy.md), usam integrações suportadas sem duplicação.
 

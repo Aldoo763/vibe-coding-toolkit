@@ -4,7 +4,7 @@
 
 ## Produto e stack
 
-- Produto e escopo: `product.md`.
+- Produto e escopo: `PRODUCT.md`.
 - Stack: [frameworks, versões observadas, runtime e gerenciador].
 - Setup e validações: `docs/setup.md`, quando utilizado este bootstrap.
 
@@ -31,6 +31,15 @@ Use comandos reais; marque checks indisponíveis, sem inventar scripts.
 - Não transforme hipóteses em fatos ou integrações pendentes em resultados simulados.
 - Continue trabalho já autorizado. Pergunte somente por informação indispensável ou por ação fora da autorização.
 - Publicação, mensagens a terceiros, custos e ações destrutivas dependem de autorização pertinente. Instalar ferramentas não concede essa autorização.
+
+## Padrões e documentação
+
+- Persistência nova: Drizzle ORM + PostgreSQL com driver compatível com o runtime. Preserve a stack existente; registre exceções em `PRODUCT.md` e `docs/architecture.md`.
+- Conexão servidor única, pool limitado e inicialização sob demanda. Gere e revise SQL antes de aplicar migrations em destino autorizado; não migre no build ou por request.
+- Valide entradas e ambiente com Zod. Use Pino no servidor, sem segredos ou corpos completos. Apresentação chama módulos da funcionalidade, sem importar o cliente de banco.
+- Prefira tipos inferidos, consultas parametrizadas, projeções explícitas, listagens limitadas e DTOs seguros. Transações seguem a atomicidade exigida e o suporte do driver.
+- Consulte fontes oficiais atuais e o canal estável antes de alterar stack/APIs. Aplique melhorias compatíveis no escopo autorizado; registre fonte, motivo e resultado em `docs/setup.md`. Não migre versões principais ou serviços automaticamente.
+- `PRODUCT.md` guarda escopo; `docs/architecture.md`, estrutura e decisões; `docs/design.md`, interface; `docs/onboarding.md`, preparação; `docs/quality.md`, checks. Atualize o documento responsável junto da mudança, sem duplicar regras.
 
 ## Ferramentas e estilo
 

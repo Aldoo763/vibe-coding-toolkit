@@ -1,0 +1,29 @@
+# Setup e evidências
+
+## Origem e contexto
+
+[Data da verificação, revisão única do toolkit, produto, cliente e runtime. Preserve a autenticação/modelo da sessão; não inclua caminhos pessoais ou credenciais.]
+
+## Decisões e fontes
+
+[Default adotado ou adaptado, motivo, documentação oficial/Context7 consultado e data. Diferencie canal estável de exemplo de prerelease. Registre exceções e critérios para revisitar.]
+
+## Componentes
+
+[Versões efetivas, gerenciador, lockfile, escopos local/global, origem e nomes das skills. Diferencie plugin instalado, arquivo presente e descoberta pelo host.]
+
+## Documentação criada
+
+[Confirme PRODUCT.md, README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, docs/design.md, docs/onboarding.md e docs/quality.md com conteúdo do projeto. Registre preservação/consolidação de arquivos anteriores.]
+
+## Verificações
+
+| Item | Estado | Evidência |
+|---|---|---|
+| [Check, integração ou recurso] | [Validado / configurado sem execução / pendente] | [Comando, resultado observado ou motivo e próximo passo] |
+
+Registre lint, tipos, testes, regras, build, auditorias, HTTP, geração SQL e banco quando aplicável. Identifique recursos temporários criados e seu encerramento. Não apresente uma simulação como teste de um serviço real.
+
+## Pendências e próxima entrega
+
+[Decisões externas, riscos conhecidos, próximo passo e menor tarefa do MVP. Publicação e serviços externos dependem de autorização pertinente.]

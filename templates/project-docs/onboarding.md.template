@@ -1,0 +1,25 @@
+# Preparação local
+
+## Pré-requisitos
+
+[Runtime, gerenciador e ferramentas realmente necessárias, com verificação de compatibilidade. Reutilize ferramentas globais; não copie caches de outro desenvolvedor.]
+
+## Primeira execução
+
+[Comandos reais para instalar, preparar ambiente e iniciar o projeto. Use o lockfile. Indique nomes das variáveis e como obter valores, sem registrar segredos.]
+
+## Banco
+
+[Como obter um PostgreSQL local ou uma conexão autorizada, configurar DATABASE_URL e, quando necessário, DATABASE_URL_UNPOOLED. Descreva db:generate, revisão do SQL e aplicação no destino correto. Não use produção como ambiente de teste.]
+
+## Verificar
+
+[Comando canônico de check e resultado esperado. Separe testes locais independentes de credenciais de verificações que exigem serviço disponível.]
+
+## Agentes
+
+Leia [AGENTS.md](../AGENTS.md). [CLAUDE.md](../CLAUDE.md) importa as mesmas instruções. Consulte [setup.md](setup.md) para skills locais, integrações e escopos configurados.
+
+## Dificuldades conhecidas
+
+[Sintoma, causa comprovada e correção verificada. Não liste problemas hipotéticos como incidentes observados.]

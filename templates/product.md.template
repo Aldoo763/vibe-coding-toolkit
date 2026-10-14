@@ -28,7 +28,7 @@
 
 ## Restrições e decisões técnicas
 
-[Next.js/App Router, versões observadas, gerenciador e limitações informadas. Banco, autenticação e serviços externos somente quando definidos ou necessários.]
+[Next.js/App Router, TypeScript, versões observadas, gerenciador e limitações informadas. Persistência usa Drizzle ORM + PostgreSQL por padrão. Registre justificativa para outra escolha ou para um produto sem banco; preserve a stack de projetos existentes. Autenticação e serviços externos entram por necessidade concreta.]
 
 ## Hipóteses e pendências
 
@@ -41,3 +41,7 @@
 ## Próxima entrega
 
 [A menor tarefa implementável que avança o MVP depois do bootstrap.]
+
+## Manutenção
+
+Atualize este documento quando objetivo, escopo, restrições ou critérios de aceitação mudarem. Decisões técnicas e evidências detalhadas ficam em docs/architecture.md e docs/setup.md. O nome do arquivo gerado é PRODUCT.md.

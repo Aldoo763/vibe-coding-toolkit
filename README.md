@@ -81,16 +81,16 @@ Exemplo: “CRM para pequenas imobiliárias, com contatos, negócios, tarefas e 
 
 O setup entrega:
 
-- `product.md` com MVP, restrições, hipóteses e critérios de aceitação.
-- Base oficial Next.js: App Router, TypeScript, Tailwind, ESLint, `src/` e alias `@/*`.
+- `PRODUCT.md` com MVP, restrições, hipóteses e critérios de aceitação.
+- Base oficial Next.js com Drizzle/PostgreSQL, Zod, Pino, Vitest, Tailwind e ESLint.
 - Skills Vercel locais, catalogadas [uma por uma](docs/tools/16-vercel-skills.md), e `skills-lock.json`.
-- `AGENTS.md` compartilhado, ponte `CLAUDE.md` quando necessária e configurações próprias de cada cliente.
+- Quatro documentos na raiz; arquitetura, design, onboarding, qualidade e evidências em `docs/`.
 - Ponytail, Caveman, Superpowers, RTK, Context7 e Graphify, reutilizando o que já está global.
-- Lint, tipos, self-check das regras, build e `docs/setup.md` com evidências e pendências.
+- Lint, tipos, testes de fronteiras, self-check das regras, SQL e build validados.
 
 > **Ideia → produto → base → skills → checks → MVP.**
 >
-> O toolkit é uma receita com templates. `create-next-app` fornece a base estável na execução. Banco, autenticação e integrações são escolhidos pelo produto; o bootstrap prepara a base antes de implementar o MVP.
+> O toolkit é uma receita com templates. `create-next-app` fornece a base estável na execução. Drizzle/PostgreSQL é o padrão de persistência; autenticação e serviços entram conforme o produto. Os [defaults](docs/06-project-defaults.md) são revistos com fontes atuais em cada setup.
 
 Não instala travas de push em `main`, não exige branch e não adiciona hooks de commit/push. Instalar skills de deploy não publica a aplicação. Veja [o fluxo completo](docs/04-project-bootstrap.md) para escopos e validação.
 
@@ -128,7 +128,7 @@ Depois da medição, use [o prompt 09](docs/prompts/09-file-size-refactor.md) pa
 
 ```mermaid
 flowchart LR
-    Ideia[Descrição do projeto] --> Produto[product.md]
+    Ideia[Descrição do projeto] --> Produto[PRODUCT.md]
     Produto --> Base[create-next-app e templates]
     Base --> Local[Skills e configuração local]
     Local --> Checks[Lint, tipos, regras e build]
@@ -150,7 +150,7 @@ Delegue quando houver benefício e suporte, com tarefas independentes e responsa
 
 ## Referências
 
-O mapa completo para entrar em qualquer parte do toolkit. Cada guia e prompt funciona como uma porta de entrada independente.
+A raiz tem a apresentação e as instruções dos agentes. `docs/` reúne guias, `docs/tools/` as ferramentas, `docs/prompts/` os prompts e `templates/` os arquivos reutilizáveis. `scripts/` contém somente a validação. Os caminhos públicos existentes foram preservados.
 
 <a id="fundamentos"></a>
 
@@ -163,55 +163,22 @@ O mapa completo para entrar em qualquer parte do toolkit. Cada guia e prompt fun
 | [Playbook Claude](docs/02-playbook-onboarding.md) | Projeto existente |
 | [Ambiente global](docs/03-environment-setup.md) | Preparação e reprodução da máquina |
 | [Bootstrap Next](docs/04-project-bootstrap.md) | Produto até base configurada |
-| [Validação do toolkit](docs/05-toolkit-validation.md) | Checks de manutenção e evidências do scaffold real |
+| [Padrões do projeto](docs/06-project-defaults.md) | Stack, documentos e atualização com fontes atuais |
+| [Validação do toolkit](docs/05-toolkit-validation.md) | Checks reproduzíveis e limites comprovados |
 
 ### Ferramentas
 
-| Documento | Uso |
-|---|---|
-| [01 — Superpowers](docs/tools/01-superpowers.md) | Design, plano, execução e revisão |
-| [02 — Subagentes](docs/tools/02-subagent-orchestration.md) | Delegação e ondas independentes |
-| [03 — RTK](docs/tools/03-rtk-token-proxy.md) | Comandos com saída enxuta |
-| [04 — Ponytail](docs/tools/04-ponytail.md) | Menor solução completa |
-| [05 — Caveman](docs/tools/05-caveman.md) | Comunicação concisa |
-| [06 — ESLint/Biome](docs/tools/06-eslint-biome-quality-gates.md) | Lint e evolução de regras |
-| [07 — Graphify](docs/tools/07-graphify.md) | Grafo do projeto |
-| [08 — Obsidian](docs/tools/08-obsidian-memory.md) | Memória externa opcional |
-| [09 — Memória Claude](docs/tools/09-claude-memory-system.md) | Contexto persistente |
-| [10 — Hooks](docs/tools/10-hooks-best-practices.md) | Referência opcional para o cliente |
-| [11 — agent-browser](docs/tools/11-agent-browser.md) | Automação de navegador |
-| [12 — Context7](docs/tools/12-context7.md) | Documentação atual |
-| [13 — Anthropic Skills](docs/tools/13-anthropics-skills.md) | Artefatos e criação de skills |
-| [14 — Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) | Console, rede e desempenho |
-| [15 — Codex](docs/tools/15-codex-workflow.md) | Instruções, plugins, MCPs e descoberta |
-| [16 — Skills Vercel](docs/tools/16-vercel-skills.md) | Catálogo, instalação local e fluxo |
+[Catálogo de ferramentas](docs/tools/README.md): fluxo e agentes, qualidade, contexto, automação e integrações opcionais.
 
 <a id="prompts-prontos"></a>
 
 ### Prompts
 
-| Prompt | Uso |
-|---|---|
-| [01 — Sanitização](docs/prompts/01-project-sanitation.md) | Medir e organizar código |
-| [02 — Warnings](docs/prompts/02-eslint-warning-burndown.md) | Reduzir avisos |
-| [03 — Code review](docs/prompts/03-multi-agent-code-review.md) | Revisão por especialistas |
-| [04 — Brainstorm até plano](docs/prompts/04-brainstorm-to-plan.md) | Refinar um pedido |
-| [05 — Ondas](docs/prompts/05-parallel-wave-dispatch.md) | Tarefas paralelas |
-| [06 — Memória](docs/prompts/06-memory-bootstrap.md) | Contexto persistente |
-| [07 — ESLint completo](docs/prompts/07-eslint-complete-setup.md) | Configuração avançada |
-| [08 — Quality gates](docs/prompts/08-eslint-quality-gates-install.md) | Copiar regras e medir |
-| [09 — Arquivos grandes](docs/prompts/09-file-size-refactor.md) | Refatorar por responsabilidade |
-| [10 — Máquina](docs/prompts/10-development-environment-setup.md) | Ambiente global |
-| [11 — Projeto Next](docs/prompts/11-next-project-bootstrap.md) | Produto e base configurada |
+[Catálogo de prompts](docs/prompts/README.md): setup, adoção parcial e manutenção.
 
 ### Templates
 
-- [Produto](templates/product.md.template), [AGENTS](templates/AGENTS.md.template) e [ponte Claude](templates/CLAUDE.md.template).
-- [ESLint Next](templates/eslint/next.config.mjs.example), [avançado](templates/eslint/eslint.config.mjs.example), [com tipos](templates/eslint/eslint.typed.config.mjs.example) e [self-check](templates/eslint/verify.mjs).
-- [Context7 Codex](templates/project/codex.config.toml.example), [Context7 Claude](templates/project/mcp.json.example) e [exclusões Graphify](templates/project/.graphifyignore.example).
-- [Manifesto global](templates/environment-manifest.json.example), [hooks ilustrativos](templates/settings.json.example) e [regra de ondas](templates/rules/parallel-subagent-driven-development.md).
-
-Templates são pontos de partida. Incorpore configurações, preencha campos e valide os clientes usados; exemplos não são instalados automaticamente.
+[Catálogo de templates](templates/README.md): documentação, núcleo Next, ESLint e configurações por cliente. Copie apenas a peça usada; preencha os documentos e valide a configuração no destino.
 
 <a id="creditos"></a>
 <a id="licenca"></a>

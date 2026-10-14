@@ -1,0 +1,23 @@
+# Qualidade
+
+## Comandos
+
+[Liste scripts existentes e o que provam: lint, typecheck, testes Vitest, self-check das regras e build. Informe o comando composto check e quando executar um teste escopado ou a suíte.]
+
+## Regras de base
+
+- TypeScript strict e presets oficiais do framework.
+- Teto de 350 linhas e organização proporcional ao comportamento.
+- Logger estruturado no servidor; dados não acessados diretamente pela apresentação.
+- Com Drizzle, guarda contra update/delete sem where e revisão das queries/migrations.
+- Validação de entradas e ambiente, erros sem segredos e testes de fronteiras relevantes.
+
+## Estratégia de testes
+
+[Cubra comportamento, decisões, falhas e regressões. Indique ambientes de teste existentes e como isolar serviços. Não escreva testes que apenas repetem o código. Não invente cobertura, suíte E2E ou garantia de segurança.]
+
+## Dependências e entrega
+
+Confira auditorias completas e de produção. Investigue advisories e registre risco conhecido e correção disponível. Lint/build aprovados não significam auditoria zerada.
+
+Checks são comandos explícitos. Hooks Git, bloqueios de push e exigências de branch não fazem parte do padrão. Atualize este documento junto dos scripts e regras que mudarem.

@@ -19,7 +19,7 @@ Catálogo conferido em **14 de outubro de 2026**, usando os `SKILL.md` e a lista
 | [`vercel-react-native-skills`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-native-skills/SKILL.md) | React Native e Expo: listas, gestos, animação e APIs nativas | Opcional; instalar somente para plataforma mobile |
 | [`find-skills`](https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md) | Descobrir uma capacidade adicional quando a base instalada não atender a uma necessidade | Instalar; descoberta não autoriza instalar extras indiscriminadamente |
 
-No Next web, a base instala **oito skills de `agent-skills` mais `find-skills`**. A skill mobile fica documentada, sem trazer recomendações de Expo para uma aplicação web. Skills de deploy ficam disponíveis para tarefas futuras; nenhum comando de publicação roda no setup.
+Este catálogo registra as **oito skills web de `agent-skills` mais `find-skills`** verificadas nesta revisão. Em cada bootstrap, confira o upstream: incorpore skills web oficiais novas pertinentes, ajuste nomes removidos/renomeados e registre a escolha. Não trate essa quantidade como contrato eterno. A skill mobile fica documentada, sem trazer recomendações de Expo para uma aplicação web. Skills de deploy ficam disponíveis para tarefas futuras; nenhum comando de publicação roda no setup.
 
 ## Instalação local
 
@@ -51,7 +51,7 @@ Antes de instalar, inventarie skills e plugins locais/globais. Uma skill com o m
 
 ## Fluxo de uso
 
-1. **Entender:** `product.md`, Context7 para APIs atuais e Superpowers quando o pedido exigir design/plano.
+1. **Entender:** `PRODUCT.md`, Context7 para APIs atuais e Superpowers quando o pedido exigir design/plano.
 2. **Construir:** Ponytail mantém escopo; `vercel-react-best-practices` orienta Next/React; `vercel-composition-patterns` entra em decisões de componentes.
 3. **Revisar:** lint, tipos, testes pertinentes e build; `web-design-guidelines` para UI e `writing-guidelines` para documentação.
 4. **Refinar quando solicitado:** `vercel-react-view-transitions` para animações compatíveis; `find-skills` se faltar uma capacidade concreta.

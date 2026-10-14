@@ -40,7 +40,7 @@ Para o grafo inicial de uma aplicação:
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify extract . --code-only --no-cluster
 ```
 
-Esse modo restringe a extração a código e evita a etapa de agrupamento. Confira os arquivos esperados em `graphify-out/graph.json`; ele não cobre automaticamente requisitos de `product.md` ou relações semânticas dos documentos.
+Esse modo restringe a extração a código e evita a etapa de agrupamento. Confira os arquivos esperados em `graphify-out/graph.json`; ele não cobre automaticamente requisitos de `PRODUCT.md` ou relações semânticas dos documentos.
 
 Copie e adapte [as exclusões](../../templates/project/.graphifyignore.example). Exclua credenciais, `.env*`, dependências, skills vendorizadas, caches e saída do próprio grafo. Ignore `graphify-out/` no Git por padrão; exportações deliberadamente compartilhadas precisam ser revisadas quanto ao conteúdo.
 
