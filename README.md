@@ -4,7 +4,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/hero-still.svg" />
-    <img src="docs/assets/readme/hero.svg" alt="Vibe Coding Toolkit — da ideia ao primeiro commit. Abertura cinematográfica em carvão e âmbar." width="1600" height="680" />
+    <img src="docs/assets/readme/hero.svg" alt="Vibe Coding Toolkit — da ideia ao primeiro commit. Abertura cinematográfica em carvão e âmbar." width="1600" />
   </picture>
 </p>
 
