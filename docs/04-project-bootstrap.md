@@ -137,12 +137,19 @@ Teste comportamento novo quando existir lógica relevante. Não adicione framewo
 
 ### 6. Verificar e entregar
 
-Execute instalação, lint, tipos, self-check das regras e build. Inicie a aplicação, confirme resposta HTTP e a página renderizada; use uma porta livre e encerre apenas o processo criado. Confira descoberta das skills em nova sessão quando o host permitir; presença no disco é uma verificação diferente.
+Execute instalação, lint, tipos, self-check das regras e build. Faça auditoria completa das dependências e separe o resultado das dependências de produção (`npm audit --omit=dev`, ou equivalente). Investigue alertas; não rode correções com downgrade ou mudança incompatível sem avaliar o efeito. Registre advisories sem correção disponível como riscos conhecidos, sem declarar auditoria zerada. Inicie a aplicação, confirme resposta HTTP e a página renderizada; use uma porta livre e encerre apenas o processo e os filhos criados. Confira descoberta das skills em nova sessão quando o host permitir; presença no disco é uma verificação diferente.
 
 Valide uma consulta real de Context7 quando disponível. Gere o grafo inicial sem LLM externo:
 
 ```bash
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify extract . --code-only --no-cluster
+```
+
+No PowerShell, defina a variável antes do comando, em vez do prefixo de shell POSIX:
+
+```powershell
+$env:GRAPHIFY_NO_AUTO_REFRESH = '1'
+graphify extract . --code-only --no-cluster
 ```
 
 Confira que `graphify-out/graph.json` contém os arquivos esperados. Se a CLI instalada não oferecer esse modo, registre a limitação. Extração semântica posterior usa o agente nativo autorizado; o grafo de código não cobre automaticamente `product.md`. Não instale hooks de atualização ou envie o grafo a um serviço.

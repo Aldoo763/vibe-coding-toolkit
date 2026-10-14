@@ -2,6 +2,18 @@
 
 O toolkit não mantém uma aplicação ou dependências Next na raiz. Valide seus templates em um projeto temporário separado, seguindo o [bootstrap](04-project-bootstrap.md). Use versões estáveis compatíveis e registre o resultado observado.
 
+## Validação reproduzível
+
+Com Node.js 24, npm e acesso à rede, execute na cópia do toolkit:
+
+```bash
+node scripts/validate-next.mjs
+```
+
+O [validador](../scripts/validate-next.mjs) cria e remove uma aplicação temporária, verifica regras reais Next/TypeScript/tamanho, lint, tipos, self-checks, build, auditoria de produção, HTTP e nove skills locais. No Windows, usa `--copy` para manter os arquivos portáveis. Não instala dependências na raiz nem modifica configurações globais de agente.
+
+O [workflow](../.github/workflows/validate.yml) executa os mesmos checks em Ubuntu e Windows. Ele tem permissão somente de leitura, usa ações oficiais fixadas por commit e não configura proteção de branch, hooks Git, deploy ou chamadas a modelos.
+
 ## Checks de manutenção
 
 1. Confira links locais e âncoras dos documentos, inclusive as âncoras públicas antigas do README.
@@ -45,7 +57,21 @@ Resultados observados:
 
 Essas versões são evidência da execução, não um pin permanente da receita. Confira documentação e flags novamente em outro setup; não force atualização principal do ESLint só por um aviso de depreciação quando o scaffold mantiver uma combinação compatível.
 
-Não foram testados Windows/Linux, execução completa por outras LLMs ou descoberta numa nova sessão de cada cliente. Presença, frontmatter e links das skills foram verificados; isso não comprova ativação pelo host. Publicação de aplicações e integrações que exigem credenciais não fazem parte deste teste.
+Publicação de aplicações e integrações que exigem credenciais não fazem parte deste teste. A execução de tarefas completas por todas as LLMs não é uma garantia: a receita exige capacidades de arquivos/terminal e integrações oficialmente suportadas pelo cliente.
+
+## Descoberta em sessões novas
+
+Em 14 de outubro de 2026, uma nova sessão nativa Claude Code retornou as nove skills pelo `supportedCommands()` do Agent SDK, com fontes `user`, `project` e `local`. Nenhum prompt foi enviado. Um processo novo do app-server Codex retornou as nove skills do projeto habilitadas por `skills/list`, com recarga do disco e sem iniciar um turno de modelo.
+
+Isso comprova descoberta pelo host, além da presença dos arquivos. Não equivale a executar todas as tarefas descritas por cada skill; deploy e serviços externos continuam dependendo de solicitação e acesso pertinentes.
+
+## Auditoria de dependências
+
+Na amostra Next 16.4.0, a auditoria de produção (`npm audit --omit=dev`) retornou zero vulnerabilidades. A auditoria completa identificou cinco entradas na cadeia de lint `eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces`.
+
+O advisory [GHSA-vfj7-8cjw-p6xm / CVE-2026-93687](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) afeta `braces` até 3.0.3 e não registra versão corrigida. O registry também informa 3.0.3 como versão mais recente. O `npm audit fix --force` sugeriu downgrade do `eslint-config-next` para 14.2.35; essa alteração não foi aplicada à base Next 16.4.0.
+
+O risco conhecido fica explícito: processamento de padrões profundamente aninhados pode derrubar o processo que usa essa dependência. Não apresente lint/build aprovados como auditoria completa zerada. Reavalie a cadeia quando houver correção upstream e valide a atualização antes de incorporá-la. O workflow verifica a auditoria de produção e mantém os alertas da instalação visíveis nos logs.
 
 ## Cinco ciclos de revisão
 

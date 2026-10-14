@@ -45,7 +45,7 @@ Adicional para projetos React Native/Expo:
 npx --yes skills@latest add vercel-labs/agent-skills --skill vercel-react-native-skills --agent codex claude-code --yes
 ```
 
-O layout padrão usa `.agents/skills/` como conteúdo canônico e links nos caminhos dos clientes quando necessário. Confira os caminhos efetivos da versão instalada. Versione conteúdo, links **relativos** e `skills-lock.json`; preserve atribuição/licenças dos arquivos. Não use links absolutos para caches do computador. Se o cliente não suportar links, use o modo de cópia documentado pela CLI e registre essa escolha.
+O layout padrão usa `.agents/skills/` como conteúdo canônico e links nos caminhos dos clientes quando necessário. Confira os caminhos efetivos da versão instalada. Versione conteúdo, links **relativos** e `skills-lock.json`; preserve atribuição/licenças dos arquivos. Não use links absolutos para caches do computador. No Windows, acrescente `--copy` aos comandos para evitar junctions com destinos absolutos; use o mesmo modo em clientes sem suporte a links. Registre essa escolha e atualize as cópias pela CLI.
 
 Antes de instalar, inventarie skills e plugins locais/globais. Uma skill com o mesmo `name` pode aparecer duplicada; no Codex, arquivos homônimos não são mesclados. Resolva sobreposição no escopo do projeto, sem apagar preferências globais de outros projetos. Fonte: [descoberta oficial do Codex](https://learn.chatgpt.com/docs/build-skills).
 

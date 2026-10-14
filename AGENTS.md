@@ -15,6 +15,7 @@ Este repositório distribui documentação, prompts e templates. Não é uma apl
 - Reutilize templates e regras. Não acrescente aplicação, gerador próprio ou dependências do produto à raiz.
 - Preserve URLs e caminhos públicos; atualize links, índices, receitas e exemplos quando contratos mudarem.
 - Valide templates executáveis num projeto temporário; confira links locais, sintaxe de configs e `git diff --check`.
+- Validação reproduzível da base: `node scripts/validate-next.mjs` com Node.js 24, npm e rede. Ela cria e remove o projeto temporário; dependências não entram na raiz.
 - Self-check das regras: `node templates/eslint/verify.mjs templates/eslint/eslint-rules/index.cjs`, em ambiente que disponibilize ESLint.
 - Não copie credenciais, domínio privado, dumps, caches pessoais ou harnesses acoplados como exemplos públicos.
 - Não adicione bloqueios de Git, exigência de branch/worktree ou hooks de commit/push.
