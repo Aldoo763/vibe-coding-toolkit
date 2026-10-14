@@ -59,6 +59,19 @@ Essas versões são evidência da execução, não um pin permanente da receita.
 
 Publicação de aplicações e integrações que exigem credenciais não fazem parte deste teste. A execução de tarefas completas por todas as LLMs não é uma garantia: a receita exige capacidades de arquivos/terminal e integrações oficialmente suportadas pelo cliente.
 
+## Windows e Linux
+
+A [execução nativa do workflow](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/runs/38517653505), no commit `6d4e5c09a313df0d10a8a633d773ef16c0785d41`, concluiu os dois jobs com sucesso em 14 de outubro de 2026.
+
+| Runner | Node.js | npm | Next.js | Resultado |
+|---|---|---|---|---|
+| `ubuntu-latest` | 24.21.0 | 11.19.0 | 16.4.0 | Aprovado |
+| `windows-latest` | 24.21.0 | 11.19.0 | 16.4.0 | Aprovado |
+
+Ambos executaram o validador completo: nove skills locais e lockfile, preset Next/TypeScript/tamanho, lint, tipos, três self-checks, build, auditoria de produção e HTTP 200. No Linux, os links Claude são relativos; no Windows, as cópias possuem o mesmo conteúdo canônico. A validação removeu os projetos temporários e encerrou o servidor criado.
+
+Esses jobs comprovam a base Next e os arquivos de skills nesses sistemas. A descoberta pelos hosts Claude/Codex e a execução Graphify descritas neste relatório foram verificadas separadamente em macOS.
+
 ## Descoberta em sessões novas
 
 Em 14 de outubro de 2026, uma nova sessão nativa Claude Code retornou as nove skills pelo `supportedCommands()` do Agent SDK, com fontes `user`, `project` e `local`. Nenhum prompt foi enviado. Um processo novo do app-server Codex retornou as nove skills do projeto habilitadas por `skills/list`, com recarga do disco e sem iniciar um turno de modelo.
