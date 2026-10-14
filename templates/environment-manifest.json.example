@@ -305,8 +305,8 @@
       "context7_no_secrets": true
     },
     "llm_work_for_graphify_and_caveman": {
-      "client": "native-codex",
-      "authentication": "chatgpt",
+      "client": "active-native-client",
+      "authentication": "existing-session-authentication",
       "model": "current-session",
       "delegated_model": "same-as-session-explicit",
       "allow_provider_model_billing_or_proxy_switch": false

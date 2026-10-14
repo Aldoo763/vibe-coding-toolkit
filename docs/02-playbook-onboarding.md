@@ -16,6 +16,8 @@ disso já está rodando no seu ambiente, pule direto pra parte que falta.
 
 ## Como usar este playbook
 
+Para criar uma nova aplicação Next com uma descrição de produto, prefira o [bootstrap](04-project-bootstrap.md). Este playbook serve como referência de adoção e configuração manual no Claude. Plugins e hooks opcionais não são parte obrigatória do starter.
+
 Este guia cobre o **fluxo dentro do projeto**, principalmente no Claude Code. Para preparar ou atualizar a máquina, comece pelo [setup do ambiente](03-environment-setup.md). Para usar Codex, veja o [guia do cliente](tools/15-codex-workflow.md) e o [template compartilhado de `AGENTS.md`](../templates/AGENTS.md.template).
 
 Duas formas, as duas válidas:
@@ -252,58 +254,28 @@ sessão do Claude Code, não num terminal separado. Depois do
 `/aia-harness:init`, use o resto deste playbook pra entender o que foi
 gerado e por quê, em vez de montar cada arquivo do zero.
 
-### 1. Copie e preencha o `CLAUDE.md`
+<a id="1-copie-e-preencha-o-claudemd"></a>
+
+### 1. Preencha `AGENTS.md` e crie a ponte Claude
+
+Use os templates a partir da cópia local do toolkit. No projeto de destino:
 
 ```bash
-cp -n templates/CLAUDE.md.template CLAUDE.md
+cp -n /caminho/do/toolkit/templates/AGENTS.md.template AGENTS.md
+cp -n /caminho/do/toolkit/templates/CLAUDE.md.template CLAUDE.md
 ```
 
-No exemplo de shell POSIX, `-n` evita sobrescrever um arquivo existente. Se já houver `CLAUDE.md`, leia e incorpore somente as instruções desejadas. Para Windows nativo, use o equivalente do seu shell que preserve o destino existente.
+Substitua `/caminho/do/toolkit` pelo caminho real. No shell POSIX, `-n` preserva o destino existente; em outro shell, use mecanismo equivalente. Se houver instruções, leia e incorpore apenas os trechos desejados.
 
-Abra o arquivo e substitua cada placeholder — `[PROJECT NAME]`, a seção de
-Stack, os seis comandos canônicos (install, lint, typecheck, test, build,
-run/dev) e a seção de Conventions — pelo que é real no seu projeto. As
-"Behavioral guidelines" no topo (pensar antes de codar, simplicidade
-primeiro, mudanças cirúrgicas, execução orientada a objetivo, orquestrador
-em vez de implementador) já vêm prontas e genéricas o bastante pra
-qualquer stack — normalmente não precisam de edição.
+Preencha nome, stack, comandos, contexto e convenções em `AGENTS.md`. O template Claude importa o arquivo com `@AGENTS.md`, usando a [sintaxe oficial de memória](https://code.claude.com/docs/en/memory). Preserve também instruções geradas pelo framework em ambos os arquivos.
 
-**A tabela de agentes especialistas.** O template já vem com um roster de
-mais de vinte especialistas prontos — de `backend-specialist` a
-`security-auditor`, passando por `code-reviewer`, `database-architect`,
-`test-engineer` e outros — cada um com uma linha de "quando usar" que
-funciona ao mesmo tempo como descrição do agente e como regra de
-roteamento: quando uma tarefa bate com a descrição, é aquele especialista
-que você despacha, nunca um agente genérico. É o mecanismo por trás da
-Parte 4 inteira. Você não precisa manter os nomes exatamente como estão —
-edite, renomeie, remova o que não se aplica ao seu domínio e adicione
-qualquer especialista que seu projeto precise e que o roster genérico não
-cubra. O raciocínio completo por trás disso está em [Orquestração de
-subagentes](tools/02-subagent-orchestration.md).
-
-> [!TIP]
-> Se o projeto também usa outras ferramentas de IA além do Claude Code
-> (Cursor, Copilot, Windsurf...), vale conhecer o
-> [AGENTS.md](https://agents.md/) — um padrão aberto de instruções
-> multi-ferramenta nascido em agosto de 2025 de uma colaboração entre
-> OpenAI, Google, Cursor, Factory.ai e Sourcegraph, hoje sob a
-> recém-criada Agentic AI Foundation (Linux Foundation, ao lado do MCP
-> da própria Anthropic), já adotado por 60 mil+ projetos open-source e
-> suportado nativamente por 24+ ferramentas. **Ressalva importante:** o
-> Claude Code não lê `AGENTS.md` nativamente — só lê `CLAUDE.md` ([issue
-> em aberto](https://github.com/anthropics/claude-code/issues/34235),
-> sem sinal de estar no roadmap). A ponte usada pela comunidade (não é
-> recomendação oficial da Anthropic pra esse uso específico) é a sintaxe
-> de import que o Claude Code já documenta oficialmente: mantenha o
-> `AGENTS.md` como fonte única entre ferramentas e, no `CLAUDE.md`, uma
-> linha só — `@AGENTS.md` — importando o conteúdo, em vez de duplicar
-> instrução em dois arquivos que podem divergir.
+O template compartilhado não instala um elenco de agentes nem exige delegação para toda tarefa. Adicione somente os papéis pertinentes e realmente suportados pelo cliente, conforme [orquestração](tools/02-subagent-orchestration.md). Instruções de produto e comportamento têm uma fonte única; especificidades do cliente ficam no arquivo/configuração correspondente.
 
 ### 2. Copie e ajuste o `.claude/settings.json`
 
 ```bash
 mkdir -p .claude
-cp -n templates/settings.json.example .claude/settings.json
+cp -n /caminho/do/toolkit/templates/settings.json.example .claude/settings.json
 ```
 
 Se já houver configurações, faça backup e incorpore apenas os hooks necessários. O arquivo de exemplo não é um setup pronto: não ative um hook cujo script ainda não exista.
@@ -328,7 +300,8 @@ Se você pretende usar o padrão de execução em ondas paralelas da Parte
 ficar arriscado — copie também a regra pronta pro seu diretório de regras:
 
 ```bash
-cp templates/rules/parallel-subagent-driven-development.md .claude/rules/
+mkdir -p .claude/rules
+cp /caminho/do/toolkit/templates/rules/parallel-subagent-driven-development.md .claude/rules/
 ```
 
 E referencie esse arquivo a partir do seu `CLAUDE.md` (uma linha basta,
@@ -723,8 +696,8 @@ O checklist abaixo permite adoção modular. Para o setup da máquina, a base in
 - [ ] Superpowers instalado e testado com um pedido ambíguo
 - [ ] Ponytail instalado e testado com um pedido que convida over-engineering
 - [ ] Caveman descoberto e comunicação concisa testada; contadores de uso separados de estimativas de economia
-- [ ] `CLAUDE.md` copiado do template e preenchido — stack, comandos canônicos, tabela de agentes ajustada ao seu projeto
-- [ ] `.claude/settings.json` copiado do exemplo, hooks reais escritos (ou removidos, se ainda não forem usados)
+- [ ] `AGENTS.md` preenchido com stack, comandos e contexto reais; `CLAUDE.md` importa o arquivo e preserva somente instruções específicas do cliente
+- [ ] (Se precisar de configuração local) `.claude/settings.json` conciliado com o existente; hooks só registrados quando seus scripts existirem e forem necessários
 - [ ] (Se for usar ondas paralelas) `parallel-subagent-driven-development.md` copiado pra `.claude/rules/` e referenciado no `CLAUDE.md`
 - [ ] Fluxo completo — brainstorm → plano → implementação em ondas → revisão multi-agente → commit — rodado pelo menos uma vez, ponta a ponta
 - [ ] ESLint + Biome configurados, com a divisão curado/bulk decidida
@@ -774,9 +747,7 @@ o bastante pra precisar, o custo de não instalar nenhum dos dois é zero.
 Uma sessão separada do Claude Code, disparada pela sessão principal pra
 executar uma tarefa específica, com contexto próprio — ela não vê o
 histórico da conversa principal, só o que foi escrito explicitamente no
-prompt que a disparou. É por isso que a Parte 3 insiste tanto na tabela de
-especialistas do `CLAUDE.md`: cada subagente precisa de instruções
-autossuficientes, porque não herda nada por osmose.
+prompt que a disparou, conforme o mecanismo de contexto do cliente. Por isso, cada tarefa delegada recebe instruções suficientes. A tabela de especialistas é opcional e fica nos acordos compartilhados quando o projeto precisar dela.
 
 **Os plugins não instalam / o marketplace não é encontrado — e agora?**
 Confirme a versão do Claude Code primeiro (`claude --version`) — plugins

@@ -1,52 +1,72 @@
-# [PROJECT NAME]
+# [Nome do projeto]
 
-> Shared project instructions. Fill in the placeholders and merge into an existing AGENTS.md instead of replacing it. Keep client-specific settings in that client's configuration.
+> Preencha os campos e incorpore a instruções existentes, inclusive as geradas pelo Next. Configurações específicas ficam no cliente correspondente.
 
-## Stack
+## Produto e stack
 
-[PLACEHOLDER: languages, frameworks, supported runtime versions, package manager]
+- Produto e escopo: `product.md`.
+- Stack: [frameworks, versões observadas, runtime e gerenciador].
+- Setup e validações: `docs/setup.md`, quando utilizado este bootstrap.
 
-## Canonical commands
+## Comandos canônicos
 
-Use the project's actual commands. Mark unavailable checks explicitly rather than inventing commands.
+Use comandos reais; marque checks indisponíveis, sem inventar scripts.
 
-- **Install:** `[PLACEHOLDER]`
-- **Lint:** `[PLACEHOLDER]`
-- **Typecheck:** `[PLACEHOLDER]`
-- **Test:** `[PLACEHOLDER]`
-- **Build:** `[PLACEHOLDER]`
-- **Run/Dev:** `[PLACEHOLDER]`
+- Instalar: `[comando]`
+- Desenvolver: `[comando]`
+- Lint: `[comando]`
+- Tipos: `[comando]`
+- Regras locais de lint: `[comando, se existirem]`
+- Testes: `[comando, ou indisponível e motivo]`
+- Build: `[comando]`
+- Verificar base: `[comando que reúne os checks existentes]`
 
-## Working agreements
+## Acordos de trabalho
 
-- Read the affected code and instructions before editing. State assumptions that change scope or behavior.
-- Complete the requested work with the smallest change that fully solves it. Reuse existing patterns and dependencies.
-- Preserve local changes, credentials, project dependencies, runtime requirements and lockfiles unless the task explicitly calls for changing them.
-- Keep validation, error handling, security, accessibility and explicit requirements intact.
-- Verify behavior with the checks appropriate to the change. Report commands, results and any checks that could not run.
-- Ask for missing information when it affects correctness. Continue independent work and respect authorization already granted.
-- Publishing, messaging others, destructive actions, new costs and unrelated changes require authorization for that action.
+- Leia código e instruções pertinentes antes de editar. Declare hipóteses que alterem comportamento ou escopo.
+- Complete o pedido com a menor mudança suficiente. Reutilize padrões, componentes e dependências existentes.
+- Preserve alterações locais, validação, tratamento de erros, segurança, acessibilidade e requisitos explícitos.
+- Não crie abstrações, arquitetura, opções, dependências ou funcionalidades para necessidades não solicitadas.
+- Execute checks adequados. Teste lógica relevante e regressões; mudanças triviais não precisam de testes que apenas reproduzem a implementação.
+- Não transforme hipóteses em fatos ou integrações pendentes em resultados simulados.
+- Continue trabalho já autorizado. Pergunte somente por informação indispensável ou por ação fora da autorização.
+- Publicação, mensagens a terceiros, custos e ações destrutivas dependem de autorização pertinente. Instalar ferramentas não concede essa autorização.
 
-## Agent preferences
+## Ferramentas e estilo
 
-- **Ponytail:** use the installed plugin or skill at `full` intensity for coding. Preserve explicit requirements and meaningful verification.
-- **Caveman:** keep conversation concise in Portuguese. Give complete technical explanations when requested. Write code, documentation and commits normally. `stop caveman` disables the conversation style; `stop ponytail` disables the coding mode.
-- **Superpowers:** use installed process skills when applicable, scaling the workflow to the task and respecting user instructions.
-- **Context7:** fetch current library and API documentation when needed. Resolve the library ID first, then query one concept at a time. Never send secrets or private project content.
-- **RTK:** use supported command integrations. With a native rewrite hook, avoid adding a second wrapper. Without one, prefix supported commands explicitly. Use `rtk proxy <command>` for raw output or unsupported commands.
-- **Graphify:** use an existing project graph when it helps answer structural questions. Record stale or incomplete evidence; do not invent relationships.
-- **LLM work for Graphify and Caveman:** use native Codex, the current session model and ChatGPT authentication. Pass that exact model explicitly when supported delegation is used. Never silently switch provider, choose a cheaper model, enable API billing or insert a proxy.
+- **Ponytail:** plugin/skill instalado em intensidade `full` para programação. `stop ponytail` desativa o modo.
+- **Caveman:** conversa concisa no idioma do usuário, preservando clareza e explicações completas quando solicitadas. Código, documentação e commits têm redação normal. `stop caveman` desativa o estilo.
+- **Superpowers:** use skills pertinentes e proporcione o fluxo ao escopo. Instruções explícitas e execução já autorizada prevalecem sobre aprovações repetidas.
+- **Context7:** consulte documentação atual para APIs, bibliotecas e setup. Resolva o identificador e consulte um conceito por vez. Nunca envie segredos ou código privado. Se indisponível, use fontes oficiais e registre a limitação.
+- **RTK:** use comandos suportados. Com hook nativo ativo, evite wrapper duplicado; sem hook, prefixe comandos suportados. Use `rtk proxy <comando>` para saída original.
+- **Graphify:** use grafo existente quando ajudar em perguntas de estrutura. Registre evidência desatualizada/incompleta; não invente relações. Exclua segredos, dependências, skills vendorizadas e arquivos gerados.
+- **LLMs:** preserve cliente nativo, modelo e autenticação autorizados na sessão, inclusive em Graphify e Caveman. Passe o mesmo modelo explicitamente na delegação suportada. Não troque provedor/modelo nem ative API paga ou proxy silenciosamente.
 
-These preferences assume the named tools are installed and discovered. If an integration is missing, report it; the environment setup prompt handles installation.
+Confira instalação e descoberta antes de depender de uma ferramenta. Ausência precisa de registro ou alternativa oficialmente suportada; uma preferência escrita não instala um plugin.
 
-## Parallel work
+## Skills para Next.js
 
-Use delegation when requested and supported. Parallel tasks need separate file ownership and no dependency on unfinished work in the same wave. Do not invent available agents or tool APIs. Keep commits under the coordinator's control when that workflow is authorized.
+[Liste apenas skills realmente instaladas; remova a seção se o projeto não usar Next/React.]
 
-## Conventions
+- `vercel-react-best-practices`: ao escrever/revisar React/Next, dados e desempenho.
+- `vercel-composition-patterns`: em decisões concretas de composição e API de componentes.
+- `web-design-guidelines`: revisão de interface e acessibilidade.
+- `writing-guidelines`: revisão de documentação e prosa.
+- `vercel-react-view-transitions`: transições solicitadas e compatíveis com as versões.
+- `vercel-optimize`: otimização com tarefa pertinente e métricas Vercel disponíveis.
+- `deploy-to-vercel`: publicação/preview autorizados.
+- `vercel-cli-with-tokens`: operações Vercel com esse método de autenticação escolhido.
+- `find-skills`: descoberta quando faltar uma capacidade concreta.
 
-[PLACEHOLDER: import style, formatting, testing, error handling, architecture boundaries]
+Instalar skills não executa suas ações. Não force animações, cache, deploy ou mudanças de arquitetura só porque uma skill está disponível.
 
-## Project context
+## Git e colaboração
 
-[PLACEHOLDER: links to architecture, domain rules, runbooks and the location of project memory]
+- Não adicione bloqueios de push em `main`, exigência de branch/worktree ou hooks `pre-commit`/`pre-push` por padrão.
+- Lint, tipos, testes e build são checks explícitos; configurações Git adicionais entram quando solicitadas.
+- Delegue quando solicitado ou pelo fluxo pertinente e suportado. Tarefas paralelas precisam de arquivos distintos e independência na mesma onda.
+- Use ferramentas reais do host; nomes ilustrativos de agentes não são capacidades instaladas.
+
+## Convenções e contexto
+
+[Importações, organização efetiva do código, erros e links para decisões úteis. Mantenha este arquivo curto; detalhes ficam nos documentos correspondentes.]

@@ -548,11 +548,11 @@ Add a tiny pre-lint script that deletes `.eslintcache` whenever a file under the
 local-rules directory is newer than the cache file, or you'll silently lint against a
 stale rule after editing one.
 
-## 10. Wire it into git hooks
+## 10. Keep checks explicit; Git hooks are opt-in
 
-Run `lint` on `pre-commit` and `pre-push` (husky, lefthook, or equivalent) — keep this
-tier fast (§8 is what makes that affordable), since pre-commit/pre-push latency is a tax
-paid on every single commit.
+Use the package.json scripts as explicit checks. Do not install pre-commit/pre-push hooks, a hook manager, branch restrictions or push blockers as part of this setup.
+
+Preserve existing hooks and their configuration. Only add or change Git hooks when the user specifically requests that integration. If requested, use the project's existing mechanism and keep type-aware lint outside the fast hook path.
 
 ## 11. After generating the config
 

@@ -1,0 +1,43 @@
+# [Nome do produto]
+
+> Preencha a partir da descrição do usuário. Remova instruções e campos sem utilidade; registre hipóteses em vez de inventar decisões.
+
+## Problema e objetivo
+
+[Quem enfrenta qual problema, como resolve hoje e qual resultado o produto deve produzir.]
+
+## Público e papéis
+
+[Usuários principais, contexto de uso e diferenças de acesso que realmente existirem.]
+
+## Fluxos da versão inicial
+
+[Fluxos essenciais, com entrada, ação e resultado esperado. Priorize os que comprovam o objetivo.]
+
+## MVP
+
+[Funcionalidades incluídas na primeira versão, em ordem de prioridade.]
+
+## Fora de escopo
+
+[O que foi explicitamente adiado ou não pertence ao pedido.]
+
+## Requisitos
+
+[Regras de negócio conhecidas, dados necessários, acessibilidade, idioma, dispositivos e requisitos de segurança pertinentes.]
+
+## Restrições e decisões técnicas
+
+[Next.js/App Router, versões observadas, gerenciador e limitações informadas. Banco, autenticação e serviços externos somente quando definidos ou necessários.]
+
+## Hipóteses e pendências
+
+[Diferencie hipótese reversível de decisão indispensável ainda sem resposta. Indique impacto e próximo passo.]
+
+## Critérios de aceitação
+
+[Resultados observáveis para os fluxos do MVP. Separe critérios do produto dos checks técnicos de setup.]
+
+## Próxima entrega
+
+[A menor tarefa implementável que avança o MVP depois do bootstrap.]

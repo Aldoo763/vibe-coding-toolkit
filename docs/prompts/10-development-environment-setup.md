@@ -192,7 +192,7 @@ Configure as preferências:
 - **Superpowers:** skills disponíveis e carregadas nos clientes compatíveis.
 - **Graphify:** ferramenta e integração prontas para uso pelo mecanismo suportado.
 
-Para trabalhos com LLM de Graphify e Caveman, preserve o uso de Codex nativo, modelo da sessão e autenticação ChatGPT. Passe o modelo explicitamente quando houver delegação suportada. Não troque silenciosamente para outro provedor, modelo mais barato, cobrança por API ou proxy.
+Para trabalhos com LLM de Graphify e Caveman, preserve cliente nativo, modelo e autenticação autorizados na sessão. No Codex, mantenha login ChatGPT quando utilizado; no Claude, preserve a modalidade vigente. Passe o mesmo modelo explicitamente quando houver delegação suportada. Não troque silenciosamente provedor/modelo nem ative cobrança por API ou proxy. A CLI standalone não herda automaticamente a autenticação do agente; registre limitações em vez de inventar suporte.
 
 As instruções deste prompt e minhas preferências explícitas prevalecem sobre fluxos de skills que repetiriam autorizações já concedidas.
 

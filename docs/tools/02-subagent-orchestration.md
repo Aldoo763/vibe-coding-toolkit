@@ -10,8 +10,7 @@ IA carrega automaticamente). Em vez de usar um único agente generalista que
 implementa tudo e revisa tudo, você define um **elenco** — um conjunto fixo
 de "papéis" — de agentes **especialistas** com escopo estreito, cada um
 cobrindo um domínio bem definido, cada um com uma descrição de uma linha só
-dizendo "quando usar esse aqui". Toda tarefa nova é roteada (direcionada)
-pro especialista cuja descrição combina com ela.
+dizendo "quando usar esse aqui". Tarefas delegáveis são roteadas para o especialista adequado, quando o cliente e o fluxo escolhido suportarem essa execução.
 
 Um subagente, aqui, é uma instância separada do agente de IA — despachada
 (disparada) só pra cuidar de uma tarefa específica, com o próprio contexto,
@@ -79,27 +78,15 @@ despacho usa, o isolamento via `isolation: worktree`) é coberto pela
 não é redundante com este documento, é a base técnica sobre a qual o padrão
 aqui é construído.
 
-## Parte B — disciplina de escolha de modelo
+<a id="parte-b--disciplina-de-escolha-de-modelo"></a>
 
-Trate isto como uma regra de bolso, não uma lei rígida: **defina
-explicitamente em qual nível (*tier*) de modelo cada despacho de subagente
-roda, toda vez — nunca deixe herdar silenciosamente o modelo da sessão
-principal.** Um despacho que herda por padrão tende a rodar tudo no nível do
-agente principal, o que costuma ser modelo demais pra uma tarefa mecânica, e
-ocasionalmente modelo de menos pra uma tarefa genuinamente difícil.
+## Parte B — modelo e autenticação
 
-A regra de bolso é: use a camada mais barata que ainda resolve o problema.
+Preserve cliente nativo, modelo e autenticação autorizados na sessão. Quando o host permitir delegação, passe esse modelo explicitamente. Nomes e níveis de modelo variam entre clientes; este toolkit não escolhe um provedor ou um modelo fixo para todos.
 
-- **Camada rápida/barata** (por exemplo, um modelo classe Haiku) — trabalho
-  mecânico: edição de um único arquivo com a mudança totalmente
-  especificada, ou exploração pura por busca/*grep* (ferramenta de linha de
-  comando que busca texto dentro de arquivos).
-- **Camada intermediária** (por exemplo, um modelo classe Sonnet) — o padrão
-  pra maior parte do trabalho de implementação, integração, *debug* e
-  revisão.
-- **Camada de raciocínio mais forte** (por exemplo, um modelo classe Opus) —
-  reservada pra decisões de arquitetura genuinamente difíceis, não pra
-  volume de trabalho.
+Não troque para um modelo mais barato, proxy ou billing de API como efeito da instalação de Graphify, Caveman ou outra ferramenta. Uma estratégia com modelos diferentes depende de escolha explícita do usuário e suporte do cliente.
+
+Delegação é um recurso proporcional ao trabalho. Use o agente principal para mudanças pequenas; use especialistas quando houver benefício, autorização ou exigência do fluxo escolhido. Os nomes da tabela são papéis ilustrativos, não agentes automaticamente instalados.
 
 ## Antes das ondas: como decidir a quebra de tarefas
 
@@ -269,9 +256,7 @@ projeto, começando do zero.
    início de cada sessão), como uma tabela em markdown. É isso que
    transforma a lista de "quando usar" numa regra de verdade — se ela só
    existir na sua cabeça, ela não roteia nada.
-4. **Defina o nível de modelo por especialista.** Pra cada linha da tabela,
-   decida (e registre) qual camada de modelo esse tipo de tarefa merece,
-   seguindo a Parte B. Não deixe em aberto.
+4. **Preserve o modelo autorizado.** Passe o mesmo modelo da sessão explicitamente nos despachos suportados, conforme a Parte B. Uma estratégia com modelos diferentes só entra quando o usuário a escolher.
 
 A partir daqui, o padrão já está montado — os passos 5 a 8 são sobre como
 usá-lo num plano de verdade, aplicando a execução em ondas da Parte C:
@@ -370,10 +355,7 @@ resolvem o mesmo problema; fundir evita até o custo de um commit extra.
   operações concorrentes disputam o mesmo recurso e o resultado final
   depende de qual delas "vence") volta a existir; a regra só funciona se for
   absoluta.
-- **Nível de modelo é por despacho, não por agente pra sempre.** O mesmo
-  especialista pode rodar na camada barata numa tarefa trivial e na camada
-  intermediária numa tarefa complexa, dentro do mesmo projeto — a decisão é
-  da tarefa, não do nome do agente.
+- **Modelo e autenticação seguem a sessão autorizada.** Nome de especialista não autoriza troca de provedor, modelo ou billing. Registre alternativas somente quando escolhidas explicitamente pelo usuário.
 - **Isolamento em worktree não é de graça.** Cada worktree usada geralmente
   precisa instalar dependências e configurar ambiente de novo — use só
   quando o paralelismo ganho realmente compensar esse custo.

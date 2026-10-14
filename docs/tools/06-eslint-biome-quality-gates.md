@@ -476,14 +476,13 @@ padrão mais comum é separar num segundo arquivo de configuração
 `lint:types` na CI ou por comando manual. Veja "Lint consciente de tipos,
 fora do caminho rápido", mais acima, pro raciocínio completo.
 
-### 7. Conectar o lint rápido a um pre-commit hook
+<a id="7-conectar-o-lint-rápido-a-um-pre-commit-hook"></a>
 
-Com o script rápido isolado, conectá-lo a um pre-commit hook (com `husky`,
-`lefthook`, ou o gerenciador de hooks que seu projeto já usa) fica seguro
-— ele roda em menos de um ou dois segundos na maioria dos projetos, porque
-só faz checagem sintática. `lint:types` fica de fora do hook e entra só na
-esteira de CI, rodando em paralelo com os outros checks, sem atrasar o
-commit de ninguém.
+### 7. Manter checks explícitos
+
+Execute lint pelos scripts do projeto. Este setup não instala hooks Git, gerenciadores de hooks, bloqueios de branch ou travas de push.
+
+Preserve hooks existentes. Se o usuário solicitar especificamente essa integração, use o mecanismo já adotado pelo projeto e mantenha lint com tipos fora do caminho rápido. Não imponha um novo hook como pré-requisito da configuração ESLint.
 
 ### 8. Introduzir a primeira regra nova em modo aviso
 

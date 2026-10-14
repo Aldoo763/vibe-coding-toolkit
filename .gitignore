@@ -146,3 +146,10 @@ vite.config.ts.timestamp-*
 .tmp/
 # macOS
 .DS_Store
+
+# Private extraction inputs and generated agent/tooling state
+/EXAMPLE/
+graphify-out/
+.vercel/
+.claude/settings.local.json
+.codex/auth.json

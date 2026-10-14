@@ -391,6 +391,8 @@ sessão continua sem o extra", nunca em "a sessão trava".
 
 ## Catálogo de categorias de hooks
 
+Esta é uma referência opcional de hooks do cliente, não uma lista de instalação obrigatória. O bootstrap não instala hooks Git nem bloqueios de edição/push em `main`.
+
 Conforme o conjunto de hooks de um projeto amadurece, algumas categorias
 tendem a aparecer repetidamente. Vale conhecê-las como referência, mesmo
 antes de precisar de todas:
@@ -402,8 +404,6 @@ antes de precisar de todas:
 - **Bloquear acesso direto ao sistema de arquivos** numa pasta protegida
   e redirecionar para uma ferramenta mais segura e estruturada. Veja
   [Obsidian como memória](08-obsidian-memory.md).
-- **Bloquear edições numa branch protegida** — recusar uma escrita direta
-  em `main`, por exemplo.
 - **Escanear conteúdo antes dele ser escrito**, procurando segredos
   (chaves de API, senhas, tokens de acesso) commitados por acidente.
 - **Formatar um arquivo automaticamente** assim que ele é editado.

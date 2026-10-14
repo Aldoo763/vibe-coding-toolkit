@@ -63,6 +63,14 @@ No Codex, selecione a skill pelo nome mostrado no cliente ou invoque-a com `$nom
 
 Peça ao agente para listar as skills descobertas e conferir a origem antes de validar. Diretório existente sem skill descoberta continua sendo configuração incompleta.
 
+## Configuração e skills do projeto
+
+Para iniciar Next com produto, lint e skills, siga o [bootstrap](../04-project-bootstrap.md). Instale a coleção Vercel localmente conforme o [catálogo](16-vercel-skills.md), selecionando `--agent codex`; se também usar Claude, selecione os dois clientes. Não copie um cache global nem duplique plugins já descobertos.
+
+Configuração local pertence a `.codex/config.toml` e só é carregada em projeto confiável. O [template Context7](../../templates/project/codex.config.toml.example) é uma alternativa quando faltar conexão ativa; concilie-o com a configuração existente e preserve autenticação fora do repositório. Não acrescente opções de modelo, provedor ou permissões pessoais ao template. Fonte: [configuração oficial](https://learn.chatgpt.com/docs/config-file/config-advanced).
+
+Plugins globais continuam globais. `AGENTS.md`, skills locais, produto, lint e exclusões Graphify pertencem ao projeto. O bootstrap não instala bloqueios Git ou hooks de commit/push.
+
 ## Conecte o Context7 por MCP
 
 Use esta alternativa quando não estiver usando o plugin que já fornece o mesmo servidor. A [documentação do Context7](https://context7.com/docs/resources/all-clients) descreve clientes locais e remotos; o endpoint remoto dispensa instalar um pacote MCP local.

@@ -41,7 +41,7 @@ segundo instala o plugin `caveman` a partir dela.
 
 Depois de instalado, a intensidade pode ser ajustada com `/caveman` no Claude Code ou pela skill correspondente no cliente. No Codex, use `$caveman` ou o nome descoberto na lista de skills. Para persistir a preferência, incorpore a regra ao `AGENTS.md` ou `CLAUDE.md`, sem substituir instruções existentes.
 
-O [projeto oficial](https://github.com/JuliusBrussee/caveman) também distribui CLI, proxy e recursos de Cloud. As skills de comunicação podem ser usadas separadamente. No setup deste toolkit, preserve Codex nativo, modelo da sessão e login ChatGPT para trabalhos com LLM de Caveman; não ative roteamento, outro provedor ou cobrança por API como efeito da instalação.
+O [projeto oficial](https://github.com/JuliusBrussee/caveman) também distribui CLI, proxy e recursos de Cloud. As skills de comunicação podem ser usadas separadamente. No setup deste toolkit, preserve cliente nativo, modelo e autenticação da sessão para trabalhos com LLM de Caveman. No Codex, mantenha login ChatGPT quando utilizado; no Claude, preserve sua modalidade. Não ative roteamento, outro provedor ou cobrança por API como efeito da instalação.
 
 Para descoberta de skills e plugins no Codex, veja o [guia do cliente](15-codex-workflow.md). Configure cada agente separadamente e evite copiar skills já fornecidas por outra distribuição.
 

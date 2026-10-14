@@ -2,7 +2,7 @@
 
 Use o [prompt 10 — ambiente de desenvolvimento](prompts/10-development-environment-setup.md) para preparar uma máquina nova ou atualizar e corrigir um ambiente existente. Ele pede execução, backups, integração dos agentes e testes em novas sessões. Instalar os binários é apenas uma parte do trabalho.
 
-O setup atua no ambiente global. Para configurar instruções, lint e memória **dentro de um projeto**, use depois o [playbook](02-playbook-onboarding.md) ou o [guia do Codex](tools/15-codex-workflow.md).
+O setup atua no ambiente global. Para **iniciar um projeto Next**, use depois o [bootstrap](04-project-bootstrap.md). Para adotar o fluxo num projeto existente, use o [playbook](02-playbook-onboarding.md) ou o [guia do Codex](tools/15-codex-workflow.md). Skills Vercel são instaladas no projeto, conforme o [catálogo](tools/16-vercel-skills.md).
 
 ## 1. Escolha onde executar
 
@@ -86,7 +86,7 @@ Essas referências ajudam a evitar pacotes com nomes parecidos. Confirme a docum
 | Context7 | [upstash/context7](https://github.com/upstash/context7) | Plugin ou MCP; um servidor lógico por cliente |
 | Graphify | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | Pacote `graphifyy`, CLI `graphify` e skill descoberta pelo agente |
 
-Para Caveman, comunicação concisa não exige ativar proxy, Cloud ou troca automática de modelos. Para trabalhos com LLM de Caveman e Graphify, este prompt exige Codex nativo, autenticação ChatGPT e modelo da sessão. Não deduza autorização para outro provedor a partir de uma opção disponível na ferramenta.
+Para Caveman, comunicação concisa não exige ativar proxy, Cloud ou troca automática de modelos. Para trabalhos com LLM de Caveman e Graphify, preserve cliente nativo, autenticação e modelo autorizados na sessão. No Codex, mantenha login ChatGPT quando utilizado; no Claude, a modalidade vigente. Não deduza autorização para outro provedor a partir de uma opção disponível na ferramenta.
 
 ## 4. Acompanhe intervenções e retomadas
 

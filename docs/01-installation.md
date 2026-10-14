@@ -83,9 +83,17 @@ No toolkit modular, você pode escolher peças. No **prompt 10**, RTK, Ponytail,
 | aia-harness | [Marketplace](https://github.com/leandrosilvaferreira/claude-plugins-registry) | Onboarding de projeto; confirme opções e suporte no próprio marketplace |
 | Plugins oficiais do Claude | [Marketplace](https://github.com/anthropics/claude-plugins-official) | Escolha ferramentas de revisão, commits ou hooks conforme a necessidade |
 
-## 3. Instruções do projeto
+## 3. Skills Vercel locais
 
-Use [AGENTS.md.template](../templates/AGENTS.md.template) para instruções compartilhadas e [CLAUDE.md.template](../templates/CLAUDE.md.template) para o cliente Claude. Preencha comandos e convenções reais; incorpore ao arquivo existente em vez de sobrescrevê-lo.
+Para Next/React, siga o [catálogo completo](tools/16-vercel-skills.md): oito skills web de `vercel-labs/agent-skills` e `find-skills` de `vercel-labs/skills`. Use instalação local, nomes reais do frontmatter e somente os clientes necessários. React Native/Expo é uma extensão opcional.
+
+Para gerar produto, base oficial e configurações em conjunto, use o [bootstrap Next](04-project-bootstrap.md) e o [prompt 11](prompts/11-next-project-bootstrap.md). Não reinstale plugins globais a cada projeto.
+
+<a id="3-instruções-do-projeto"></a>
+
+## 4. Instruções do projeto
+
+Use [AGENTS.md.template](../templates/AGENTS.md.template) para instruções compartilhadas e [CLAUDE.md.template](../templates/CLAUDE.md.template) como ponte do cliente Claude para `AGENTS.md`. Preencha comandos e convenções no arquivo compartilhado; incorpore aos existentes sem sobrescrevê-los.
 
 O [settings.json.example](../templates/settings.json.example) mostra o formato de hooks personalizados. Os scripts citados são exemplos: só registre hooks cujos arquivos existam e cujo comportamento tenha sido verificado. RTK e plugins devem usar sua instalação oficial, sem duplicar interceptadores.
 
