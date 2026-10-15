@@ -7,7 +7,7 @@ node scripts/validate-docs.mjs
 node scripts/validate-next.mjs
 ```
 
-Use Node.js 24, npm, Git e rede. O [check de documentos](../scripts/validate-docs.mjs) verifica links locais, âncoras, destinos do manifesto e JSON. O [check do app](../scripts/validate-next.mjs) cria e remove um projeto temporário; dependências e recursos de teste ficam nele. Nenhum dos dois chama modelos, instala hooks Git ou altera configuração global.
+Use Node.js 24, npm, Git e rede. O [check de documentos](../scripts/validate-docs.mjs) verifica links locais, âncoras, destinos do manifesto e JSON. O [check do app](../scripts/validate-next.mjs) cria e remove um projeto temporário; dependências e recursos de teste ficam nele. Os checks ESLint rodam em processo filho, liberando extensões nativas antes da limpeza no Windows; o resultado final só é aprovado após remover o temporário. Nenhum dos dois chama modelos, instala hooks Git ou altera configuração global.
 
 O [workflow](../.github/workflows/validate.yml) executa os dois em Ubuntu e Windows, com ações oficiais fixadas por commit e permissão somente de leitura. Preservar nomes públicos é parte do contrato: atualize callers, índices e templates no mesmo trabalho.
 

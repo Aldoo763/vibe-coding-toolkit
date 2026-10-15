@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { execSync, spawn } from "node:child_process";
+import { execFileSync, execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 import { cp, mkdir, mkdtemp, readFile, readdir, readlink, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -76,59 +76,6 @@ async function checkSkills() {
     assert.equal(await readFile(path.join(app, ".claude/skills", name, "SKILL.md"), "utf8"), canonical);
     if (process.platform !== "win32") assert(!path.isAbsolute(await readlink(path.join(app, ".claude/skills", name))));
   }
-}
-
-async function checkLint(require) {
-  const { ESLint } = require("eslint");
-  const eslint = new ESLint({ cwd: app });
-  const check = async (code, file) => (await eslint.lintText(code, { filePath: path.join(app, file) }))[0];
-  const oversized = Array.from({ length: 351 }, (_, i) => `export const value${i} = ${i};`).join("\n");
-  const cases = [
-    ...["src/oversized.ts", "src/index.ts", "src/components/index.tsx", "src/types.ts", "src/constants.ts"].map(file => [oversized, file, "quality/max-lines"]),
-    ["export const value: any = 1;", "src/typed.ts", "@typescript-eslint/no-explicit-any"],
-    ['export default function Page() { return <a href="/">Home</a>; }', "src/app/page.tsx", "@next/next/no-html-link-for-pages"],
-    ['console.log("probe");', "src/app/page.tsx", "quality/no-direct-console"],
-    ['import { getDb as loadDb } from "@/db"; export const GET = loadDb;', "src/app/api/probe/route.ts", "quality/no-direct-data-access"],
-    ["export const remove = (db, table) => db.delete(table);", "src/features/probe/repository.ts", "drizzle/enforce-delete-with-where"],
-    ["export const update = (db, table) => db.update(table).set({ name: 'x' });", "src/features/probe/repository.ts", "drizzle/enforce-update-with-where"],
-  ];
-  for (const [code, file, rule] of cases) {
-    assert((await check(code, file)).messages.some(message => message.ruleId === rule && message.severity === 2), `${rule} not enforced at ${file}`);
-  }
-  for (const [code, file] of [
-    ["export default function Home() { return <main>Ready</main>; }", "src/app/page.tsx"],
-    ['import { getDb } from "@/db"; export const read = () => getDb();', "src/features/probe/repository.ts"],
-    ["export const remove = (db, table, condition) => db.delete(table).where(condition);", "src/features/probe/repository.ts"],
-    ["export const update = (db, table, condition) => db.update(table).set({ name: 'x' }).where(condition);", "src/features/probe/repository.ts"],
-    ["export const remove = (map: Map<string, string>) => map.delete('key');", "src/lib/map.ts"],
-  ]) assert.equal((await check(code, file)).errorCount, 0, file);
-  for (const file of ["src/app/page.tsx", "app/page.tsx", "components/widget.tsx"]) {
-    assert.equal((await eslint.calculateConfigForFile(path.join(app, file))).rules["quality/max-lines"][0], 2);
-  }
-  for (const declaration of ["export type Value", "export interface Value"]) {
-    const types = Array.from({ length: 351 }, (_, i) => `${declaration}${i} ${declaration.includes("type") ? "=" : ""} { value: string };`).join("\n");
-    assert(!(await check(types, "src/public-types.ts")).messages.some(message => message.ruleId === "quality/max-lines"));
-    assert((await check(types + "\nexport const runtime = initialize();", "src/types.ts")).messages.some(message => message.ruleId === "quality/max-lines"));
-  }
-  await cp(path.join(root, "templates/eslint/eslint.config.mjs.example"), path.join(app, "eslint.advanced.mjs"));
-  const advanced = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.advanced.mjs") });
-  for (const name of ["order.test.ts", "order.spec.ts", "order.e2e-spec.ts", "order-spec.ts", "order-test.js", "order.spec.mts", "order.test.cts", "__tests__/helper.ts"]) {
-    const file = path.join(app, "src", name);
-    const config = await advanced.calculateConfigForFile(file);
-    assert.equal(config.rules["quality/max-lines"][0], 1, name);
-    for (const rule of ["max-statements", "max-lines-per-function", "max-nested-callbacks", "import-x/no-restricted-paths", "import-x-debt/no-restricted-paths"]) {
-      assert.equal(config.rules[rule][0], 0, `${name}: ${rule}`);
-    }
-    assert((await advanced.lintText(oversized, { filePath: file }))[0].messages.some(message => message.ruleId === "quality/max-lines" && message.severity === 1), name);
-  }
-  assert.equal((await advanced.calculateConfigForFile(path.join(app, "src/order-specification.ts"))).rules["quality/max-lines"][0], 2);
-  await rm(path.join(app, "eslint.advanced.mjs"));
-  console.log("PASS content-based barrel detection and consistent test classification in advanced ESLint");
-  // Resolve the lightweight profile from the fixture so imports use its dependencies.
-  await cp(path.join(root, "templates/eslint/next.config.mjs.example"), path.join(app, "eslint.light.mjs"));
-  const localLight = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.light.mjs") });
-  assert.equal((await localLight.lintText("export const ready = true;", { filePath: path.join(app, "src/light.ts") }))[0].errorCount, 0);
-  await rm(path.join(app, "eslint.light.mjs"));
 }
 
 async function checkSql() {
@@ -256,7 +203,8 @@ try {
   await writeFile(packageFile, JSON.stringify(packageJson, null, 2) + "\n");
   await checkDocs();
   await checkSkills();
-  await checkLint(require);
+  // Windows locks loaded native addons; the child must exit before removing its dependencies.
+  execFileSync(process.execPath, [path.join(root, "scripts/check-eslint.mjs")], { cwd: app, env, stdio: "inherit", timeout: 120_000 });
   await checkSql();
   await checkServerBoundary();
   run("npm run check");
@@ -266,7 +214,8 @@ try {
   const versions = Object.fromEntries(["next", "react", "drizzle-orm", "drizzle-kit", "pg", "zod", "pino", "vitest"].map(name => [name, lock.packages[`node_modules/${name}`].version]));
   assert(Object.values(versions).every(version => /^\d+\.\d+\.\d+$/.test(version)), "Expected stable releases");
   console.log("Validated versions:", JSON.stringify(versions));
-  console.log(`PASS ${process.platform}: documentation contracts, Next/Drizzle templates, quality guards, tests, SQL, build, audit, HTTP and nine local skills`);
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }
+
+console.log(`PASS ${process.platform}: documentation contracts, Next/Drizzle templates, quality guards, tests, SQL, build, audit, HTTP and nine local skills`);
