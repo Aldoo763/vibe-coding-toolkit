@@ -45,6 +45,10 @@ reexporta não tem tamanho que signifique alguma coisa, e reporta em
 posição errada. Nenhum desses erros aparece como falha — aparece como uma
 regra que "não pega nada" ou que "pega tudo", e a pessoa desliga.
 
+O teto distingue barrels pelo AST, sem isentar `index.*`, `types.*` ou `constants.*` por nome. Imports, reexportações ESM e declarações de tipos sem lógica própria podem ser isentos; código executável conta. Os sufixos `.test`, `.spec`, `-test` e `-spec` (incluindo `.e2e-spec`) e diretórios de testes compartilham a classificação das três regras. `includeTests` permite medir esses testes com orçamento próprio.
+
+Ao atualizar uma instalação existente, recopie os três `.cjs` da mesma revisão, rode o self-check e meça a linha de base novamente: módulos com lógica antes isentos pelo nome podem passar a aparecer no relatório. A atualização deste toolkit não altera cópias já instaladas em outros projetos.
+
 Por isso o prompt não pede pro agente escrever as regras. Ele pede pra
 copiar. O que o agente decide é só o que realmente depende do seu
 projeto: onde fica a camada de apresentação, qual módulo exporta o

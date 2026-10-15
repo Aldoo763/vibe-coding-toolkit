@@ -73,7 +73,17 @@ const maxLines = {
       return {};
     }
     return {
-      Program() {
+      Program(node) {
+        // Exempt forwarding/type-only modules by syntax, never by basename.
+        const declarationOnly = node.body.every((statement) => {
+          if (["ImportDeclaration", "ExportAllDeclaration", "EmptyStatement"].includes(statement.type)) return true;
+          if (["ExportNamedDeclaration", "ExportDefaultDeclaration"].includes(statement.type)) {
+            if (!statement.declaration) return true;
+            statement = statement.declaration;
+          }
+          return ["TSTypeAliasDeclaration", "TSInterfaceDeclaration"].includes(statement.type);
+        });
+        if (declarationOnly) return;
         const lines = context.sourceCode.lines.length;
         if (lines > max) {
           context.report({

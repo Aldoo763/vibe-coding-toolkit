@@ -82,8 +82,9 @@ async function checkLint(require) {
   const { ESLint } = require("eslint");
   const eslint = new ESLint({ cwd: app });
   const check = async (code, file) => (await eslint.lintText(code, { filePath: path.join(app, file) }))[0];
+  const oversized = Array.from({ length: 351 }, (_, i) => `export const value${i} = ${i};`).join("\n");
   const cases = [
-    [Array.from({ length: 351 }, (_, i) => `export const value${i} = ${i};`).join("\n"), "src/oversized.ts", "quality/max-lines"],
+    ...["src/oversized.ts", "src/index.ts", "src/components/index.tsx", "src/types.ts", "src/constants.ts"].map(file => [oversized, file, "quality/max-lines"]),
     ["export const value: any = 1;", "src/typed.ts", "@typescript-eslint/no-explicit-any"],
     ['export default function Page() { return <a href="/">Home</a>; }', "src/app/page.tsx", "@next/next/no-html-link-for-pages"],
     ['console.log("probe");', "src/app/page.tsx", "quality/no-direct-console"],
@@ -104,6 +105,25 @@ async function checkLint(require) {
   for (const file of ["src/app/page.tsx", "app/page.tsx", "components/widget.tsx"]) {
     assert.equal((await eslint.calculateConfigForFile(path.join(app, file))).rules["quality/max-lines"][0], 2);
   }
+  for (const declaration of ["export type Value", "export interface Value"]) {
+    const types = Array.from({ length: 351 }, (_, i) => `${declaration}${i} ${declaration.includes("type") ? "=" : ""} { value: string };`).join("\n");
+    assert(!(await check(types, "src/public-types.ts")).messages.some(message => message.ruleId === "quality/max-lines"));
+    assert((await check(types + "\nexport const runtime = initialize();", "src/types.ts")).messages.some(message => message.ruleId === "quality/max-lines"));
+  }
+  await cp(path.join(root, "templates/eslint/eslint.config.mjs.example"), path.join(app, "eslint.advanced.mjs"));
+  const advanced = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.advanced.mjs") });
+  for (const name of ["order.test.ts", "order.spec.ts", "order.e2e-spec.ts", "order-spec.ts", "order-test.js", "order.spec.mts", "order.test.cts", "__tests__/helper.ts"]) {
+    const file = path.join(app, "src", name);
+    const config = await advanced.calculateConfigForFile(file);
+    assert.equal(config.rules["quality/max-lines"][0], 1, name);
+    for (const rule of ["max-statements", "max-lines-per-function", "max-nested-callbacks", "import-x/no-restricted-paths", "import-x-debt/no-restricted-paths"]) {
+      assert.equal(config.rules[rule][0], 0, `${name}: ${rule}`);
+    }
+    assert((await advanced.lintText(oversized, { filePath: file }))[0].messages.some(message => message.ruleId === "quality/max-lines" && message.severity === 1), name);
+  }
+  assert.equal((await advanced.calculateConfigForFile(path.join(app, "src/order-specification.ts"))).rules["quality/max-lines"][0], 2);
+  await rm(path.join(app, "eslint.advanced.mjs"));
+  console.log("PASS content-based barrel detection and consistent test classification in advanced ESLint");
   // Resolve the lightweight profile from the fixture so imports use its dependencies.
   await cp(path.join(root, "templates/eslint/next.config.mjs.example"), path.join(app, "eslint.light.mjs"));
   const localLight = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.light.mjs") });
@@ -214,8 +234,10 @@ try {
   const require = createRequire(packageFile);
   const nextVersion = require("next/package.json").version;
   assert(/^\d+\.\d+\.\d+$/.test(nextVersion));
+  const eslintMajor = require("eslint/package.json").version.split(".")[0];
+  assert(/^\d+$/.test(eslintMajor));
   run("npm install drizzle-orm pg server-only zod pino clsx tailwind-merge");
-  run(`npm install -D @types/node@24 drizzle-kit @types/pg @next/env@${nextVersion} vitest eslint-plugin-drizzle @electric-sql/pglite`);
+  run(`npm install -D @types/node@24 drizzle-kit @types/pg @next/env@${nextVersion} vitest eslint-plugin-drizzle @electric-sql/pglite @eslint/js@${eslintMajor} typescript-eslint eslint-plugin-import-x eslint-import-resolver-typescript`);
   assert.equal(require("@next/env/package.json").version, nextVersion);
   await copyNext();
   await cp(path.join(root, "templates/eslint/eslint-rules"), path.join(app, "eslint-rules"), { recursive: true });

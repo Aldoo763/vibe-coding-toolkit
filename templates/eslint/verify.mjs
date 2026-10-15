@@ -9,7 +9,7 @@
 // RuleTester.run() throws on the first failing case, so a non-zero exit is
 // the failure signal; there is no assertion library to configure. Test
 // sources are plain JavaScript with .ts/.tsx filenames on purpose: the
-// rules only ever look at the filename and at syntax espree already
+// rules inspect filenames and syntax espree already
 // understands, so the check needs no TypeScript parser.
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -20,6 +20,7 @@ const target = process.argv[2] ?? "./eslint-rules/index.cjs";
 const plugin = (await import(pathToFileURL(path.resolve(target)).href)).default;
 
 const ruleTester = new RuleTester();
+const testFilenames = ["src/order.e2e-spec.ts", "src/order-spec.ts", "src/order-test.js", "src/order.spec.mts", "src/order.test.cts"];
 // Unique identifiers per line: repeating one declaration would collide
 // with itself and fail as a parse error before any rule ever runs.
 const lines = (count) =>
@@ -28,6 +29,20 @@ const lines = (count) =>
 
 ruleTester.run("quality/max-lines", plugin.rules["max-lines"], {
   valid: [
+    ...testFilenames.map((filename) => ({
+      name: `test suffix is exempt by default: ${filename}`,
+      code: lines(20), filename, options: [{ max: 10 }],
+    })),
+    {
+      name: "a non-index barrel is exempt by content",
+      code: Array.from({ length: 20 }, (_, i) => `export * from "./module${i}";`).join("\n"),
+      filename: "src/public-api.ts", options: [{ max: 10 }],
+    },
+    {
+      name: "empty statements do not turn a forwarding module into runtime logic",
+      code: 'import { value } from "./module";\nexport { value };\n' + ";\n".repeat(20),
+      filename: "src/public-api.ts", options: [{ max: 10 }],
+    },
     {
       name: "a file under the budget",
       code: lines(3),
@@ -53,8 +68,8 @@ ruleTester.run("quality/max-lines", plugin.rules["max-lines"], {
       options: [{ max: 10 }],
     },
     {
-      name: "barrel files are never checked",
-      code: lines(20),
+      name: "a pure re-export barrel is exempt by content",
+      code: Array.from({ length: 20 }, (_, i) => `export { item${i} } from "./module${i}";`).join("\n"),
       filename: "src/index.ts",
       options: [{ max: 10 }],
     },
@@ -72,6 +87,21 @@ ruleTester.run("quality/max-lines", plugin.rules["max-lines"], {
     },
   ],
   invalid: [
+    ...testFilenames.map((filename) => ({
+      name: `includeTests opts in a test suffix: ${filename}`,
+      code: lines(20), filename, options: [{ max: 10, includeTests: true }],
+      errors: [{ messageId: "tooLong" }],
+    })),
+    {
+      name: "a similar production suffix is still checked",
+      code: lines(20), filename: "src/order-specification.ts", options: [{ max: 10 }],
+      errors: [{ messageId: "tooLong" }],
+    },
+    ...["src/index.ts", "src/components/index.tsx", "src/types.ts", "src/constants.ts", "C:\\repo\\src\\index.ts"].map((filename) => ({
+      name: `runtime code is checked regardless of the basename: ${filename}`,
+      code: lines(20), filename, options: [{ max: 10 }],
+      errors: [{ messageId: "tooLong" }],
+    })),
     {
       name: "a file over the budget",
       code: lines(20),
@@ -93,6 +123,9 @@ console.log("quality/max-lines: ok");
 
 ruleTester.run("quality/no-direct-console", plugin.rules["no-direct-console"], {
   valid: [
+    ...testFilenames.map((filename) => ({
+      name: `test suffix may use console: ${filename}`, code: "console.log('test');", filename,
+    })),
     {
       name: "a logging helper is fine",
       code: "logger.info('hello');",
@@ -155,6 +188,11 @@ ruleTester.run(
   plugin.rules["no-direct-data-access"],
   {
     valid: [
+      ...testFilenames.map((filename) => ({
+        name: `test suffix may access data: ${filename}`,
+        code: "import { db } from '@/db';", filename: `/repo/${filename}`,
+        options: [{ ...dataAccess, layers: ["/src/"] }],
+      })),
       {
         name: "a guarded layer importing something other than the client",
         code: "import { userColumns } from '@/db';",

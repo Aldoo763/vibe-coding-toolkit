@@ -177,6 +177,11 @@ import { createTypeScriptImportResolver } from "eslint-import-resolver-typescrip
 // synchronous require for rule modules in most setups:
 // import local from "./eslint-rules/local.cjs";
 
+const testFiles = [
+  "**/*{.,-}{test,spec}.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+  "**/{__tests__,__mocks__,fixtures,mocks}/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+];
+
 export default defineConfig([
   js.configs.recommended,
   ...tseslint.configs.strict, // not just "recommended" — drop to recommended only if
@@ -233,7 +238,7 @@ export default defineConfig([
 
   // Test-file relaxations — MUST come after the production blocks above
   {
-    files: ["**/*.test.{ts,tsx}", "**/{__tests__,__mocks__,fixtures,mocks}/**/*.{ts,tsx}"],
+    files: testFiles,
     rules: { /* see §5's "Test-file relaxation" */ },
   },
 
@@ -384,8 +389,8 @@ intentional: a function that's grown too complex is a nudge (`warn`); a file tha
 grown too large is a hard stop (`error`) — file size is cheap to check, expensive to let
 rot, and has no legitimate reason to be waived the way a gnarly function sometimes does.
 
-**Test-file relaxation** — on `**/*.test.{ts,tsx}` and equivalent test/mock/fixture
-globs, turn fully **`off`** (not just relaxed): `max-statements`,
+**Test-file relaxation** — on the shared `testFiles` globs above (`.test`, `.spec`,
+`-test`, `-spec`, including `.e2e-spec`, plus test/mock/fixture directories), turn fully **`off`** (not just relaxed): `max-statements`,
 `max-lines-per-function`, `max-nested-callbacks`, `@typescript-eslint/no-non-null-assertion`,
 and any architecture-boundary rule from §6. Leave `max-params` on, and leave the
 file-line-count rule (§7.1) on too but downgraded to `warn` with an explicit
@@ -437,8 +442,10 @@ whichever apply to the target project's actual domain — adapt names/paths in
 ### 7.1 File-length ceiling — `error` in production, `warn` on tests
 
 Count lines in the file; report once if over a threshold (350 is what this taste uses —
-tune to the codebase). Skip `.d.ts`, generated/vendor paths, and barrel files (`index.*`,
-`types.*`, `constants.*` — anything inherently just declarations). On test/mock/fixture
+tune to the codebase). Skip `.d.ts` and generated/vendor paths. Detect forwarding/type-only
+modules by their AST: imports, ESM re-exports and TypeScript interface/type declarations
+only. Never exempt `index.*`, `types.*` or `constants.*` by name: runtime initializers,
+functions, classes and components still count, even alongside re-exports. On test/mock/fixture
 globs: same rule, but `warn`, with an explicit opt-in flag to check them at all (tests
 are allowed more slack before this becomes noise).
 

@@ -17,7 +17,7 @@ O [workflow](../.github/workflows/validate.yml) executa os dois em Ubuntu e Wind
 |---|---|
 | Documentação | Nove fontes/destinos do manifesto e links relativos ao destino; a LLM ainda deve preencher conteúdo específico |
 | Skills | Nove fontes locais, nomes do frontmatter, lockfile e conteúdo Claude/Codex; links relativos ou cópias no Windows |
-| ESLint | Perfil completo e leve carregam; negativos reais de tamanho, Next, TypeScript, console, dados e escritas Drizzle; positivos válidos passam |
+| ESLint | Perfis completo, leve e avançado carregam; negativos de tamanho inclusive em `index/types/constants`, Next, TypeScript, console, dados e Drizzle; barrels/tipos puros e sufixos de teste têm casos positivos |
 | Servidor | Oito testes Vitest de ambiente, redação de logs e ciclo de vida de pool; compilação rejeita ambiente servidor em Client Component |
 | SQL | Drizzle Kit gera sem URL; SQL de uma tabela de teste migra/reaplica em PGlite, com CRUD parametrizado e rollback |
 | Aplicação | Lint, tipos, self-checks, testes e build; servidor de produção responde HTTP 200 com conteúdo esperado |
@@ -65,7 +65,7 @@ Confira também TOML, sintaxe dos executáveis, `git diff --check`, escopo dos a
 
 ## Três ciclos de revisão desta atualização
 
-Revisores com contexto separado conferiram a mudança completa antes do commit.
+As revisões abaixo se referem à padronização do bootstrap, com contexto separado e correções antes do commit.
 
 | Ciclo | Foco | Resultado |
 |---|---|---|

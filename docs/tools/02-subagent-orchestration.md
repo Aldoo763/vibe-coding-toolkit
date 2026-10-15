@@ -88,6 +88,10 @@ Não troque para um modelo mais barato, proxy ou billing de API como efeito da i
 
 Delegação é um recurso proporcional ao trabalho. Use o agente principal para mudanças pequenas; use especialistas quando houver benefício, autorização ou exigência do fluxo escolhido. Os nomes da tabela são papéis ilustrativos, não agentes automaticamente instalados.
 
+## Recuperar uma execução interrompida
+
+Falha de trabalhador não conclui o escopo do coordenador. Confirme que o agente parou antes de assumir seus arquivos, examine alterações parciais e retome do ponto verificado. Se o estado continuar incerto, preserve a propriedade desses arquivos e avance apenas em trabalho independente. Não repita a mesma tentativa sem evidência nova; respeite gates e limites. O [playbook](../02-playbook-onboarding.md#continuidade-de-execução) reúne os acordos e cenários de avaliação, também disponíveis no template de instruções compartilhadas.
+
 ## Antes das ondas: como decidir a quebra de tarefas
 
 Tudo que a Parte C ensina — marcar `Files:` e `Depends-on:`, agrupar em

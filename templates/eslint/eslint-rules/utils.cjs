@@ -27,13 +27,7 @@ const BANNED_CONSOLE_METHODS = new Set([
 // A file whose basename says it is not production source. Config and story
 // files are here for the same reason as tests: their length says nothing
 // about how well the code behind them is factored.
-const NON_SOURCE_BASENAME = /\.(test|spec|stories|config|conf)\.[^.]+$/;
-
-// A barrel or a pure declaration module. An index.ts that only re-exports
-// has no meaningful size, and neither does a file that is nothing but type
-// or constant declarations.
-const TYPE_BARREL_BASENAME =
-  /^(index|types?|interfaces?|constants?|dtos?|enums?|vo)\.[^.]+$/;
+const NON_SOURCE_BASENAME = /[.-](stories|config|conf)\.[^.]+$/;
 
 // Directories whose contents are either not authored by hand or not part of
 // the application being linted.
@@ -64,7 +58,7 @@ function fileName(context) {
 }
 
 function isTestFile(filename) {
-  return /(^|\/)(__tests__|__mocks__|fixtures|mocks)(\/|$)|\.(test|spec)\.[cm]?[jt]sx?$/.test(
+  return /(^|\/)(__tests__|__mocks__|fixtures|mocks)(\/|$)|[.-](test|spec)\.[cm]?[jt]sx?$/.test(
     filename
   );
 }
@@ -76,7 +70,7 @@ function isCheckableSourceFile(filename) {
     if (IGNORED_PATH_SEGMENTS.has(segment)) return false;
   }
   const base = segments[segments.length - 1];
-  return !NON_SOURCE_BASENAME.test(base) && !TYPE_BARREL_BASENAME.test(base);
+  return !isTestFile(filename) && !NON_SOURCE_BASENAME.test(base);
 }
 
 // Baseline entries are matched as a whole path or as a path suffix, so an

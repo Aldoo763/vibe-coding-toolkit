@@ -82,6 +82,10 @@ For each wave, in order:
    each other and lose updates; a single write after the wave completes
    doesn't.
 
+## Worker failure and recovery
+
+The controller retains the authorized scope when a worker fails. Confirm that the worker has stopped before taking over or reassigning its files; an interrupt request alone is not confirmation. Inspect partial changes and resume from a verified state. While ownership is uncertain, continue only independent work on other files. Retry only with new evidence, within permissions and cost/time/attempt limits; otherwise report the blocker and the condition for resuming.
+
 ## Escape hatch
 
 Sometimes two tasks genuinely can't avoid touching the same files. When

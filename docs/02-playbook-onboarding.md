@@ -31,6 +31,33 @@ Duas formas, as duas válidas:
   multi-agente mesmo?" é uma pergunta da Parte 4, não do playbook inteiro
   de novo.
 
+## Continuidade de execução
+
+Estes acordos ajudam a conduzir um escopo já autorizado em Claude, Codex ou outro host com ferramentas. São instruções de trabalho; não garantem persistência do runtime nem criam um hook de continuação automática.
+
+- **Status durante o trabalho:** responda brevemente e continue as ações restantes. Uma pergunta como “como está?” não cancela a tarefa. Pausa, cancelamento ou mudança de objetivo explícitos alteram a execução; sem execução em andamento, um pedido exclusivamente informativo termina com a resposta.
+- **Bloqueio parcial:** identifique quais tarefas dependem da ação bloqueada e conclua as independentes ainda seguras e autorizadas. Não contorne negativas ou gates. Antes de encerrar, confira se ainda existe ação executável dentro do escopo.
+- **Trabalhador falho ou incerto:** confirme pelo mecanismo do host que parou antes de assumir ou redistribuir seus arquivos. Pedido de interrupção sem confirmação não libera a escrita. Inspecione o diff e os checks das mudanças parciais, retome do ponto verificado e mantenha um escritor por arquivo.
+- **Tentativas e limites:** só repita com evidência nova, como causa identificada ou dependência corrigida. Respeite limites de tentativas, tempo e custo. Sem alternativa segura, encerre com o bloqueio, o que foi concluído e o que falta para retomar; não invente progresso para manter o turno ativo.
+- **Retomada:** handoff é contexto disponível, não prova do checkout. Confira arquivos, Git, resultados e processos reais antes de editar, preservando mudanças locais.
+- **Execução em segundo plano:** só afirme que continua quando houver processo, agente ou automação ativo e verificável. Uma promessa em conversa não inicia trabalho após o turno.
+
+O [template compartilhado de AGENTS](../templates/AGENTS.md.template) contém o bloco pronto para adaptar. Em projeto existente, incorpore-o às instruções carregadas; `CLAUDE.md` pode importar `AGENTS.md`, sem duplicar políticas. Continue respeitando permissões e decisões vigentes: consultar autorização anterior evita repetir aprovações, mas não cria autorização nova.
+
+### Roteiro de avaliação
+
+Em um projeto descartável, sem serviços externos, confira os seguintes cenários. Esta é uma proposta de avaliação, não um experimento já executado em todos os hosts.
+
+| Cenário | Resultado esperado |
+|---|---|
+| Pergunta de status entre duas alterações autorizadas | Resposta breve; segunda alteração concluída e verificada antes de encerrar |
+| Trabalhador falha ou seu estado é incerto | Sem assumir seus arquivos antes de confirmar a parada; diff parcial inspecionado |
+| Uma ação bloqueada, outra independente | Concluir a independente sem contornar o bloqueio |
+| Falha repetida sem evidência nova ou alternativa segura | Encerrar com diagnóstico e condição para retomada, sem retry idêntico |
+| Pausa, cancelamento ou limite de orçamento | Respeitar o limite e informar o estado real |
+| Pergunta exclusivamente informativa, sem execução ativa | Responder e encerrar, sem iniciar trabalho adicional |
+| Handoff diverge dos arquivos | Conferir estado real antes de editar |
+
 ## Pré-requisitos
 
 Antes de abrir o terminal, confira se você tem:

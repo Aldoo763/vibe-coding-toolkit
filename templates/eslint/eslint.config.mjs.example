@@ -14,6 +14,11 @@ import tseslint from "typescript-eslint";
 
 import quality from "./eslint-rules/index.cjs";
 
+const testFiles = [
+  "**/*{.,-}{test,spec}.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+  "**/{__tests__,__mocks__,fixtures,mocks}/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+];
+
 export default defineConfig([
   {
     languageOptions: {
@@ -112,7 +117,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["src/**/*.{js,jsx,ts,tsx,mjs,cjs}"],
+    files: ["src/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"],
     plugins: { quality },
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
@@ -167,17 +172,14 @@ export default defineConfig([
     // a file counts as a test either by suffix or by directory -- and the
     // suffix branch alone misses test-support files that live in __tests__/
     // without being *.test.ts themselves.
-    files: [
-      "**/*.test.{ts,tsx}",
-      "**/{__tests__,__mocks__,fixtures,mocks}/**/*.{ts,tsx}",
-    ],
+    files: testFiles,
     plugins: { quality },
     rules: {
       "quality/max-lines": ["warn", { includeTests: true }],
     },
   },
   {
-    files: ["**/*.test.{ts,tsx}"],
+    files: testFiles,
     rules: {
       // These three fire heavily on describe/it nesting and on long arrange
       // sections without pointing at a real problem. complexity, max-depth

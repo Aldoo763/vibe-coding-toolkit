@@ -63,6 +63,10 @@ No Codex, selecione a skill pelo nome mostrado no cliente ou invoque-a com `$nom
 
 Peça ao agente para listar as skills descobertas e conferir a origem antes de validar. Diretório existente sem skill descoberta continua sendo configuração incompleta.
 
+## Continuidade do trabalho
+
+Adote os [acordos de continuidade](../02-playbook-onboarding.md#continuidade-de-execução) e o bloco do [AGENTS compartilhado](../../templates/AGENTS.md.template). Perguntas de status não encerram trabalho autorizado; bloqueios afetam só dependências. Confirme a parada de um trabalhador antes de assumir arquivos, confira o checkout na retomada e preserve permissões/limites. Essas instruções não garantem execução após o turno nem substituem processos ativos verificáveis.
+
 ## Configuração e skills do projeto
 
 Para iniciar Next com produto, lint e skills, siga o [bootstrap](../04-project-bootstrap.md). Instale a coleção Vercel localmente conforme o [catálogo](16-vercel-skills.md), selecionando `--agent codex`; se também usar Claude, selecione os dois clientes. Não copie um cache global nem duplique plugins já descobertos.
