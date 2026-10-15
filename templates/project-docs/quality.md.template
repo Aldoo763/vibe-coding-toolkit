@@ -16,6 +16,12 @@
 
 [Cubra comportamento, decisões, falhas e regressões. Indique ambientes de teste existentes e como isolar serviços. Não escreva testes que apenas repetem o código. Não invente cobertura, suíte E2E ou garantia de segurança.]
 
+## Revisão após implementação ou correção
+
+Ao concluir um ciclo de implementação ou correção, sugira de 3 a 8 ciclos posteriores de code review, com quantidade proporcional ao risco, focos complementares e prompt de continuação preenchido. Essa faixa é convenção do projeto; revisões adicionais dependem de pedido do usuário.
+
+Cada ciclo verifica o estado atual e o código conectado, registra achados com severidade, local e evidência e reavalia correções autorizadas com os checks afetados. Correções da mesma rodada não reiniciam a contagem. Termine com verificação integrada e riscos residuais, sem criar ciclos artificiais ou afirmar que uma quantidade de revisões prova ausência de bugs.
+
 ## Dependências e entrega
 
 Confira auditorias completas e de produção. Investigue advisories e registre risco conhecido e correção disponível. Lint/build aprovados não significam auditoria zerada.

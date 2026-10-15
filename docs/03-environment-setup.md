@@ -134,4 +134,6 @@ As versões registradas são evidência do ambiente de origem. O prompt ainda pe
 
 ## Depois da base
 
+Para configurar ou atualizar um projeto já existente com o conjunto aplicável, use o [prompt 12](prompts/12-existing-project-setup.md). Ele reutiliza o ambiente preparado e mantém o escopo do projeto separado do setup da máquina.
+
 Escolha extras pelo problema que resolvem. Para automação de fluxos no navegador, veja [agent-browser](tools/11-agent-browser.md); para investigar console, rede e desempenho, veja [Chrome DevTools MCP](tools/14-chrome-devtools-mcp.md). Para qualidade no projeto, use os [quality gates](tools/06-eslint-biome-quality-gates.md). Nenhum desses extras novos deve ser instalado automaticamente por aparecer como recomendação.

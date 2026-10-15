@@ -2,6 +2,8 @@
 
 Esta é a referência de decisões para o [bootstrap](04-project-bootstrap.md). Os padrões dão uma base coerente; requisitos explícitos e evidências atuais podem justificar adaptações. Registre a escolha no projeto, sem instalar ferramentas apenas porque existem na referência.
 
+Para adoção ou atualização em aplicação existente, siga o [prompt 12](prompts/12-existing-project-setup.md). Preserve stack e equivalentes funcionais; estes defaults de projeto novo não autorizam uma migração.
+
 ## Núcleo padrão
 
 | Área | Escolha inicial | Limite |

@@ -6,11 +6,12 @@ Não é um plugin, nem algo que você instala — é um **padrão** (um jeito
 recorrente de resolver um problema, que você reaplica sempre que ele
 aparece) que você constrói dentro das próprias instruções do seu projeto (um
 `CLAUDE.md`, um `AGENTS.md`, ou o arquivo equivalente que a sua ferramenta de
-IA carrega automaticamente). Em vez de usar um único agente generalista que
-implementa tudo e revisa tudo, você define um **elenco** — um conjunto fixo
-de "papéis" — de agentes **especialistas** com escopo estreito, cada um
-cobrindo um domínio bem definido, cada um com uma descrição de uma linha só
-dizendo "quando usar esse aqui". Tarefas delegáveis são roteadas para o especialista adequado, quando o cliente e o fluxo escolhido suportarem essa execução.
+IA carrega automaticamente). Quando a delegação compensa, você define
+**papéis** de agentes especialistas com escopo estreito e uma descrição
+de uma linha dizendo quando usar cada um. Selecione os papéis por tarefa;
+um elenco persistente só faz sentido para necessidades recorrentes
+comprovadas. Tarefas delegáveis são roteadas para o especialista adequado,
+quando o cliente e o fluxo escolhido suportarem essa execução.
 
 Um subagente, aqui, é uma instância separada do agente de IA — despachada
 (disparada) só pra cuidar de uma tarefa específica, com o próprio contexto,
@@ -82,11 +83,41 @@ aqui é construído.
 
 ## Parte B — modelo e autenticação
 
-Preserve cliente nativo, modelo e autenticação autorizados na sessão. Quando o host permitir delegação, passe esse modelo explicitamente. Nomes e níveis de modelo variam entre clientes; este toolkit não escolhe um provedor ou um modelo fixo para todos.
+Preserve cliente nativo, modelo principal e autenticação autorizados. **Sem política de seleção autorizada, subagentes usam o modelo da sessão.** A instalação de uma ferramenta não concede permissão para trocar modelo, provedor ou modo de cobrança.
 
-Não troque para um modelo mais barato, proxy ou billing de API como efeito da instalação de Graphify, Caveman ou outra ferramenta. Uma estratégia com modelos diferentes depende de escolha explícita do usuário e suporte do cliente.
+O usuário pode autorizar uma política de seleção por tarefa, sem precisar escolher o nome de cada modelo. O [prompt de projeto existente](../prompts/12-existing-project-setup.md) concede essa autorização dentro do provedor e autenticação vigentes, respeitando restrições explícitas. Isso não autoriza alterar o agente principal, instalar proxy, configurar billing de API ou contrariar uma limitação de modelo já definida.
 
-Delegação é um recurso proporcional ao trabalho. Use o agente principal para mudanças pequenas; use especialistas quando houver benefício, autorização ou exigência do fluxo escolhido. Os nomes da tabela são papéis ilustrativos, não agentes automaticamente instalados.
+### Escolher capacidade na hora
+
+Descubra os modelos e esforços realmente disponíveis no host. Com seleção autorizada, prefira o modelo mais leve que consiga cumprir o aceite, considerando complexidade, ambiguidade, risco e esforço de revisão. Confira as recomendações atuais do cliente; não fixe nomes comerciais em instruções portáveis.
+
+| Trabalho | Orientação de capacidade |
+|---|---|
+| Busca localizada, inventário, links, leitura de logs e mudança mecânica pequena | Capacidade leve, com saída verificável |
+| Implementação delimitada, contratos e revisão de comportamento | Capacidade suficiente para raciocínio e checks do escopo |
+| Arquitetura, autorização, segurança, migrations, concorrência ou causa ambígua | Capacidade maior quando o julgamento exigido justificar; não reduzir apenas pelo preço |
+
+Selecione modelo e esforço explicitamente nos controles suportados. Se o host só permitir herança ou configuração de agente, siga o mecanismo documentado e registre a limitação; não invente parâmetros. Falta de compreensão ou baixa qualidade pede diagnóstico e possível escalonamento, não repetição indefinida no modelo barato. Respeite limites finitos de tempo, tentativas e recursos definidos para a tarefa.
+
+Essa escolha segue a orientação de [modelos e raciocínio em subagentes do Codex](https://learn.chatgpt.com/docs/agent-configuration/subagents) e de [seleção de modelo para custos no Claude Code](https://code.claude.com/docs/en/costs). Os mecanismos concretos variam por cliente e versão. As tabelas deste toolkit são critérios de decisão, não benchmarks nem promessas de economia.
+
+### Contexto, ferramentas e integração
+
+Use execução direta ou ferramenta determinística quando resolverem a tarefa com menos coordenação. Delegue para isolar contexto, aproveitar especialização ou executar partes independentes. Os nomes da Parte A são papéis ilustrativos, não agentes automaticamente instalados.
+
+Cada briefing inclui objetivo, contexto necessário, instruções aplicáveis, arquivos, dependências, aceite e checks. Prefira contexto limpo a copiar a conversa inteira. Peça um retorno curto com caminhos, achados, evidências e limitações. Conceda somente ferramentas/permissões necessárias; um revisor em leitura não vira escritor implicitamente. As [boas práticas de subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents) documentam esse isolamento.
+
+O coordenador confere diff e valida a integração. Lockfiles, configuração compartilhada, ledger e operações Git têm responsável único. Controle concorrência pelos recursos e limites reais do host; não crie árvores de agentes sem ganho claro. Registre modelos/esforços observados, sem estimar tokens ou economia quando não houver medição.
+
+## Revisão após implementação ou correção
+
+Como convenção deste toolkit, **sempre sugira ao usuário de 3 a 8 ciclos posteriores de code review** ao concluir um ciclo de implementação ou correção. A LLM escolhe quantidade e focos conforme o diff, o risco e a incerteza, com uma frase de justificativa. Essa faixa é preferência do fluxo, não recomendação universal dos fornecedores nem garantia de ausência de bugs.
+
+Mudanças pequenas tendem ao início da faixa; alterações extensas ou críticas tendem ao final. Distribua focos complementares que existam na mudança: requisitos, comportamento, regressões, testes, segurança, dados, integrações, acessibilidade, desempenho medido e manutenção. Inclua verificação de integração ao final; não crie revisões vazias para preencher uma lista.
+
+Entregue um prompt de continuação com o número escolhido, os focos e os comandos reais. **Sugerir não é executar:** novas rodadas precisam ser solicitadas. Dentro de uma rodada autorizada, cada ciclo inspeciona o estado atual e o código conectado, apresenta achados com severidade, local e evidência e reavalia correções autorizadas com os checks afetados. Correções internas não reiniciam a contagem; encerre na quantidade combinada com achados e riscos residuais explícitos.
+
+Exemplo de sugestão para uma mudança pequena de documentação: “Recomendo 3 ciclos: coerência dos contratos, segurança das instruções e navegação/uso. Revise o diff atual nesses 3 ciclos, com achados por severidade e caminho; verifique links e execute `node scripts/validate-docs.mjs` e `git diff --check`. Apresente propostas de correção; implemente-as somente dentro da autorização vigente.” Adapte a quantidade, os focos e os comandos a cada projeto.
 
 ## Recuperar uma execução interrompida
 
@@ -247,20 +278,18 @@ inteiro num plano real.
 Isto é o passo a passo pra construir o padrão inteiro no seu próprio
 projeto, começando do zero.
 
-1. **Liste os domínios reais do seu projeto.** Não copie o elenco da Parte A
-   palavra por palavra — olhe pro que seu projeto de fato tem: existe banco
-   de dados? Tem front-end? Você faz deploy próprio? Cada domínio real ganha
-   (no mínimo) um especialista; um domínio que seu projeto não tem não
-   precisa de agente nenhum.
+1. **Identifique o trabalho que merece delegação.** Não copie o elenco da
+   Parte A palavra por palavra. Selecione papéis para tarefas reais que
+   ganhem com isolamento, especialização ou paralelismo; ter banco ou
+   front-end não exige criar um agente para cada domínio.
 2. **Escreva a frase de "quando usar" pra cada um.** Uma linha, objetiva,
    sem sobreposição com as outras. Essa frase é a tabela de roteamento — não
    escreva uma tabela separada.
-3. **Salve isso nas instruções do projeto** (`CLAUDE.md`, `AGENTS.md`, ou o
-   arquivo equivalente que sua ferramenta de IA carrega automaticamente no
-   início de cada sessão), como uma tabela em markdown. É isso que
-   transforma a lista de "quando usar" numa regra de verdade — se ela só
-   existir na sua cabeça, ela não roteia nada.
-4. **Preserve o modelo autorizado.** Passe o mesmo modelo da sessão explicitamente nos despachos suportados, conforme a Parte B. Uma estratégia com modelos diferentes só entra quando o usuário a escolher.
+3. **Documente somente os papéis recorrentes comprovados.** Quando houver
+   necessidade, mantenha uma tabela curta nas instruções ou em um documento
+   referenciado por elas. Papéis pontuais ficam no briefing da tarefa;
+   não carregue uma equipe inteira em toda sessão.
+4. **Defina a política de capacidade.** Sem seleção autorizada, preserve o modelo da sessão; com autorização, escolha capacidade por tarefa e risco conforme a Parte B. Informe modelo e esforço nos controles suportados, preservando cliente, autenticação e restrições explícitas.
 
 A partir daqui, o padrão já está montado — os passos 5 a 8 são sobre como
 usá-lo num plano de verdade, aplicando a execução em ondas da Parte C:
@@ -359,7 +388,7 @@ resolvem o mesmo problema; fundir evita até o custo de um commit extra.
   operações concorrentes disputam o mesmo recurso e o resultado final
   depende de qual delas "vence") volta a existir; a regra só funciona se for
   absoluta.
-- **Modelo e autenticação seguem a sessão autorizada.** Nome de especialista não autoriza troca de provedor, modelo ou billing. Registre alternativas somente quando escolhidas explicitamente pelo usuário.
+- **Modelo e autenticação seguem a política autorizada.** Nome de especialista não autoriza troca de provedor ou billing. Seleção dinâmica de modelos exige política escolhida pelo usuário; sem ela, preserve o modelo da sessão.
 - **Isolamento em worktree não é de graça.** Cada worktree usada geralmente
   precisa instalar dependências e configurar ambiente de novo — use só
   quando o paralelismo ganho realmente compensar esse custo.
@@ -391,9 +420,10 @@ arquivo de instruções que a ferramenta carrega automaticamente, e a
 capacidade de despachar mais de um agente (ou sessão) ao mesmo tempo.
 
 **Existe um limite máximo de tarefas por onda?**
-Não tem número fixo. O tamanho da onda é puramente estrutural — quantas
-tarefas passam nas duas condições (sem dependência, arquivos disjuntos)
-nesse momento do plano — nunca um limite manual de concorrência.
+Não há número universal. Primeiro selecione tarefas sem dependências e com
+arquivos disjuntos; depois limite a concorrência aos slots, recursos e
+orçamento autorizados no host. Uma onda estruturalmente válida pode precisar
+ser executada em lotes menores.
 
 **Os revisores de uma onda podem discordar sobre tarefas vizinhas?**
 Cada revisor cuida só do intervalo de commit da própria tarefa, então isso

@@ -1,11 +1,14 @@
 # Visão geral
 
-O toolkit tem dois usos: consultar ferramentas e práticas separadamente, ou iniciar uma base Next.js a partir da descrição do produto. Ambos reutilizam a mesma coleção de templates e acordos.
+O toolkit permite iniciar uma base Next.js, configurar ou atualizar um projeto existente e consultar ferramentas separadamente. Os caminhos reutilizam a mesma coleção de templates e acordos.
 
-## Três caminhos
+<a id="três-caminhos"></a>
+
+## Quatro caminhos
 
 - **Máquina:** [setup global](03-environment-setup.md), com instalação, integração dos clientes, backups e manifesto.
 - **Projeto novo:** [bootstrap Next](04-project-bootstrap.md), com `PRODUCT.md`, scaffold oficial, skills locais, lint e evidências.
+- **Projeto existente:** [setup completo](prompts/12-existing-project-setup.md), com diagnóstico, brainstorming, harness, adoção/atualização das peças aplicáveis e validação antes/depois.
 - **Adoção parcial:** [instalação](01-installation.md), [ferramentas](tools/) e [prompts](prompts/), escolhendo somente o necessário.
 
 O agente precisa de acesso ao ambiente para executar e validar. Claude Code e Codex usam configurações próprias; outras LLMs podem seguir os requisitos com capacidades equivalentes, sem assumir compatibilidade de formatos.
@@ -32,7 +35,13 @@ O scaffold vem da versão estável de `create-next-app`, consultada no momento d
 
 O agente principal pode implementar mudanças pequenas. Subagentes ajudam em investigação ampla, tarefas independentes e revisão especializada. Use somente ferramentas e papéis realmente disponíveis.
 
-Ondas paralelas exigem responsabilidade por arquivo e ausência de dependência entre tarefas da mesma onda. O [guia de orquestração](tools/02-subagent-orchestration.md) detalha esse protocolo. Preserve modelo e autenticação autorizados na sessão; alternativas de modelo precisam de escolha explícita.
+Ondas paralelas exigem responsabilidade por arquivo e ausência de dependência entre tarefas da mesma onda. O [guia de orquestração](tools/02-subagent-orchestration.md) detalha esse protocolo. Preserve o modelo principal e a autenticação; seleção dinâmica de subagentes leves depende de política autorizada, capacidade suficiente e suporte do cliente. O prompt de projeto existente autoriza essa seleção dentro da sessão vigente, respeitando restrições explícitas.
+
+## Harness e revisão contínua
+
+O [setup de projeto existente](prompts/12-existing-project-setup.md) organiza instruções curtas, documentação localizável, comandos reproduzíveis, invariantes verificáveis e evidências para retomada. Cada peça do catálogo recebe uma decisão explícita; equivalentes funcionais são preservados.
+
+Após implementação ou correção, as instruções compartilhadas recomendam de 3 a 8 ciclos posteriores de code review, escolhidos conforme risco e escopo. A [convenção de revisão](tools/02-subagent-orchestration.md#revisão-após-implementação-ou-correção) exige focos úteis, evidência e limite de rodada; a sugestão não dispara revisões automaticamente.
 
 <a id="6-um-grafo-de-conhecimento-do-código"></a>
 <a id="7-um-sistema-de-memória-em-duas-camadas"></a>
@@ -70,4 +79,4 @@ O [manifesto global](../templates/environment-manifest.json.example) registra o 
 
 ## Próximo passo
 
-Use o [prompt curto de projeto](prompts/11-next-project-bootstrap.md) para começar Next, o [prompt de ambiente](prompts/10-development-environment-setup.md) para preparar a máquina ou o [playbook Claude](02-playbook-onboarding.md) e o [guia Codex](tools/15-codex-workflow.md) para uma base existente.
+Use o [prompt curto de projeto](prompts/11-next-project-bootstrap.md) para começar Next, o [setup de projeto existente](prompts/12-existing-project-setup.md) para adotar/atualizar o conjunto ou o [prompt de ambiente](prompts/10-development-environment-setup.md) para preparar a máquina. O [playbook Claude](02-playbook-onboarding.md) e o [guia Codex](tools/15-codex-workflow.md) detalham os clientes.

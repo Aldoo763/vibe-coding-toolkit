@@ -1,6 +1,6 @@
 # Ferramentas
 
-Escolha uma ferramenta para a necessidade atual. Para uma base inteira, siga o [bootstrap](../04-project-bootstrap.md); para preparar a máquina, o [setup global](../03-environment-setup.md).
+Escolha uma ferramenta para a necessidade atual. Para uma base nova, siga o [bootstrap](../04-project-bootstrap.md); para configurar ou atualizar um projeto existente, o [setup completo](../prompts/12-existing-project-setup.md); para preparar a máquina, o [setup global](../03-environment-setup.md).
 
 | Documento | Uso |
 |---|---|

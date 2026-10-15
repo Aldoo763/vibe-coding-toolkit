@@ -2,6 +2,8 @@
 
 Referência rápida para instalar os agentes e as peças do toolkit. Para **preparar ou atualizar o computador inteiro**, use o [guia de setup](03-environment-setup.md) e o [prompt 10](prompts/10-development-environment-setup.md): ele inclui a base de sistema, Node.js, Docker, todas as integrações obrigatórias, backups e validação.
 
+Para **configurar ou atualizar um projeto existente**, use o [prompt 12](prompts/12-existing-project-setup.md): diagnóstico, brainstorming, harness e integração de todo o toolkit aplicável, preservando a stack e as personalizações.
+
 Comandos conferidos em **14 de outubro de 2026**. Confirme a documentação da versão e do sistema usados. Escolha um método por ferramenta e preserve instalações existentes quando suportadas.
 
 ## 1. Codex e Claude Code
@@ -100,5 +102,6 @@ O [settings.json.example](../templates/settings.json.example) mostra o formato d
 ## Quer o passo a passo completo?
 
 - [Setup da máquina](03-environment-setup.md): execução, retomada, relatório e reprodução.
+- [Setup de projeto existente](prompts/12-existing-project-setup.md): adoção completa, atualização e validação.
 - [Playbook do Claude Code](02-playbook-onboarding.md): fluxo de projeto narrado.
 - [Fluxo do Codex](tools/15-codex-workflow.md): instruções, skills, MCP e permissões.

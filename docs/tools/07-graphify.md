@@ -50,7 +50,7 @@ Copie e adapte [as exclusões](../../templates/project/.graphifyignore.example).
 
 ## Documentos e extração semântica
 
-Use a skill descoberta pelo cliente, como `$graphify` no Codex ou a invocação equivalente documentada no outro agente. Preserve **cliente nativo, modelo e autenticação autorizados na sessão**. Passe o mesmo modelo explicitamente quando a delegação for suportada.
+Use a skill descoberta pelo cliente, como `$graphify` no Codex ou a invocação equivalente documentada no outro agente. Preserve **cliente nativo, modelo principal e autenticação autorizados**. Sem política de seleção autorizada, passe o modelo da sessão na delegação suportada; com essa política, siga a [seleção por tarefa e risco](02-subagent-orchestration.md#parte-b--disciplina-de-escolha-de-modelo), respeitando restrições explícitas a modelos.
 
 No Codex, preserve login ChatGPT quando utilizado; no Claude, preserve sua modalidade vigente. Não ative backend de API, proxy ou outro modelo por efeito do setup. A CLI `graphify extract` sozinha **não herda automaticamente a autenticação da conversa**. Uma opção `--backend openai` não equivale ao login ChatGPT.
 

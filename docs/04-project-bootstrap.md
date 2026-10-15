@@ -2,6 +2,8 @@
 
 Transforme uma descrição de produto numa base configurada. Para usar só uma peça, consulte [ferramentas](tools/README.md), [prompts](prompts/README.md) ou [templates](../templates/README.md). Este toolkit distribui a receita; a aplicação fica em outro diretório.
 
+Se a aplicação já existe, use o [prompt 12 — configurar ou atualizar projeto existente](prompts/12-existing-project-setup.md), que preserva sua stack e concilia o toolkit com a base atual.
+
 Funciona com um agente capaz de ler arquivos, editar e executar comandos. Claude Code e Codex usam os mesmos acordos em formatos próprios; outras LLMs seguem os requisitos com capacidades equivalentes. Um chat sem acesso ao ambiente não comprova execução.
 
 ## Prompt curto

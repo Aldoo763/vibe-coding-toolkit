@@ -16,6 +16,8 @@ disso já está rodando no seu ambiente, pule direto pra parte que falta.
 
 ## Como usar este playbook
 
+Para configurar ou atualizar o conjunto aplicável em um projeto existente, use o [prompt 12](prompts/12-existing-project-setup.md). Ele conduz diagnóstico, brainstorming, harness, implementação e validação; este playbook permanece como referência narrada do fluxo Claude.
+
 Para criar uma nova aplicação Next com uma descrição de produto, prefira o [bootstrap](04-project-bootstrap.md). Este playbook serve como referência de adoção e configuração manual no Claude. Plugins e hooks opcionais não são parte obrigatória do starter.
 
 Este guia cobre o **fluxo dentro do projeto**, principalmente no Claude Code. Para preparar ou atualizar a máquina, comece pelo [setup do ambiente](03-environment-setup.md). Para usar Codex, veja o [guia do cliente](tools/15-codex-workflow.md) e o [template compartilhado de `AGENTS.md`](../templates/AGENTS.md.template).

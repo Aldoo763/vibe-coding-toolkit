@@ -58,7 +58,7 @@ Use comandos reais; marque checks indisponíveis, sem inventar scripts.
 - **Context7:** consulte documentação atual para APIs, bibliotecas e setup. Resolva o identificador e consulte um conceito por vez. Nunca envie segredos ou código privado. Se indisponível, use fontes oficiais e registre a limitação.
 - **RTK:** use comandos suportados. Com hook nativo ativo, evite wrapper duplicado; sem hook, prefixe comandos suportados. Use `rtk proxy <comando>` para saída original.
 - **Graphify:** use grafo existente quando ajudar em perguntas de estrutura. Registre evidência desatualizada/incompleta; não invente relações. Exclua segredos, dependências, skills vendorizadas e arquivos gerados.
-- **LLMs:** preserve cliente nativo, modelo e autenticação autorizados na sessão, inclusive em Graphify e Caveman. Passe o mesmo modelo explicitamente na delegação suportada. Não troque provedor/modelo nem ative API paga ou proxy silenciosamente.
+- **LLMs:** preserve cliente nativo, modelo principal e autenticação autorizados, inclusive em Graphify e Caveman. Sem política de seleção autorizada, subagentes usam o modelo da sessão. Com essa política, escolha dinamicamente o modelo mais leve capaz de cumprir o aceite e aumente capacidade conforme risco/evidência; respeite restrições explícitas a modelos. Informe modelo e esforço nos controles suportados. Não troque provedor nem ative API paga ou proxy silenciosamente.
 
 Confira instalação e descoberta antes de depender de uma ferramenta. Ausência precisa de registro ou alternativa oficialmente suportada; uma preferência escrita não instala um plugin.
 
@@ -84,6 +84,15 @@ Instalar skills não executa suas ações. Não force animações, cache, deploy
 - Lint, tipos, testes e build são checks explícitos; configurações Git adicionais entram quando solicitadas.
 - Delegue quando solicitado ou pelo fluxo pertinente e suportado. Tarefas paralelas precisam de arquivos distintos e independência na mesma onda.
 - Use ferramentas reais do host; nomes ilustrativos de agentes não são capacidades instaladas.
+
+## Delegação e revisão
+
+- Delegue somente quando isolamento de contexto, especialização ou paralelismo independente compensarem a coordenação; prefira ferramenta determinística ou execução direta para tarefas simples.
+- Descubra modelos disponíveis e confira a política autorizada antes de despachar. Prefira capacidade leve para busca, inventário e mudanças mecânicas verificáveis; use capacidade suficiente para decisões complexas, segurança, dados e revisão crítica. Sem suporte à seleção, preserve o modelo permitido e registre a limitação.
+- Cada tarefa recebe objetivo, contexto mínimo, arquivos permitidos, dependências, aceite e checks. Um escritor por arquivo; coordenador cuida de lockfiles, configuração compartilhada e integração. Revisores paralelos trabalham somente em leitura.
+- Verifique diff e checks antes de aceitar o resultado de um trabalhador. Diante de falha, investigue e escale capacidade/contexto quando necessário; respeite limites finitos de tentativas, tempo e recursos. Não estime economia sem medição.
+- Após cada ciclo de implementação ou correção, sempre sugira ao usuário de **3 a 8 ciclos posteriores de code review**, escolhendo quantidade e focos conforme risco e escopo. Entregue motivo e prompt copiável com número, focos e checks reais. Essa faixa é convenção do projeto, não garantia de qualidade; a sugestão não autoriza executar novas rodadas automaticamente.
+- Em uma rodada solicitada, cada ciclo revisa o estado atual, registra achados com severidade/local/evidência e verifica correções autorizadas. Use focos complementares, com revisão de integração ao final. Correções internas não reiniciam a contagem; respeite a quantidade combinada e informe riscos residuais.
 
 ## Convenções e contexto
 

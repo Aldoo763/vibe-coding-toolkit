@@ -2,7 +2,7 @@
 
 ## Origem e contexto
 
-[Data da verificação, revisão única do toolkit, produto, cliente e runtime. Preserve a autenticação/modelo da sessão; não inclua caminhos pessoais ou credenciais.]
+[Data da verificação, revisão única do toolkit, produto, cliente e runtime. Preserve a autenticação e o modelo principal; registre a política autorizada de subagentes e os modelos/esforços observáveis, sem inventar custos. Não inclua caminhos pessoais ou credenciais.]
 
 ## Decisões e fontes
 
@@ -11,6 +11,10 @@
 ## Componentes
 
 [Versões efetivas, gerenciador, lockfile, escopos local/global, origem e nomes das skills. Diferencie plugin instalado, arquivo presente e descoberta pelo host.]
+
+| Componente | Ação e motivo | Escopo | Estado e evidência |
+|---|---|---|---|
+| [Peça avaliada do catálogo atual] | [Instalar, atualizar, integrar, reaproveitar equivalente ou justificar inaplicabilidade/bloqueio] | [Projeto, cliente ou usuário] | [Resultado observado e pendência, se houver] |
 
 ## Documentação criada
 
@@ -24,6 +28,8 @@
 
 Registre lint, tipos, testes, regras, build, auditorias, HTTP, geração SQL e banco quando aplicável. Identifique recursos temporários criados e seu encerramento. Não apresente uma simulação como teste de um serviço real.
 
+Em projeto existente, compare os checks antes/depois, distinguindo falhas preexistentes de regressões. Registre verificação de reexecução sem duplicação e o que recebeu somente revisão estática.
+
 ## Pendências e próxima entrega
 
-[Decisões externas, riscos conhecidos, próximo passo e menor tarefa do MVP. Publicação e serviços externos dependem de autorização pertinente.]
+[Decisões externas, riscos conhecidos, próximo passo e menor tarefa do MVP. Indique manutenção/reexecução, quantidade sugerida de 3 a 8 ciclos posteriores de code review, motivo, focos e prompt de continuação com checks reais. Publicação e serviços externos dependem de autorização pertinente.]

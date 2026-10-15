@@ -2,6 +2,8 @@
 
 Copie apenas a peça necessária. Os arquivos são fontes para adaptação, não uma aplicação pronta nem um instalador independente. O [bootstrap](../docs/04-project-bootstrap.md) define a ordem; os [padrões](../docs/06-project-defaults.md), as decisões.
 
+Em projeto existente, o [prompt 12](../docs/prompts/12-existing-project-setup.md) concilia estes templates com a estrutura, as ferramentas e os documentos já adotados.
+
 | Pasta ou arquivo | Uso | Destino |
 |---|---|---|
 | [project-docs/manifest.json](project-docs/manifest.json) | Mapa único da documentação inicial | Quatro arquivos na raiz e cinco em `docs/` |

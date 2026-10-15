@@ -1,5 +1,7 @@
 # Criar um projeto com o toolkit
 
+Para uma aplicação já existente, use o [prompt 12](12-existing-project-setup.md): ele adota ou atualiza o conjunto aplicável sem gerar outra base.
+
 ## Atalho
 
 Cole no agente com acesso ao diretório de destino:

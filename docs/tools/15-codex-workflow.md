@@ -2,6 +2,8 @@
 
 O Codex tem CLI, aplicativo e integrações próprias. Este guia mostra como usar o toolkit nele, com `AGENTS.md`, plugins, skills e MCPs. Para preparar o computador inteiro, use o [setup do ambiente](../03-environment-setup.md); para o fluxo narrado do Claude Code, use o [playbook](../02-playbook-onboarding.md).
 
+Para configurar ou atualizar o toolkit aplicável em um projeto existente, use o [prompt 12](../prompts/12-existing-project-setup.md), com diagnóstico, brainstorming, harness e validação.
+
 Referências conferidas em **14 de outubro de 2026**. Consulte as fontes novamente antes de instalar ou migrar: comandos e formatos podem mudar.
 
 ## Instale e autentique
@@ -100,7 +102,7 @@ Abra uma nova sessão e confirme a reescrita de um comando suportado. O hook alt
 
 Sem hook ativo nessa superfície, use `rtk git status`, por exemplo. Para saída completa ou comandos não suportados, use `rtk proxy <comando>`. Mais detalhes: [RTK](03-rtk-token-proxy.md).
 
-O [Graphify](https://github.com/Graphify-Labs/graphify) fornece instalação por `graphify install`, que detecta os agentes compatíveis. Confira a instalação da skill no Codex em uma nova sessão. Para extração semântica ou delegação, preserve Codex nativo, o modelo da sessão explicitamente e login ChatGPT; não configure um backend de API ou outra LLM como substituto silencioso. Veja [Graphify](07-graphify.md).
+O [Graphify](https://github.com/Graphify-Labs/graphify) fornece instalação por `graphify install`, que detecta os agentes compatíveis. Confira a instalação da skill no Codex em uma nova sessão. Para extração semântica ou delegação, preserve Codex nativo, o modelo principal e login ChatGPT. Sem política de seleção autorizada, passe o modelo da sessão; com essa política, siga o [roteamento por tarefa](02-subagent-orchestration.md#parte-b--disciplina-de-escolha-de-modelo), respeitando restrições explícitas. Não configure um backend de API ou outra LLM como substituto silencioso. Veja [Graphify](07-graphify.md).
 
 ## Permissões e persistência
 
