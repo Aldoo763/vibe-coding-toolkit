@@ -89,6 +89,11 @@ Set up ESLint 9 (flat config, `eslint.config.mjs`) matching this taste:
 
 Prerequisite: ESLint ≥ 9, flat config only — no `.eslintrc*` anywhere.
 
+These severities are defaults for newly introduced rules. Inventory and reuse
+existing configuration, scripts, framework presets, and CI gates. Preserve
+stronger existing protections; do not downgrade errors, remove checks, or replace
+working script names merely to match these examples.
+
 ## Language scope
 
 This targets the **JavaScript/TypeScript family** — `.js/.jsx/.mjs/.cjs` and
@@ -517,8 +522,11 @@ export default [
 ];
 ```
 
-For an existing codebase, first set these rules to `warn`, record each violation
-count and runtime, and promote each rule only after its violations reach zero.
+In an existing codebase, preserve each rule's current severity and blocking gate.
+Only newly introduced rules with existing violations may begin at `warn`: record
+the count, scope, runtime, and reduction plan, then promote each rule once clean.
+New rules without violations start at `error`. If the current gate requires zero
+warnings, measure adoption separately without weakening that gate.
 The separate [advanced typed profile](../../templates/eslint/eslint.typed.config.mjs.example)
 retains the broader warning rules for measured adoption; preserve those checks
 when already installed rather than replacing them with the focused profile.

@@ -153,9 +153,10 @@ formatted.
 
 ## From warning to error: promotion as a migration tool
 
-In an existing codebase, a new rule first enters as `"warn"`
-across the entire codebase — making every existing violation
-visible without breaking anyone's build. From there, the warning count
+In an existing codebase, a newly introduced rule with violations may enter as
+`"warn"`, while existing rules retain their severity. A new rule with no violations
+starts at `"error"`. If the existing gate requires zero warnings, measure adoption
+separately without weakening it. From there, the warning count
 is a real, trackable number, not a "we'll tighten this
 later" comment nobody ever revisits. Only when that count reaches
 zero does the rule become `"error"` — and stay that way.
@@ -361,8 +362,10 @@ from yours):
 For new TypeScript projects, `lint:typed` is an explicit `check`/CI gate with
 `no-floating-promises` and `no-misused-promises` at `error`. Use the
 [focused profile](../../templates/eslint/next.typed.config.mjs.example), which
-extends the fast configuration without a broad type-aware preset. In existing
-code, begin at `warn`, record counts, and promote each rule after reaching zero.
+extends the fast configuration without a broad type-aware preset. Preserve
+existing severities and gates. Only newly introduced rules with violations begin
+at `warn`, with measured counts and a reduction plan; new rules without violations
+start at `error`.
 Measure elapsed time and peak memory before adding typed rules or widening scope;
 keep the command separate from fast lint and Git hooks. The separate
 [advanced typed profile](../../templates/eslint/eslint.typed.config.mjs.example)
@@ -435,7 +438,8 @@ this generic baseline. Then copy the
 `eslint.typed.config.mjs`. Its `projectService: true` obtains TypeScript information;
 `tsconfigRootDir: import.meta.dirname` locates the project. Adjust the source glob
 to files included by the project's tsconfig. New projects use the two async-safety
-rules as errors; existing projects measure warnings before promoting them.
+rules as errors. Existing projects preserve their current protections and use
+measured warnings only for newly introduced rules with violations.
 
 ### 5. Install your framework's plugin, if it has one
 
@@ -457,8 +461,10 @@ starting point, not the final word" logic.
 ```
 
 Keep type-aware rules in the second configuration. Include `npm run lint:typed`
-in the new project's explicit `check`/CI sequence. For legacy adoption, first measure
-its warnings and runtime, then promote each rule once clean. See "Type-aware lint,
+in the new project's explicit `check`/CI sequence. Preserve equivalent existing
+script names, severities, and gates. For newly introduced rules with legacy
+violations, measure warnings and runtime, then promote each rule once clean.
+See "Type-aware lint,
 outside the fast path" above for the reasoning.
 
 <a id="7-connect-fast-lint-to-a-pre-commit-hook"></a>

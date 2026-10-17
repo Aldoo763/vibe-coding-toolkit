@@ -51,6 +51,18 @@ The coordinator reran the evaluator and compared file contents independently of 
 
 Fresh subagent contexts do not prove client restart behavior. Repeated setup, shared-resource contention, external partial blockers, stop/resume, and complete host/network traces were not exercised in these smoke tests; elapsed model time and token totals were not measured. No account-dependent integration or other model/client was evaluated. Production audit remained clear; the nine development entries below remain disclosed.
 
+### Requested three-cycle follow-up review
+
+Three sequential review cycles covered `0feb60d..f925aeb` and the resulting corrections, using independent native reviewers. The [CI run for `f925aeb`](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/runs/39075036417) passed the complete disposable-project validation on Ubuntu and Windows, including the Windows long-path correction.
+
+| Cycle | Focus | Result |
+|---|---|---|
+| 1 | Executable behavior, security, memory, and orchestration | Corrected older guide text requiring commits and assuming read-only reviews could not collide through shared resources; aligned guide, prompt, and rule template |
+| 2 | Bootstrap integration and existing-project protections | Restricted warning adoption to newly introduced rules with violations; preserved existing lint severities, scripts, and blocking gates |
+| 3 | Integrated result and verification of corrections | No new actionable findings within the reviewed scope; connected instructions, executable fixtures, and report contracts checked |
+
+The two findings were verified closed. Eleven local regression tests, all 593 local links/anchors, and `git diff --check` passed. The corrections change instructions and one ESLint comment, not executable behavior. Account-dependent integrations and additional client/model behavior were not exercised in these review cycles; the review count does not establish universal correctness.
+
 ### Earlier capability expansion
 
 The expanded fixture passed on macOS with Node.js 24.21.0, without database credentials. It installed and checked **15 selected skills**: the prior web/discovery set plus `next-dev-loop`, `next-bundle-optimizer`, `supabase-postgres-best-practices`, `gh-fix-ci`, `differential-review`, and `shadcn`. Canonical names, lockfile entries, matching client files, and relative Claude links passed. The source `gh-fix-ci` uses a quoted frontmatter name, which the fixture accepts.

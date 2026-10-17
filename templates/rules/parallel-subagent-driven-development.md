@@ -27,8 +27,8 @@ The following ownership rules address known failure modes:
   file, they never run in the same wave.
 - **Commit races** are prevented by removing self-committing from
   implementers entirely. Implementers leave their changes in the working
-  tree; the controller commits every task's changes itself, one at a time,
-  after the wave finishes.
+  tree; when commits are authorized, the controller commits every task's
+  changes itself, one at a time, after the wave finishes.
 
 - **Resource collisions** require independent mutable resources for each task,
   including checks, or serialization of the affected work. Worktrees alone
@@ -83,12 +83,11 @@ For each wave, in order:
 4. When authorized, the controller commits per task, in wave order — capturing the current
    HEAD fresh immediately before each commit, never a stale or hardcoded
    ref.
-5. Once commits exist for the wave, dispatch that wave's task reviewers
-   together. This is safe because review is read-only — each reviewer is
-   scoped to exact base/head commits plus connected callers, contracts, and
-   tests. Without commit authorization, use recorded working-tree snapshots.
-   Serialize review checks that share mutable resources; review does not
-   authorize fixes or commits.
+5. Dispatch that wave's task reviewers against exact base/head commits plus
+   connected callers, contracts, and tests. Without commit authorization, use
+   recorded working-tree snapshots. Reviewers remain read-only; run them together
+   only when their checks use independent mutable resources. Isolate or serialize
+   checks that share resources; review does not authorize fixes or commits.
 6. Make exactly one controller-owned log or ledger write for the whole
    wave, not one per task. Concurrent per-task writes to the same log race
    each other and lose updates; a single write after the wave completes

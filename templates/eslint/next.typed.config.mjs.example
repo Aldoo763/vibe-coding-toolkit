@@ -12,7 +12,7 @@ const config = [
       },
     },
     rules: {
-      // Greenfield gate; in legacy code, measure warnings before promoting each rule.
+      // Preserve existing severity; only new rules with violations may start as warnings.
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": "error",
     },

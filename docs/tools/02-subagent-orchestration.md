@@ -228,8 +228,8 @@ Three parts reduce these coordination risks:
    If any condition fails or is uncertain, serialize the affected work.
    Disjoint source files alone do not isolate builds or test services.
 3. **Implementers within a wave never commit on their own.** They
-   edit files and report changes; the orchestrator makes all
-   commits afterward, one per task in wave order, capturing the current
+   edit files and report changes; when commits are authorized, the orchestrator makes them
+   afterward, one per task in wave order, capturing the current
    `HEAD` (Git's pointer to the branch's latest commit) immediately before
    each commit — never an old or predetermined reference. This
    eliminates commit contention entirely: there is only one
@@ -242,12 +242,13 @@ Three parts reduce these coordination risks:
 2. Dispatch all wave implementers **in a single message** — this
    is the only point where actual parallelism happens.
 3. Wait for everyone to finish.
-4. Make commits in order, one per task, capturing the current `HEAD`
-   immediately before each commit.
-5. Only then dispatch the wave's reviewers, also together — this is
-   safe because review is *read-only* (nobody writes anything) —
-   each handling its own task's commit range (the difference between the states
-   before and after).
+4. When authorized, make commits in order, one per task, capturing the current
+   `HEAD` immediately before each commit. Otherwise record working-tree snapshots
+   for review; do not require a commit to continue.
+5. Dispatch reviewers against each task's exact before/after range and connected
+   code. Reviewers remain read-only. Run them together only when any checks use
+   independent mutable resources; isolate or serialize shared builds, ports,
+   databases, and services. Review does not authorize fixes or commits.
 6. Make exactly **one** tracking entry per wave (a log, a
    progress spreadsheet), never one per task — two agents competing to
    write the same tracking file is the same class of bug as

@@ -111,6 +111,9 @@ Imagine a small project with four queued tasks. The
   three. `Files:` `src/components/auth/LoginForm.tsx`. `Depends-on:` none.
   `Owner:` frontend-specialist.
 
+This example assumes commits are authorized; otherwise use reviewed working-tree
+snapshots at the same boundaries, without committing.
+
 In Step 2, the agent builds the waves table: T01 and T04 belong in the
 **same wave**, because neither depends on the other and their files do not
 overlap, assuming independent resources for their checks. The owner alone
