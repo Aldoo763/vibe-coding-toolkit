@@ -18,11 +18,17 @@
 
 [For adopted capabilities, document runtime/browser preflight, comparable bundle measurements, SQL/migration checks, actual CI run evidence, security report range/coverage, UI interaction checks, and read-only Sentry evidence. Omit inapplicable checks with a reason. Installation and discovery alone do not prove these workflows ran.]
 
+[For typed lint, record the two focused async rules, severity, command, measured runner cost, and any legacy adoption plan. Run relevant harness smoke cases after instruction, memory, skill, or orchestration changes; identify the client/model and distinguish observed behavior from unrun cases.]
+
 ## Review after implementation or fixes
 
-After an implementation or fix cycle, suggest 3 to 8 subsequent code review cycles, with a count proportional to risk, complementary focuses, and a completed continuation prompt. This range is a project convention; additional reviews require a user request.
+Select review scope by risk and the actual diff. Use independent review for nontrivial work when available. Record the exact target, connected callers/contracts/tests, confirmed findings, and coverage. Add rounds for new evidence or unresolved risk; honor an explicitly requested count without inventing additional cycles.
 
-Each cycle checks the current state and connected code, records findings with severity, location, and evidence, and reassesses authorized fixes using affected checks. Fixes within the same round do not reset the count. Finish with integrated verification and residual risks, without creating artificial cycles or claiming that a review count proves the absence of bugs.
+Finish when relevant findings are resolved or explicitly dispositioned, affected checks pass, and integrated verification and residual risks are recorded. Fixes do not reset an agreed count. Missing independent review or blocked checks remain explicit limitations.
+
+## Security review
+
+[Record the adopted reusable prompt/skill, baseline or diff procedure, private report location, authorization boundaries, and relevant checks. Reviews trace entry points through shared validation/authorization to sensitive operations. Keep reviews read-only unless fixes are requested; redact reports and do not publish sensitive findings. Record severity, confidence, reproducibility, exclusions, and remaining hypotheses.]
 
 ## Dependencies and delivery
 

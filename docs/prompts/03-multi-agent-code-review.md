@@ -37,7 +37,16 @@ reliable — not four times more signal.
 ```
 Review [DIFF/PR/BRANCH] using a panel of independent specialist reviewers,
 then synthesize their findings into one ranked report. Do not review it
-yourself first — dispatch the panel.
+yourself first — dispatch the panel after fixing the target and scope.
+Record exact base/head commit IDs, or freeze an explicit working-tree snapshot
+covering staged, unstaged, and relevant untracked files. Review the diff plus
+connected callers, contracts, and tests; report missing context as a limitation.
+Choose lenses by risk and unresolved evidence. Respect any user-requested round
+count. Stop when that scope and count are covered and findings have evidence
+and disposition; do not add rounds merely to meet a universal quota.
+All reviewers are read-only: no fixes, commits, or publishing. Checks that mutate
+build output, test databases, ports, or services need independent resources or
+must be serialized by the coordinator.
 
 ## 1. Dispatch the panel — in parallel, one batch
 Send the same diff to each of these reviewer lenses at once, dropping any
@@ -66,7 +75,7 @@ Once every reviewer has reported:
    which reviewers agreed.
 2. **Filter** — drop anything without a concrete failure scenario, or
    anything already handled elsewhere in the code. Verify against the
-   actual diff before dropping a finding — don't take a reviewer's claim
+   frozen diff and connected code before dropping a finding — don't take a reviewer's claim
    on faith in either direction.
 3. **Rank** — CRITICAL (security/data-loss, must fix before merge) → HIGH
    (real bug or significant quality issue) → MEDIUM (maintainability) →
@@ -76,7 +85,10 @@ Once every reviewer has reported:
 One report, most severe first. Each entry: file:line, one-sentence
 summary, failure scenario, severity, which reviewer(s) raised it. State
 plainly if nothing survived synthesis — an empty CRITICAL/HIGH list is a
-valid, useful result, not a failure to find something.
+valid, useful result, not a failure to find something. Include the target
+identifiers, checks performed, unreviewed scope, and residual risks. Do not
+apply fixes automatically; report them for the coordinator to handle within
+existing or explicit implementation authorization.
 
 Target: [DIFF/PR/BRANCH]. Stack: [LANGUAGE] / [FRAMEWORK].
 ```

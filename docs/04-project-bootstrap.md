@@ -135,6 +135,10 @@ Version `.agents/skills/`, relative client links, and `skills-lock.json`. On Win
 
 Fill the nine [manifest](../templates/project-docs/manifest.json) destinations with product and code facts. Four files belong at the root; the five supporting documents belong in `docs/`. Remove unused fields and placeholders. `CLAUDE.md` imports `AGENTS.md` without repeating policies; it is a small bridge ready for Claude adoption. Other clients use their official formats.
 
+Preserve the scaffold's framework instructions and version-matched documentation pointers when merging `AGENTS.md`. Establish a portable [memory contract](tools/09-claude-memory-system.md#portable-storage-and-freshness): native memory or a short index into canonical documents, actual loading mechanism, source/evidence, last verification, and invalidation triggers. Record retrieval evidence in `docs/setup.md`. Reuse the optional [handoff template](../templates/task-handoff.md.template) only for unfinished multi-session work.
+
+Make the [security review prompt](prompts/13-security-review.md) available from `docs/quality.md`, with its source revision and update method. Copy its self-contained Prompt block into an existing project prompt directory when appropriate, adapting paths without weakening its limits; otherwise record a versioned source and invocation. Repository and diff reviews work without mandatory scanners or a paid service. Reports stay private by default; the optional `differential-review` skill supports change review.
+
 Reuse working Ponytail `full`, Caveman, Superpowers, and RTK integrations. If a plugin is missing and the host supports project scope, prefer it. In Claude, check `claude plugin install --help`/`--scope project`; in Codex, check current support rather than inventing flags. Never copy caches to simulate installation. See [installation](01-installation.md).
 
 For missing Context7, merge the [Codex TOML](../templates/project/codex.config.toml.example) or [Claude MCP](../templates/project/mcp.json.example), without transporting tokens. Respect host trust/configuration. Copy [Graphify exclusions](../templates/project/.graphifyignore.example) and ignore the graph, `.vercel/`, personal configuration, and credentials; skills and lockfiles remain versionable.
@@ -149,6 +153,8 @@ For the full core, use [next-app.config.mjs.example](../templates/eslint/next-ap
 
 The profile combines official Next.js/TypeScript presets, a 350-line limit, logging, a data boundary, and Drizzle `update/delete` guards. The logger is server-only; remove client debug logs without importing Pino into Client Components. Write methods must use the `db` variable, as configured in the plugin; aliases, raw SQL, and exceptions need review. The import guard also depends on configured paths: adapt them to the actual layout. It does not replace authorization or validation.
 
+Copy the [focused typed profile](../templates/eslint/next.typed.config.mjs.example) to `eslint.typed.config.mjs` and install a compatible `typescript-eslint` development dependency when not already present. It checks floating and misused promises as errors in a new project. Measure time/memory on the actual runner; record a concrete compatibility/resource limitation instead of silently skipping it. Existing applications measure violations and adopt gradually. Additional typed rules require their own need and cost assessment.
+
 For partial adoption or a product without a database, the [lightweight profile](../templates/eslint/next.config.mjs.example) still requires no ORM/logger dependencies. The [advanced profile](../templates/eslint/eslint.config.mjs.example) and [typed lint](../templates/eslint/eslint.typed.config.mjs.example) are separate options.
 
 Reference npm scripts:
@@ -160,24 +166,29 @@ Reference npm scripts:
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint:typed": "eslint --config eslint.typed.config.mjs .",
     "lint:rules": "node scripts/verify-quality-rules.mjs ./eslint-rules/index.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "check": "npm run lint && npm run typecheck && npm run lint:rules && npm test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run lint:typed && npm run lint:rules && npm test && npm run build"
   }
 }
 ```
 
 Adapt the combined command to the package manager; omit database scripts without persistence. `check` does not connect or apply migrations. ESLint runs through its own CLI; do not use `next lint` or assume the build runs lint. Add DOM/E2E tests with flows that require them.
 
+For Next.js versions supporting `typegen`, generate route types before TypeScript checks, including on a clean checkout before any dev server/build. Preserve older projects' supported commands and record the limitation instead of upgrading their framework implicitly. See the [Next.js CLI](https://nextjs.org/docs/app/api-reference/cli/next#next-typegen-options) and [typed lint guidance](https://typescript-eslint.io/getting-started/typed-linting/).
+
 ### 7. Verify and deliver
 
 Run lint, types, self-check, tests, and build without real credentials. Run `db:generate` with a schema present and inspect SQL. With an authorized connection, test migrations and data flows against the database, distinguishing these from mocks or an embedded engine. Audit production and development separately; investigate advisories without forcing incompatible downgrades or claiming absolute security.
 
 Start the application on a free port, verify HTTP/page content, and stop only processes/resources created by setup. Check skill discovery in a new session when possible; disk presence is different evidence. Validate a real Context7 query.
+
+Verify instruction/command discovery and memory retrieval using [harness evaluation](07-harness-evaluation.md). Run relevant disposable behavior cases for materially changed instructions, memory, or orchestration. Record observed actions, client/model, and pass/fail/not run; a fresh subagent context does not prove client restart behavior. Scope review to risk, verify fixes, and record coverage and residual risks without requiring an arbitrary number of rounds.
 
 For selected capabilities, also record the Next.js runtime preflight and affected browser flow, analyzer support/audit evidence, PostgreSQL checks, read-only CI/Sentry queries, and the security report or component checks that actually ran. Keep unavailable account-dependent checks pending. A successful build does not prove any remote integration works.
 

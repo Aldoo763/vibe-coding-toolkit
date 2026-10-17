@@ -12,17 +12,13 @@ in [subagent orchestration](../tools/02-subagent-orchestration.md) and the
 
 ## Why it works
 
-The two rules in Step 2 — no dependencies between tasks and no file overlap —
-make it safe to run multiple agents at once; breaking either causes silent
-conflicts (two agents overwriting each other in the same file) or a **wave**
-that was not actually independent. When these conditions are uncertain for
-a task, the prompt says to treat it as depending on everything already
-listed — the safe default degrades to sequential execution rather than
-risking false parallelism. For commits, each implementer only edits and
-reports changes; the orchestrator alone commits, one at a time, in a fixed
-order, always capturing HEAD (the reference to the branch's latest commit)
-at that moment, never reusing an earlier HEAD — eliminating races between
-agents trying to commit simultaneously.
+Parallel waves require no cross-dependencies, disjoint writable files, and
+independent mutable resources. Separate source files can still share a port,
+build directory, test database, or service. Allocate independent resources or
+serialize the affected work; this reduces known races, not every integration
+risk. Implementers only edit and report changes. When commits are authorized,
+the orchestrator alone commits, sequentially, capturing the current HEAD for
+each task rather than reusing an earlier reference.
 
 ## How to adapt the placeholders
 
@@ -51,21 +47,24 @@ For each unit of work, write:
 - **Description** — one line.
 - **Files:** — every path/glob this task will create or modify. Be exact;
   when in doubt, list more rather than fewer.
+- **Resources:** — ports, build directories, test databases, and services
+  used by implementation or checks; state isolation or `none`.
 - **Depends-on:** — task IDs whose output this task needs, or `none`.
 - **Owner:** — the specialist role responsible (e.g. [BACKEND_ROLE],
   [FRONTEND_ROLE], [DB_ROLE], [TEST_ROLE] — use whatever roles this
   project defines).
 
-Any task where `Files:` or `Depends-on:` is uncertain gets `Depends-on:
+Any task where `Files:`, `Resources:`, or `Depends-on:` is uncertain gets `Depends-on:
 everything already listed` — that's the safe default, not a shortcut to
 skip filling it in.
 
 ## 2. Group into waves
-Two tasks go in the **same wave** only if BOTH hold:
+Two tasks go in the **same wave** only if ALL hold:
 1. Neither depends on the other, directly or transitively.
 2. Their `Files:` sets are completely disjoint — zero overlap.
+3. Mutable resources are independent or explicitly isolated.
 
-If either fails, put the dependent (or file-colliding) task in a later
+If any condition fails or is uncertain, put the dependent (or file-colliding) task in a later
 wave. A task with no valid same-wave partner is simply a wave of one —
 that's correct, not a failure of the grouping.
 
@@ -77,14 +76,17 @@ For every wave:
    what makes it parallel instead of a string of sequential turns.
 2. **Implementers do not commit.** They implement, verify their own work,
    and report exactly which files changed — and stop there.
-3. **The orchestrator commits**, one task at a time, in a fixed order:
+3. **When commits are authorized, the orchestrator commits**, one task at a time, in a fixed order:
    right before each commit, capture the current HEAD fresh (never reuse a
    HEAD captured earlier, never assume `HEAD~1`), stage that task's files,
    commit.
 4. **That wave's reviewers run together, after all its commits exist** —
    dispatch them in one batch too, each reviewing their task's own
-   before/after range.
-5. Only once every task in the wave is committed and reviewed, move to
+   before/after range and connected callers, contracts, and tests. Reviewers
+   remain read-only; serialize checks sharing mutable resources. Without commit
+   authorization, use recorded working-tree snapshots instead.
+5. Only once every task in the wave is verified and reviewed (and committed
+   when authorized), move to
    the next wave.
 
 Plan/task list: [FEATURE/PLAN/TASK LIST].
@@ -111,7 +113,9 @@ Imagine a small project with four queued tasks. The
 
 In Step 2, the agent builds the waves table: T01 and T04 belong in the
 **same wave**, because neither depends on the other and their files do not
-overlap — the rule considers only dependencies and files, not the owner.
+overlap, assuming independent resources for their checks. The owner alone
+does not establish independence. Record the concrete resource allocation in
+each task brief before dispatch.
 T02 can only enter a wave after T01 is committed (wave 2), and T03 only
 after T02 (wave 3) — even though T03 and T04 share no files, T03 cannot enter
 wave 1 because it depends on T02, which does not yet exist.
@@ -124,12 +128,14 @@ does wave 2 (T02 alone) start — followed finally by wave 3 (T03 alone).
 
 ## Tips
 
-- When in doubt, use `Depends-on: everything already listed` — at worst,
-  you lose some parallelism, never gain a race condition.
+- When scope or resources are uncertain, serialize the task and inspect them.
+  An unrecognized dependency can still cause a race.
 - A fixed commit order per wave (not "whoever finishes first") keeps HEAD
   easy to track — capture it immediately before that specific task's
   commit, never earlier.
 - When two tasks genuinely cannot avoid touching the same files, take it
   as a signal to combine them into one task or isolate each in a separate
   worktree (a parallel repository copy in another folder, isolated from
-  the main one) — do not force both into the same wave.
+  the main one) — do not force both into the same wave. Serial execution is
+  also valid. Worktrees are optional and do not isolate ports, databases,
+  or external services.

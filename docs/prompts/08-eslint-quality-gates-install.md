@@ -22,12 +22,10 @@ ban on direct `console` calls, and a ban on the presentation layer importing
 the database client — without reconstructing the reasoning behind them.
 
 The difference from [`07-eslint-complete-setup.md`](07-eslint-complete-setup.md)
-is what each delivers. Prompt 07 describes the patterns in prose and lets
-the agent write the rules from scratch, adapted to your stack: more flexible,
-but every run produces different code. This one points the agent to three
-existing, tested `.cjs` files to copy and connect. Use 07 when you want the
-agent to reason about your whole stack, including framework rules; use this
-one when you want the 350-line ceiling enforced today.
+is scope. Prompt 07 evaluates the whole stack and reuses the relevant
+profiles, including framework rules. This one focuses on three existing,
+tested `.cjs` files to copy and connect. Use it when you want the 350-line
+ceiling and local boundaries installed with a measured adoption baseline.
 
 After installation, the natural next step is
 [`09-file-size-refactor.md`](09-file-size-refactor.md) — it tells the agent
@@ -91,7 +89,8 @@ this project's real shape.
 
 ## 0. Get the files
 
-Fetch these six files from [SOURCE_URL] (default:
+Fetch these six files into a temporary location from the same revision of
+[SOURCE_URL] (default:
 https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/templates/eslint):
 
   eslint-rules/utils.cjs
@@ -101,7 +100,8 @@ https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/templ
   eslint.typed.config.mjs.example
   verify.mjs
 
-Place them in the project like this:
+After inspecting the project in step 1, place or merge them like this;
+preserve existing configuration, scripts, and protections:
 
   ./eslint-rules/utils.cjs
   ./eslint-rules/core-rules.cjs
@@ -180,12 +180,12 @@ importer, narrow `target`.
 
   "lint": "eslint ."
   "lint:fix": "eslint . --fix"
-  "lint:types": "eslint --config eslint.typed.config.mjs ."
+  "lint:typed": "eslint --config eslint.typed.config.mjs ."
 
-Drop lint:types on a JavaScript project. Keep the type-aware tier out of
-the fast script and out of any pre-commit hook: it builds a full
-TypeScript program, which is slow enough to make people bypass the hook
-and heavy enough to exhaust the heap on a small CI runner.
+Omit lint:typed on a JavaScript project; preserve an equivalent existing
+script name. Keep the type-aware tier separate from the fast lint command
+and measure its runtime/memory on the actual runner before selecting its
+CI scope. Preserve an existing typed gate. Do not add Git hooks.
 
 ## 5. Verify the copy survived
 
@@ -200,16 +200,16 @@ lying around unexplained.
 
   [PACKAGE_MANAGER] run lint
 
-Report the count per rule. Then set severities from the count, not from
-preference:
+Report the count per newly introduced rule. Preserve existing severities;
+do not downgrade an established protection or add ignores to hide violations.
+For the new rules, set severities from the count:
 
 - zero violations for a rule: leave it at "error"
 - violations exist: drop that rule to "warn" and write the count in a
   comment next to it. That count is the baseline, and the migration is
   finished when it reaches zero and the rule goes back to "error"
-- quality/max-lines with only a handful of offenders: keep it at "error"
-  and list those files in its `ignore` option instead. A short explicit
-  list beats a rule nobody trusts
+- keep existing exceptions scoped and documented; do not add generic
+  exclusions or increase ceilings to manufacture a passing result
 
 ## 7. Report
 
@@ -224,8 +224,8 @@ Do NOT fix any violation you found. Installing the gate and measuring what
 it catches is the entire job. Refactoring is separate work with its own
 review.
 
-Do NOT raise [MAX_LINES] to make a file pass. The budget is the point. Use
-the `ignore` option for a known offender, or leave it reported.
+Do NOT raise [MAX_LINES] to make a file pass. Leave existing offenders
+reported with the measured adoption baseline.
 
 Do NOT enable a framework preset because it exists. Uncomment a block only
 for a framework this project actually uses.

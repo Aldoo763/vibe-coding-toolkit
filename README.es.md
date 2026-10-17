@@ -238,15 +238,16 @@ El toolkit distingue entre **archivo presente**, **configuración completa** e *
 | **Comportamiento** | Tipos, pruebas pertinentes, regresiones, manejo de errores y build | [Valores predeterminados del proyecto](docs/06-project-defaults.md) |
 | **Interfaz en uso** | Navegación local, teclado, foco, estados, consola, red y rendimiento cuando corresponda | [agent-browser](docs/tools/11-agent-browser.md) · [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) |
 | **Integraciones del agente** | Descubrimiento real de skills, consultas a Context7, RTK sin duplicación y un grafo pertinente | [Configuración de un proyecto existente](docs/prompts/12-existing-project-setup.md) |
+| **Comportamiento del harness** | Tareas desechables para autorización, traspasos obsoletos, revisión sin cambios y recuperación observable | [Evaluación del harness](docs/07-harness-evaluation.md) |
 | **El propio toolkit** | Enlaces, anclas, manifiesto, JSON y una base Next.js en un proyecto temporal | [Validación reproducible](docs/05-toolkit-validation.md) |
 
 Las reglas nuevas en código heredado reciben medición y adopción gradual. Las protecciones existentes no se debilitan para obtener un informe en verde. El perfil de lint sigue el stack; instalar reglas no justifica cambiar de ORM ni añadir dependencias que no se usan.
 
 ### Revisión después de implementar o corregir
 
-Las instrucciones compartidas recomiendan **de 3 a 8 ciclos posteriores de revisión de código**. El LLM elige la cantidad y los enfoques según el tamaño, el riesgo y la incertidumbre del cambio, y entrega un prompt de continuación.
+Las instrucciones compartidas ajustan la revisión al **riesgo y la evidencia**. Los cambios relevantes reciben revisión independiente cuando está disponible, cubriendo el diff exacto, los llamadores, contratos y pruebas relacionados.
 
-Los ciclos pueden cubrir comportamiento, regresiones, seguridad, datos, accesibilidad e integración. Cada uno inspecciona el estado actual, registra hallazgos y verifica las correcciones autorizadas. La cuenta no se reinicia con cada corrección interna. Este intervalo es una convención del toolkit; no garantiza la ausencia de errores ni inicia automáticamente nuevas rondas.
+La revisión termina con los hallazgos relevantes resueltos o con una decisión explícita, las verificaciones afectadas aprobadas y la cobertura y los riesgos residuales registrados. Las rondas adicionales requieren nueva evidencia, riesgo pendiente o una solicitud explícita. Respeta las cantidades solicitadas sin reiniciarlas tras correcciones internas. El [prompt de seguridad](docs/prompts/13-security-review.md) cubre repositorios y diffs, sin modificaciones por defecto y con informes privados.
 
 ### Evidencias y límites
 
@@ -267,6 +268,8 @@ Elige una tarea, abre el prompt y copia el bloque indicado. El [catálogo comple
 | **Comprender y planificar** | [04 · Del brainstorming al plan](docs/prompts/04-brainstorm-to-plan.md) | Convertir una solicitud ambigua en trabajo con criterios de aceptación |
 | **Organizar la base de código** | [01 · Limpieza](docs/prompts/01-project-sanitation.md) · [09 · Archivos grandes](docs/prompts/09-file-size-refactor.md) | Medir problemas y refactorizar por responsabilidad |
 | **Mejorar el lint** | [07 · ESLint completo](docs/prompts/07-eslint-complete-setup.md) · [08 · Controles de calidad](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Advertencias](docs/prompts/02-eslint-warning-burndown.md) | Instalar reglas, medir código heredado y reducir infracciones |
+| **Revisar seguridad** | [13 · Revisión de seguridad](docs/prompts/13-security-review.md) | Repositorio o diff exacto, evidencias e informe privado |
+| **Evaluar el harness** | [14 · Evaluación del harness](docs/prompts/14-harness-evaluation.md) | Verificar comportamiento tras configurar o cambiar instrucciones/herramientas |
 | **Revisar y coordinar** | [03 · Revisión de código](docs/prompts/03-multi-agent-code-review.md) · [05 · Oleadas paralelas](docs/prompts/05-parallel-wave-dispatch.md) | Revisión especializada y ejecución independiente |
 | **Mantener el contexto** | [06 · Memoria](docs/prompts/06-memory-bootstrap.md) | Conservar conocimiento útil sin sobrecargar la sesión |
 

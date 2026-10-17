@@ -23,7 +23,7 @@ Choose a tool for the current need. For a new foundation, follow the [bootstrap]
 | [17 — Next.js runtime and performance](17-nextjs-runtime-and-performance.md) | Development feedback and bundle analysis |
 | [18 — PostgreSQL](18-postgresql-skills.md) | SQL, indexes, migrations, pooling, and security |
 | [19 — GitHub CI repair](19-github-ci-repair.md) | Diagnose failing GitHub Actions checks |
-| [20 — Security review](20-security-review.md) | Review a diff and its trust boundaries |
+| [20 — Security review](20-security-review.md) | Repository or diff review, trust boundaries, and private evidence-based reports |
 | [21 — shadcn/ui](21-shadcn-ui.md) | Work with an adopted component system |
 | [22 — Sentry MCP](22-sentry-mcp.md) | Investigate errors and performance in a chosen service |
 

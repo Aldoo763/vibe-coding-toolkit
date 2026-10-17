@@ -46,7 +46,7 @@ The [shared AGENTS template](../templates/AGENTS.md.template) contains a ready-t
 
 ### Evaluation outline
 
-In a disposable project without external services, check these scenarios. This is a proposed evaluation, not an experiment already run across all hosts.
+In a disposable project without external services, check these scenarios. The [harness evaluation guide](07-harness-evaluation.md) supplies runnable authorization checks, a reusable prompt, and a result protocol. The [validation record](05-toolkit-validation.md) identifies executed cases; this outline is not evidence that every interaction passed across all hosts.
 
 | Scenario | Expected result |
 |---|---|

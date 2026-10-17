@@ -238,15 +238,16 @@ O toolkit separa **arquivo presente**, **configuração concluída** e **integra
 | **Comportamento** | Tipos, testes relevantes, regressões, tratamento de erros e build | [Padrões do projeto](docs/06-project-defaults.md) |
 | **Interface em uso** | Navegação local, teclado, foco, estados, console, rede e desempenho quando pertinente | [agent-browser](docs/tools/11-agent-browser.md) · [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) |
 | **Integrações do agente** | Descoberta real de skills, consulta ao Context7, RTK sem duplicação e grafo pertinente | [Setup de projeto existente](docs/prompts/12-existing-project-setup.md) |
+| **Comportamento do harness** | Tarefas descartáveis para autorização, handoff desatualizado, revisão sem alterações e recuperação observável | [Avaliação do harness](docs/07-harness-evaluation.md) |
 | **O próprio toolkit** | Links, âncoras, manifesto, JSON e base Next em projeto temporário | [Validação reproduzível](docs/05-toolkit-validation.md) |
 
 Regras novas em código legado recebem medição e adoção progressiva. Proteções existentes não são enfraquecidas para obter um relatório verde. O perfil de lint acompanha a stack; instalar regras não justifica trocar ORM ou introduzir dependências sem uso.
 
 ### Revisão depois de implementar ou corrigir
 
-As instruções compartilhadas recomendam **3 a 8 ciclos posteriores de code review**. A LLM escolhe quantidade e focos pelo tamanho, risco e incerteza da mudança e entrega um prompt de continuação.
+As instruções compartilhadas definem a revisão por **risco e evidência**. Mudanças relevantes recebem revisão independente quando disponível, cobrindo o diff exato, chamadores, contratos e testes relacionados.
 
-Os ciclos podem cobrir comportamento, regressões, segurança, dados, acessibilidade e integração. Cada um inspeciona o estado atual, registra achados e verifica correções autorizadas. A contagem não reinicia a cada correção interna. Essa faixa é uma convenção do toolkit; não garante ausência de bugs nem inicia novas rodadas automaticamente.
+A revisão termina com achados relevantes resolvidos ou com destino explícito, checks afetados passando, cobertura e riscos residuais registrados. Rodadas adicionais precisam de nova evidência, risco pendente ou pedido explícito. Quantidades solicitadas são respeitadas sem reiniciar após correções internas. O [prompt de segurança](docs/prompts/13-security-review.md) cobre repositório e diff, sem alterações por padrão e com relatório privado.
 
 ### Evidências e limites
 
@@ -267,6 +268,8 @@ Escolha a tarefa, abra o prompt e copie o bloco indicado. O [catálogo completo]
 | **Entender e planejar** | [04 · Brainstorm até plano](docs/prompts/04-brainstorm-to-plan.md) | Transformar pedido ambíguo em trabalho com aceite |
 | **Organizar a base** | [01 · Sanitização](docs/prompts/01-project-sanitation.md) · [09 · Arquivos grandes](docs/prompts/09-file-size-refactor.md) | Medir problemas e refatorar por responsabilidade |
 | **Evoluir o lint** | [07 · ESLint completo](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Instalar regras, medir legado e reduzir violações |
+| **Revisar segurança** | [13 · Revisão de segurança](docs/prompts/13-security-review.md) | Repositório ou diff exato, evidências e relatório privado |
+| **Avaliar o harness** | [14 · Avaliação do harness](docs/prompts/14-harness-evaluation.md) | Verificar comportamento após setup ou mudanças de instruções/ferramentas |
 | **Revisar e coordenar** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Ondas paralelas](docs/prompts/05-parallel-wave-dispatch.md) | Revisão especializada e execução independente |
 | **Manter contexto** | [06 · Memória](docs/prompts/06-memory-bootstrap.md) | Guardar conhecimento útil sem inflar a sessão |
 

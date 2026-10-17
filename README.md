@@ -236,15 +236,16 @@ The toolkit distinguishes **file present**, **configuration complete**, and **in
 | **Behavior** | Types, relevant tests, regressions, error handling, and build | [Project defaults](docs/06-project-defaults.md) |
 | **Interface in use** | Local navigation, keyboard, focus, states, console, networking, and performance where relevant | [agent-browser](docs/tools/11-agent-browser.md) · [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) |
 | **Agent integrations** | Actual skill discovery, Context7 queries, RTK without duplication, and a relevant graph | [Existing-project setup](docs/prompts/12-existing-project-setup.md) |
+| **Harness behavior** | Disposable tasks for authorization fixes, stale handoffs, read-only review, and observable recovery | [Harness evaluation](docs/07-harness-evaluation.md) |
 | **The toolkit itself** | Links, anchors, manifest, JSON, and a Next.js foundation in a temporary project | [Reproducible validation](docs/05-toolkit-validation.md) |
 
 New rules in legacy code receive measurement and gradual adoption. Existing protections are not weakened to obtain a green report. The lint profile follows the stack; installing rules does not justify switching ORM or adding unused dependencies.
 
 ### Review after implementation or fixes
 
-Shared instructions recommend **3 to 8 subsequent code review cycles**. The LLM chooses the count and focuses according to the change's size, risk, and uncertainty, and provides a continuation prompt.
+Shared instructions scope review by **risk and evidence**. Nontrivial changes receive independent review when available, covering the exact diff and connected callers, contracts, and tests.
 
-Cycles may cover behavior, regressions, security, data, accessibility, and integration. Each inspects the current state, records findings, and verifies authorized fixes. The count does not reset with each internal fix. This range is a toolkit convention; it neither guarantees the absence of bugs nor automatically starts new rounds.
+Finish when relevant findings are resolved or explicitly dispositioned, affected checks pass, and coverage and residual risks are recorded. Additional rounds need new evidence, unresolved risk, or an explicit request. Honor requested counts without resetting them after internal fixes. The [security prompt](docs/prompts/13-security-review.md) supports read-only repository and diff reviews with private reports.
 
 ### Evidence and limits
 
@@ -265,6 +266,8 @@ Choose a task, open the prompt, and copy the indicated block. The [complete cata
 | **Understand and plan** | [04 · Brainstorm to plan](docs/prompts/04-brainstorm-to-plan.md) | Turn an ambiguous request into work with acceptance criteria |
 | **Organize the codebase** | [01 · Sanitation](docs/prompts/01-project-sanitation.md) · [09 · Large files](docs/prompts/09-file-size-refactor.md) | Measure problems and refactor by responsibility |
 | **Evolve lint** | [07 · Complete ESLint](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Install rules, measure legacy code, and reduce violations |
+| **Review security** | [13 · Security review](docs/prompts/13-security-review.md) | Repository baseline or precise diff, evidence and private reporting |
+| **Evaluate the harness** | [14 · Harness evaluation](docs/prompts/14-harness-evaluation.md) | Verify behavior after setup or instruction/tool changes |
 | **Review and coordinate** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Parallel waves](docs/prompts/05-parallel-wave-dispatch.md) | Specialist review and independent execution |
 | **Maintain context** | [06 · Memory](docs/prompts/06-memory-bootstrap.md) | Keep useful knowledge without bloating the session |
 

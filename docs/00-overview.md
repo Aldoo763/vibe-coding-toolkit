@@ -41,7 +41,9 @@ Parallel waves require file ownership and no dependencies between tasks in the s
 
 The [existing-project setup](prompts/12-existing-project-setup.md) organizes short instructions, discoverable documentation, reproducible commands, verifiable invariants, and evidence for resuming work. Each catalog component receives an explicit decision; working equivalents are preserved.
 
-After implementation or a fix, shared instructions recommend 3 to 8 subsequent code review cycles, selected by risk and scope. The [review convention](tools/02-subagent-orchestration.md#review-after-implementation-or-fixes) requires useful focuses, evidence, and a bounded round; the suggestion does not start reviews automatically.
+After implementation or a fix, the [review convention](tools/02-subagent-orchestration.md#review-after-implementation-or-fixes) selects scope by risk, checks connected code, and ends with verified fixes and explicit residual risks. Additional rounds need evidence or an explicit request. The [security prompt](prompts/13-security-review.md) supports read-only repository and diff reviews with private reports.
+
+[Harness evaluation](07-harness-evaluation.md) uses disposable tasks to check instructions, recovery, memory, and review behavior. Installation, passing application checks, and successful agent execution are separate evidence.
 
 <a id="6-a-code-knowledge-graph"></a>
 <a id="7-a-two-layer-memory-system"></a>

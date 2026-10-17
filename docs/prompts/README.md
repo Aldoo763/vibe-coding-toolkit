@@ -16,3 +16,5 @@ To start a project, use [prompt 11](11-next-project-bootstrap.md). To configure 
 | [10 — Machine](10-development-environment-setup.md) | Global environment |
 | [11 — Next project](11-next-project-bootstrap.md) | Product and configured foundation |
 | [12 — Existing project](12-existing-project-setup.md) | Complete setup, updates, harness and validation |
+| [13 — Security review](13-security-review.md) | Read-only repository or diff review with a private evidence-based report |
+| [14 — Harness evaluation](14-harness-evaluation.md) | Disposable behavioral checks for agent instructions, recovery and review |

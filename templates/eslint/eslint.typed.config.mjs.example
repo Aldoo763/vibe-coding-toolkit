@@ -3,7 +3,7 @@
 // a large codebase is slow enough to break a pre-commit hook and heavy
 // enough to exhaust the heap on a small CI runner.
 //
-// Two config files and two npm scripts (`lint` and `lint:types`), rather
+// Two config files and two npm scripts (`lint` and `lint:typed`), rather
 // than one config branching on process.env.CI: branching makes local and CI
 // behavior diverge silently for identical code, and reading process.env
 // inside a flat config file trips that config's own no-undef rule.
@@ -20,10 +20,8 @@ export default [
       },
     },
     rules: {
-      // Every rule here starts at "warn". None of them has a known violation
-      // count on a codebase this config has never run against, so none of
-      // them gets to fail a build sight unseen. Promote to "error" per rule,
-      // once its count is zero.
+      // Advanced legacy adoption: measure violation counts, runtime and memory.
+      // Promote each rule only once clean; new Next projects use next.typed instead.
       "@typescript-eslint/no-floating-promises": "warn",
       "@typescript-eslint/no-misused-promises": "warn",
       "@typescript-eslint/no-unsafe-assignment": "warn",

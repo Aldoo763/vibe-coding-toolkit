@@ -47,12 +47,21 @@ async function checkDocs() {
     "AGENTS.md", "CLAUDE.md", "PRODUCT.md", "README.md", "docs/architecture.md",
     "docs/design.md", "docs/onboarding.md", "docs/quality.md", "docs/setup.md",
   ]);
+  const frameworkInstructions = await readFile(path.join(app, "AGENTS.md"), "utf8");
+  assert(frameworkInstructions.trim(), "Expected create-next-app framework instructions");
   const defaults = await readFile(path.join(root, "docs/06-project-defaults.md"), "utf8");
   for (const [destination, source] of Object.entries(manifest)) {
     assert(defaults.includes(destination), `Missing documented destination: ${destination}`);
     await mkdir(path.dirname(path.join(app, destination)), { recursive: true });
-    await cp(path.join(sources, source), path.join(app, destination));
+    if (destination === "AGENTS.md") {
+      await writeFile(path.join(app, destination), frameworkInstructions + "\n\n" + await readFile(path.join(sources, source), "utf8"));
+    } else {
+      await cp(path.join(sources, source), path.join(app, destination));
+    }
   }
+  const mergedInstructions = await readFile(path.join(app, "AGENTS.md"), "utf8");
+  assert(mergedInstructions.startsWith(frameworkInstructions), "Toolkit must preserve the scaffold AGENTS.md verbatim");
+  assert(mergedInstructions.includes(await readFile(path.join(sources, manifest["AGENTS.md"]), "utf8")), "Toolkit instructions must also be present");
   assert.equal((await readFile(path.join(app, "CLAUDE.md"), "utf8")).trim(), "@AGENTS.md");
   // Document templates contain destination-relative links, not toolkit-relative links.
   for (const destination of Object.keys(manifest)) {
@@ -129,6 +138,29 @@ try {
   }
 }
 
+async function checkCleanTypecheck() {
+  const routeDirectory = path.join(app, "src/app/api/typecheck-probe");
+  await mkdir(routeDirectory, { recursive: true });
+  try {
+    await writeFile(path.join(routeDirectory, "route.ts"), "export function GET(_request: number) { return Response.json({ ok: true }); }\n");
+    await rm(path.join(app, ".next"), { recursive: true, force: true });
+    await rm(path.join(app, "tsconfig.tsbuildinfo"), { force: true });
+    let rejected = false;
+    try { execSync("npm run typecheck", { cwd: app, env, encoding: "utf8", stdio: "pipe", timeout: 120_000 }); }
+    catch (error) {
+      assert.equal(error.status, 2);
+      assert.match(error.stdout + error.stderr, /typecheck-probe/);
+      assert.match(error.stdout + error.stderr, /RouteHandlerConfig/);
+      rejected = true;
+    }
+    assert(rejected, "Clean typecheck must reject invalid route signatures without a prior build");
+  } finally { await rm(routeDirectory, { recursive: true, force: true }); }
+  await rm(path.join(app, ".next"), { recursive: true, force: true });
+  await rm(path.join(app, "tsconfig.tsbuildinfo"), { force: true });
+  run("npm run typecheck");
+  console.log("PASS clean typecheck generates route types and rejects invalid route handlers before build");
+}
+
 async function checkServerBoundary() {
   const page = path.join(app, "src/app/page.tsx");
   const original = await readFile(page, "utf8");
@@ -202,11 +234,12 @@ try {
   await cp(path.join(root, "templates/project/.graphifyignore.example"), path.join(app, ".graphifyignore"));
   const packageJson = JSON.parse(await readFile(packageFile, "utf8"));
   Object.assign(packageJson.scripts, {
-    lint: "eslint .", typecheck: "tsc --noEmit",
+    lint: "eslint .", typecheck: "next typegen && tsc --noEmit",
+    "lint:typed": "eslint --config eslint.typed.config.mjs .",
     "lint:rules": "node scripts/verify-quality-rules.mjs ./eslint-rules/index.cjs",
     test: "vitest run", "test:watch": "vitest",
     "db:generate": "drizzle-kit generate", "db:migrate": "drizzle-kit migrate",
-    check: "npm run lint && npm run typecheck && npm run lint:rules && npm test && npm run build",
+    check: "npm run lint && npm run typecheck && npm run lint:typed && npm run lint:rules && npm test && npm run build",
   });
   await writeFile(packageFile, JSON.stringify(packageJson, null, 2) + "\n");
   await checkDocs();
@@ -214,6 +247,7 @@ try {
   // Windows locks loaded native addons; the child must exit before removing its dependencies.
   execFileSync(process.execPath, [path.join(root, "scripts/check-eslint.mjs")], { cwd: app, env, stdio: "inherit", timeout: 120_000 });
   await checkSql();
+  await checkCleanTypecheck();
   await checkServerBoundary();
   run("npm run check");
   checkAudit();

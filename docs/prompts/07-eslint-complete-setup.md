@@ -31,9 +31,9 @@ matter of taste — and `warn` for refactoring pressure and heuristics with a
 real false-positive rate, which should never block a commit or fail CI.
 Second, formatting stays entirely outside ESLint — quotes, semicolons and
 line breaks belong to a separate formatter (Prettier, Biome, dprint), never
-duplicated here. Third, type-aware linting becomes a separate, `warn`-only,
-nonblocking tier — powerful but costly: slow and memory-hungry enough to
-crash a heap-constrained CI runner on a large project. Fourth, a small
+duplicated here. Third, type-aware linting uses a separate, focused async-safety
+gate for new projects and a measured warning migration for existing code —
+powerful but costly enough to exhaust memory on a constrained CI runner. Fourth, a small
 number of custom rules cover architecture or domain invariants that no
 off-the-shelf rule expresses — always as a last resort, only after
 confirming no published plugin already solves the case.
@@ -84,7 +84,7 @@ Set up ESLint 9 (flat config, `eslint.config.mjs`) matching this taste:
 - **Formatting is not ESLint's job.** A separate formatter (Prettier/Biome/dprint) owns
   quote style, semicolons, `eqeqeq`-style stuff, line-wrapping. Don't duplicate that
   here.
-- **Type-aware linting is a separate, non-blocking tier** — it's powerful but too slow
+- **Type-aware linting is a separate, focused tier** — it's powerful but too slow
   and memory-hungry to run on every commit at scale (see §8).
 
 Prerequisite: ESLint ≥ 9, flat config only — no `.eslintrc*` anywhere.
@@ -488,16 +488,16 @@ limitation worth keeping honest about: this only proves the gate was *called*, n
 a non-throwing gate's return value was actually checked by the caller — don't oversell
 what it guarantees.
 
-## 8. Two-tier lint: fast default + optional type-aware tier
+## 8. Two-tier lint: fast default + focused type-aware gate
 
-Type-aware ESLint rules (anything needing `parserOptions.projectService`/`project`) are
-powerful but expensive — full type-aware linting across a few thousand files can OOM a
-constrained CI runner (this taste hit an actual heap-exhaustion failure around 2GB on a
-standard CI box). Don't put them in the default `lint` script:
+Keep `eslint.config.mjs` fast and put type-aware rules in
+`eslint.typed.config.mjs`, using the [focused Next profile](../../templates/eslint/next.typed.config.mjs.example).
+Type information requires a TypeScript program; measure elapsed time and peak memory
+on the actual repository before expanding the rule set. Do not enable a broad
+`recommendedTypeChecked` or `strictTypeChecked` preset by default.
 
-- `eslint.config.mjs` — no type info, fast. This is what `lint` / `lint:fix` /
-  pre-commit / pre-push run.
-- `eslint.typed.config.mjs` — layers type-aware rules on top, all at `"warn"`:
+For greenfield TypeScript projects, enable these two rules as errors and include
+`lint:typed` in the explicit `check`/CI sequence:
 
 ```js
 import defaultConfig from "./eslint.config.mjs";
@@ -505,39 +505,33 @@ import defaultConfig from "./eslint.config.mjs";
 export default [
   ...defaultConfig,
   {
-    files: ["src/**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}"], // match files included by the project's tsconfig
     languageOptions: {
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
     },
     rules: {
-      "@typescript-eslint/no-floating-promises": "warn",
-      "@typescript-eslint/no-misused-promises": "warn",
-      "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-member-access": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn",
-      "@typescript-eslint/no-unsafe-return": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
-      "@typescript-eslint/only-throw-error": "warn",
-      "@typescript-eslint/return-await": ["warn", "in-try-catch"],
-      "@typescript-eslint/await-thenable": "warn",
-      "@typescript-eslint/unbound-method": "warn",
-      "@typescript-eslint/restrict-template-expressions": "warn",
-      "@typescript-eslint/restrict-plus-operands": "warn",
-      "@typescript-eslint/require-await": "warn",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
     },
   },
 ];
 ```
 
-Run it via its own script (`lint:types`), never wired into `test`/`check`/the commit
-gate.
+For an existing codebase, first set these rules to `warn`, record each violation
+count and runtime, and promote each rule only after its violations reach zero.
+The separate [advanced typed profile](../../templates/eslint/eslint.typed.config.mjs.example)
+retains the broader warning rules for measured adoption; preserve those checks
+when already installed rather than replacing them with the focused profile.
+Keep the migration command visible; do not describe warning-only execution as a
+blocking async-safety gate. Add other typed rules only for a demonstrated need.
+Keep this tier out of Git hooks; this setup does not install hooks.
 
 ## 9. package.json scripts
 
 ```json
 "lint": "[FORMATTER] check . && eslint . --cache",
 "lint:fix": "[FORMATTER] check --write . && eslint . --fix --cache",
-"lint:types": "eslint --config eslint.typed.config.mjs ."
+"lint:typed": "eslint --config eslint.typed.config.mjs ."
 ```
 
 If you have local custom rules (§7) and use `--cache`: ESLint's cache invalidates on
@@ -567,8 +561,8 @@ Run the lint command for real, read the actual output, and fix or consciously re
   carried over from here.
 - **No formatting rules of any kind** in ESLint — quote style, semicolons, `eqeqeq`,
   wrapping. That's a separate formatter's job (§3).
-- **No blocking type-aware rules** — they exist, but only as `warn` in a separate,
-  non-default tier (§8), for the OOM/latency reasons stated there.
+- **No broad type-aware preset** — the separate greenfield gate checks two async
+  hazards; existing code adopts them through measured warnings (§8).
 ````
 
 ## Usage example
@@ -594,9 +588,9 @@ sense for the project (at least §7.1, the per-file line ceiling, and §7.2,
 the direct `console.log` ban). Since the project uses Drizzle but has no
 layer boundaries or custom text component yet, §6 and §7.5 are left out.
 The expected result is an actually runnable `eslint.config.mjs` — not a
-skeleton with `TODO`s — plus, optionally, an `eslint.typed.config.mjs` with
-§8's type-aware rules in a separate `lint:types` script, never on the fast
-path. Finally, the agent actually runs lint (§11) and reports the real
+skeleton with `TODO`s — plus an `eslint.typed.config.mjs` with
+§8's focused rules in a separate `lint:typed` script, included in greenfield
+`check`/CI and measured before promotion in legacy code. Finally, the agent actually runs lint (§11) and reports the real
 output rather than assuming it worked.
 
 ## Tips

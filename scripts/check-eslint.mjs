@@ -1,6 +1,6 @@
 // Internal disposable-app check: native ESLint addons stay in this child process.
 import assert from "node:assert/strict";
-import { cp, rm } from "node:fs/promises";
+import { cp, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -58,3 +58,28 @@ await cp(path.join(root, "templates/eslint/next.config.mjs.example"), path.join(
 const localLight = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.light.mjs") });
 assert.equal((await localLight.lintText("export const ready = true;", { filePath: path.join(app, "src/light.ts") }))[0].errorCount, 0);
 await rm(path.join(app, "eslint.light.mjs"));
+
+await cp(path.join(root, "templates/eslint/eslint.typed.config.mjs.example"), path.join(app, "eslint.advanced-typed.mjs"));
+const advancedTyped = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.advanced-typed.mjs") });
+await cp(path.join(root, "templates/eslint/next.typed.config.mjs.example"), path.join(app, "eslint.typed.config.mjs"));
+const typed = new ESLint({ cwd: app, overrideConfigFile: path.join(app, "eslint.typed.config.mjs") });
+const probe = path.join(app, "src/async-probe.ts");
+// Project service requires a real file included by tsconfig.json.
+await writeFile(probe, "export {};\n");
+try {
+  const legacy = (await advancedTyped.lintText("export async function legacy() { await 1; }", { filePath: probe }))[0];
+  assert(legacy.messages.some(message => message.ruleId === "@typescript-eslint/await-thenable" && message.severity === 1), "Advanced typed profile must retain its migration warnings");
+  for (const [code, rule] of [
+    ["Promise.resolve(1);", "@typescript-eslint/no-floating-promises"],
+    ["export const callback: () => void = async () => {};", "@typescript-eslint/no-misused-promises"],
+  ]) {
+    const result = (await typed.lintText(code, { filePath: probe }))[0];
+    assert(result.messages.some(message => message.ruleId === rule && message.severity === 2), `${rule} must block async bugs`);
+  }
+  const safe = (await typed.lintText("export async function safe() { await Promise.resolve(1); }", { filePath: probe }))[0];
+  assert.equal(safe.errorCount, 0, JSON.stringify(safe.messages));
+  console.log("PASS focused typed lint rejects floating promises and async void callbacks; awaited promises pass");
+} finally {
+  await rm(probe, { force: true });
+  await rm(path.join(app, "eslint.advanced-typed.mjs"), { force: true });
+}

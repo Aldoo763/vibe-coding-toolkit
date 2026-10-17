@@ -39,6 +39,7 @@ Use actual commands; mark unavailable checks without inventing scripts.
 - If an agent fails or its state becomes uncertain, confirm it has stopped before taking over its files. Inspect partial changes and resume from a verified point, without concurrent writers.
 - Do not repeat an identical attempt without new evidence. Respect cost, time, and retry limits, explicit gates, and denials; earlier decisions do not expand authorization.
 - When resuming from a handoff, check actual files, Git state, checks, and processes. Claim background execution only when an active process, agent, or automation can be verified.
+- For unfinished multi-session work, keep a short handoff in the existing plan/task record: objective, verified state, checks, pending work, blockers, owned resources, and next action. Do not turn temporary progress into permanent memory.
 - Without a safe alternative, report the blocker, completed work, and what is needed to resume; do not present pending work as results or promise automatic continuation.
 
 ## Standards and documentation
@@ -49,6 +50,7 @@ Use actual commands; mark unavailable checks without inventing scripts.
 - Prefer inferred types, parameterized queries, explicit projections, bounded listings, and safe DTOs. Transactions follow required atomicity and driver support.
 - Consult current official sources and stable channels before changing stack/APIs. Apply compatible improvements within authorized scope; record source, reason, and outcome in `docs/setup.md`. Do not automatically migrate major versions or services.
 - `PRODUCT.md` owns scope; `docs/architecture.md`, structure and decisions; `docs/design.md`, interface; `docs/onboarding.md`, preparation; `docs/quality.md`, checks. Update the responsible document with each change without duplicating rules.
+- Record the actual memory/index location and loading mechanism in `docs/setup.md`. Prefer native memory or existing versioned docs; keep an index short and retrieve details on demand. Durable memories carry their source, last verification, and invalidation trigger. Recheck conflicts against current code and authoritative decisions; update or retire superseded entries. Verify retrieval in a clean context when observable.
 
 ## Tools and style
 
@@ -87,6 +89,7 @@ Installing skills does not execute their actions. Do not force animations, cachi
 - `supabase-postgres-best-practices`: load before PostgreSQL schema, SQL, migration, security, or performance work; preserve the provider and ORM.
 - `gh-fix-ci`: investigate GitHub Actions PR failures through authorized GitHub CLI access in a supported Codex workflow; follow the skill's fix-approval requirements.
 - `differential-review`: review security-sensitive diffs and connected callers/history; define the range and Markdown report destination, then verify findings.
+- Security review: use the project's adopted review prompt for repository baselines or precise diffs. Keep review read-only and reports private by default; trace reachable trust boundaries, redact evidence, and distinguish confirmed findings from hypotheses. No findings is not a security guarantee.
 - `shadcn`: inspect the adopted UI configuration, base library, tokens, and components before changing them; preserve customizations and accessibility.
 - Sentry MCP: use the intended organization/project connection for authorized investigation. Confirm scope and read-only evidence; OAuth secrets remain outside versioned files.
 
@@ -103,10 +106,10 @@ Project setup reuses machine tooling. Missing global prerequisites belong to mac
 
 - Delegate only when context isolation, specialization, or independent parallelism justify coordination; prefer deterministic tools or direct execution for simple tasks.
 - Discover available models and check the authorized policy before dispatching. Prefer lightweight capability for searches, inventories, and verifiable mechanical changes; use enough capability for complex decisions, security, data, and critical review. Without selection support, preserve the permitted model and record the limitation.
-- Each task receives an objective, minimal context, permitted files, dependencies, acceptance criteria, and checks. One writer per file; the coordinator owns lockfiles, shared configuration, and integration. Parallel reviewers are read-only.
+- Each task receives an objective, minimal context, permitted files, dependencies, mutable resources, acceptance criteria, and checks. One writer per file; the coordinator owns lockfiles, shared configuration, and integration. Isolate or serialize shared ports, build output, databases, and services. Parallel reviewers are read-only.
 - Check diffs and checks before accepting a worker's result. After a failure, investigate and escalate capability/context when needed; respect finite retry, time, and resource limits. Do not estimate savings without measurement.
-- After each implementation or fix cycle, always suggest **3 to 8 subsequent code review cycles**, choosing the count and focuses by risk and scope. Provide the reason and a copyable prompt with count, focuses, and actual checks. This range is a project convention, not a quality guarantee; the suggestion does not authorize automatically starting more rounds.
-- In a requested round, each cycle reviews the current state, records findings with severity/location/evidence, and verifies authorized fixes. Use complementary focuses, with integrated review at the end. Internal fixes do not reset the count; respect the agreed count and report residual risks.
+- Scope review to risk and actual changes. For nontrivial work, use an independent review when available; inspect the exact revision/working tree and connected callers, contracts, and tests. Stop when relevant findings are resolved or explicitly dispositioned, affected checks pass, and coverage and residual risks are recorded. More rounds require new evidence, unresolved risk, or an explicit request.
+- Respect a user-requested review count without resetting it after internal fixes. Report unavailable independent review and remaining risks; do not imply that a count proves correctness. Evaluate material harness changes with small disposable tasks and record observed behavior separately from installation or self-reported success.
 
 ## Conventions and context
 

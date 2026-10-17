@@ -32,6 +32,12 @@ Record lint, types, tests, rules, builds, audits, HTTP, SQL generation, and data
 
 For existing projects, compare before/after checks, distinguishing pre-existing failures from regressions. Record rerun verification without duplication and what received only static review.
 
+## Memory and harness evidence
+
+[Actual native memory/index or canonical documentation location, how this client loads it, source/verification/invalidation convention, and clean-context retrieval result. Keep durable decisions separate from temporary task handoffs. Record the handoff/plan location only when work spans sessions.]
+
+[Harness cases executed, inputs, client/version, actual model, commands/results, observed behavior, elapsed time, preserved customizations, and unrun cases. Distinguish fresh subagent context from a restarted client session. A passing smoke case is not a cross-client reliability guarantee. Record the adopted security review prompt and private reporting convention.]
+
 ## Pending work and next delivery
 
-[External decisions, known risks, next step, and the smallest MVP task. State maintenance/rerun guidance, the suggested count of 3 to 8 subsequent code review cycles, reason, focuses, and continuation prompt with actual checks. Publishing and external services require relevant authorization.]
+[External decisions, known risks, next step, and the smallest MVP task. State maintenance/rerun guidance, review coverage, residual findings, and the next useful check if needed. Publishing and external services require relevant authorization.]

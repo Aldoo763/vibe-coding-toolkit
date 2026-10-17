@@ -26,6 +26,8 @@ jobs:
           node-version: "24"
       - name: Test documentation link validation
         run: node --test scripts/validate-docs.test.mjs
+      - name: Test harness evaluation checks
+        run: node --test scripts/validate-harness.test.mjs
       - name: Validate documentation and configuration contracts
         run: node scripts/validate-docs.mjs
       - name: Validate a disposable Next.js project

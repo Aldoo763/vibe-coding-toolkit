@@ -21,7 +21,7 @@ The remote shortcut becomes available when this file is published on `main`. Unt
 - Shared instructions, reliable documentation, compatible skills and integrations.
 - A harness with reproducible commands, review, on-demand context, recovery and task-based subagent selection.
 - Incremental improvements to quality, organization, security and accessibility, preserving existing contracts.
-- Before/after evidence, outstanding issues, maintenance instructions and a recommendation for 3 to 8 subsequent review cycles.
+- Before/after evidence, outstanding issues, maintenance instructions and review scoped by risk and evidence.
 
 ## Prompt
 
@@ -92,10 +92,10 @@ Incorporate durable working agreements:
 - Define acceptance criteria and commands before implementing; test relevant behavior and failures. Fixes need reproduction and regression proof when feasible.
 - Prefer verifiable invariants to lengthy recommendations: validate boundaries, inputs, contracts and rules with existing resources. Reuse scripts; create a small check only for a real gap, with a self-check/test if it contains new logic.
 - Expose local execution, diagnosis, secret-free logs and recovery procedures. Reuse existing observability; do not build a monitoring platform without a need.
-- Keep complex decisions and plans discoverable, with status, evidence, outstanding issues and the next action. Resuming checks the actual checkout, files and processes before trusting the handoff.
+- Keep complex decisions and plans discoverable, with status, evidence, outstanding issues and the next action. Reuse templates/task-handoff.md.template for unfinished multi-session work when no equivalent exists. Resuming checks the actual checkout, files and processes before trusting the handoff.
 - Update the responsible document alongside changes to behavior, commands, schema, boundaries or configuration. Record recurring lessons in the right place; load details and tools on demand.
 - Answer status questions and continue authorized work. A partial blocker affects only its dependencies. Respect pauses, refusals and limits; do not promise background execution without a verifiable process.
-- After every implementation or correction cycle, suggest 3 to 8 subsequent code review cycles to the user, choosing the count and focus according to the review section below.
+- Review nontrivial changes independently when available, with scope and completion criteria from the review section below.
 
 When a recurring rule fails, fix its cause in the responsible test, tool or documentation. Avoid repeating the same instruction across files or creating a new skill for an isolated task.
 
@@ -113,9 +113,9 @@ Discover the models and effort levels actually available in the session and cons
 
 Explicitly select the model and effort when the host provides those controls; otherwise, use the documented mechanism and record inheritance/limitations. Do not invent parameters or alter global settings to force a tier. If an attempt reveals poor quality or insufficient understanding, investigate and increase capability/context; avoid repeating identical cheap attempts. Set finite time/attempt limits for the task, respecting already supplied limits, and stop/escalate with evidence.
 
-Every task receives a goal, minimal context, relevant instructions, allowed files, dependencies, acceptance criteria, checks and return format. Prefer clean context with a sufficient brief over the full history. Require a summary with affected files, evidence, questions and limitations; do not dump logs on the coordinator.
+Every task receives a goal, minimal context, relevant instructions, allowed files, dependencies, mutable resources, acceptance criteria, checks and return format. Prefer clean context with a sufficient brief over the full history. Require a summary with affected files, evidence, questions and limitations; do not dump logs on the coordinator.
 
-Run only independent tasks in parallel, with disjoint writable file sets. Each file has one writer; lockfiles, shared configuration, the ledger and Git operations belong to the coordinator. Reviewers are read-only; fixes return to the responsible writer. Respect host resources, slots and limits without unnecessary recursive fan-out.
+Run only independent tasks in parallel, with disjoint writable file sets and isolated mutable resources. Serialize conflicting ports, build directories, databases, or services when isolation is unavailable. Each file has one writer; lockfiles, shared configuration, the ledger and Git operations belong to the coordinator. Reviewers are read-only; fixes return to the responsible writer. Respect host resources, slots and limits without unnecessary recursive fan-out.
 
 The coordinator checks the diff and validates integration, including after a worker reports success. Confirm that an agent has stopped before taking over its files. Reuse the worker for fixes when the host supports it. Record actual model/effort when observable; do not invent savings, tokens or costs.
 
@@ -131,7 +131,7 @@ Use the current catalog guides to implement and verify each integration:
 - Evaluate all rows in docs/tools/README.md's scope matrix and read guides 17–22: next-dev-loop and next-bundle-optimizer for compatible Next.js; supabase-postgres-best-practices for PostgreSQL anywhere; gh-fix-ci for supported Codex/GitHub Actions work; differential-review for security-sensitive changes; shadcn for the adopted UI system; Sentry MCP for a chosen service and authorized organization/project. Install applicable skills locally and route their use in shared instructions. Record unavailable and not-applicable choices with reasons. Do not upgrade an older Next.js application, switch its bundler, change its PostgreSQL provider, adopt shadcn or install a Sentry SDK to satisfy an optional capability.
 - Validate capability prerequisites and actual execution separately: browser/runtime MCP preflight for next-dev-loop; installed analyzer support for bundle work; relevant SQL checks; explicit security review range/report; UI configuration and component checks; read-only CI/Sentry queries only with authorized access. Configure Sentry through a scoped OAuth connection, reusing existing client configuration without tokens or duplicate servers. Missing global tools become machine-setup prerequisites; missing accounts remain pending. Installation, client discovery and a successful live workflow are different evidence.
 - Browser and diagnosis when an interface exists: reuse available capability; integrate agent-browser and/or Chrome DevTools MCP according to distinct automation, console, network and performance gaps. Install only what the workflow needs. Validate against a local environment without reusing personal sessions or accessing production.
-- Layered memory: a short index and detailed knowledge on demand. Reuse client memory and versioned documentation; external Obsidian/MCP applies when there is a concrete need and authorized destination. Do not create a vault, custom server or data export just to fill a checklist.
+- Layered memory: a short index and detailed knowledge on demand. Record the actual location, client loading mechanism, source/evidence, last verification, and invalidation triggers; retire superseded facts and verify retrieval in a clean context when observable. Keep temporary handoffs separate. Reuse client memory and versioned documentation; external Obsidian/MCP applies when there is a concrete need and authorized destination. Do not create a vault, custom server or data export just to fill a checklist.
 - Artifact skills, skill creation, official plugins, aia-harness and other extras: assess every item in the current catalog. Install compatible items that meet a project need without duplicating the harness or requiring an unauthorized service. Lack of need is a justified decision, not a mandatory installation.
 - Client-specific hooks only when officially supported, necessary, available and tested. Preserve working integrations and avoid duplicate interceptors. Installing deployment skills does not authorize publishing.
 
@@ -141,7 +141,7 @@ If a restart, authentication, plugin trust or external policy is required, recor
 
 Reuse the existing package manager, linter, formatter, testing framework, validation and logger when suitable. Update dependencies and configuration in compatible groups, checking changelogs, peers, engines, stable channels and lockfile. An available major version does not authorize an incompatible migration. Do not use forced installation, automatic audit downgrades or redundant dependencies to copy defaults.
 
-Adapt existing rules and templates instead of rewriting them. For compatible JS/TS, copy the quality-gate modules and self-check from the same revision, choosing the correct profile. Adjust actual paths and boundaries; Next, logger or Drizzle rules apply only where those contracts exist. Other stacks use native tools; do not install ESLint in a codebase without JavaScript merely to satisfy a checklist.
+For compatible TypeScript, evaluate the focused typed lint profile with no-floating-promises and no-misused-promises. Measure runtime/memory on the real runner; adopt gradually in legacy code without weakening existing protections. Adapt existing rules and templates instead of rewriting them. For compatible JS/TS, copy the quality-gate modules and self-check from the same revision, choosing the correct profile. Adjust actual paths and boundaries; Next, logger or Drizzle rules apply only where those contracts exist. Other stacks use native tools; do not install ESLint in a codebase without JavaScript merely to satisfy a checklist.
 
 Measure violations per rule before tightening. A new rule with legacy violations may start at warn, with a count, scope and reduction plan; without violations, use error. Preserve the severity of existing protections. If the check requires zero warnings, separate adoption measurement from the existing gate without weakening it. Do not hide violations with broad ignores, generic suppressions, a higher ceiling or deleted tests.
 
@@ -159,21 +159,19 @@ Run relevant available checks, the copied rules' self-check and dependency audit
 
 Validate local operation: startup on a free port, the critical browser flow when UI exists, relevant errors, logs and changed contracts. Use test data and disposable/authorized services. Mocks, SQL generation, an embedded engine and a real database are different evidence. Stop only processes and temporary resources created by setup.
 
-Verify the harness: find instructions and commands in a clean session when possible; discover a relevant skill; query Context7; observe RTK without duplicate execution; query the graph when applicable. Also check the diff, links and configuration syntax.
+Verify the harness using docs/07-harness-evaluation.md and prompt 14 for relevant disposable behavioral cases. Record pass/fail/not run, client/model, and observed actions; do not mistake a fresh subagent for a restarted client. Find instructions, memory, and commands in a clean session when possible; discover a relevant skill; query Context7; observe RTK without duplicate execution; query the graph when applicable. Also check the diff, links and configuration syntax.
 
 Test reruns on safe parts: no section, MCP server, hook, skill or script should be duplicated; customizations must survive. Do not reinstall everything merely to prove repeatability. Record what actually ran and what received only static review.
 
-## 10. Recommend 3 to 8 code review cycles
+## 10. Review by risk and evidence
 
-Adopt this range as a project convention, without presenting it as a quality guarantee or a universal provider rule. At the end of every implementation or correction cycle, always suggest a subsequent round of 3 to 8 review cycles. Choose the count at that time: small changes tend toward the lower end; extensive, critical or uncertain changes tend toward the upper end. Explain the choice in one sentence.
+Select complementary review scopes from the actual diff: requirements and behavior; regressions and tests; security and data; integrations and configuration; accessibility/UX; measured performance; clarity and maintenance. Use independent review for nontrivial changes when available. Do not create a fixed panel or mandatory number of cycles for every change.
 
-Plan complementary areas of focus according to the diff: requirements and behavior; regressions and tests; security and data; integrations and configuration; accessibility/UX; measured performance; clarity and maintenance. Do not create artificial stages for absent areas.
+Establish the exact revision range and working-tree layers. Review current code plus affected callers, contracts, and tests. Reviewers work read-only and return findings with severity, location, concrete failure scenario, and evidence. The coordinator verifies and deduplicates claims. Apply authorized fixes and rerun affected checks.
 
-Each cycle reviews the current state and connected code, presenting findings with severity, path, evidence and proposed correction. Authorized fixes pass affected checks and are reassessed in the next cycle. Inspect integration at the end; rereading only your own summary is not a new review.
+Finish when relevant findings are resolved or explicitly dispositioned, checks pass, and integration coverage and residual risks are recorded. More rounds need new evidence, unresolved risk, or an explicit request. Respect user-requested counts and limits without restarting the count after internal fixes. Report unavailable independent review or blocked checks; never claim that a review count proves correctness.
 
-Suggest the count and provide a continuation prompt already filled with that count, actual focus areas and project commands. The recommendation does not authorize automatically launching new rounds, costs or out-of-scope fixes. If the user requests the cycles, execute within current authorization and limits. Do not restart the count after every internal fix in the same round; stop at the agreed count with explicit findings and residual risks. A new round requires a new decision.
-
-Lightweight models remain preferred for bounded checks; critical review uses sufficient capability. Parallel reviewers receive distinct scopes and work read-only. The coordinator verifies results and avoids duplicate findings.
+Make security review reusable: copy only the self-contained Prompt block from docs/prompts/13-security-review.md into the existing project prompt location, adapting paths while preserving its limits, or record its versioned source and invocation in docs/quality.md. It supports repository baselines and precise diffs, with a private redacted report and read-only default. Keep its source revision/update method; do not copy the whole toolkit. Use differential-review when installed and compatible, with manual code tracing as an explicit fallback. A baseline review is not dependent on having a PR. Installation does not authorize production probing, code uploads, or automatic fixes.
 
 ## 11. Delivery, evidence and future maintenance
 
@@ -183,11 +181,11 @@ Record before/after checks and organizational changes. Document commands to run,
 
 Finish when applicable items are resolved or have a proven external blocker, available checks have run, introduced regressions are fixed and documentation reflects the delivered state. A blocker does not justify abandoning independent tasks; neither does it authorize inventing success.
 
-In the final response, state: main changes; evidence; what was not validated; risks and pending interventions; commands to run; next action; and a reasoned recommendation for 3 to 8 code review cycles with a copyable prompt. Do not promise the project is perfect or claim background work without verifiable execution.
+In the final response, state: main changes; evidence; what was not validated; risks and pending interventions; commands to run; next action; and review coverage with any next useful validation. Do not promise the project is perfect or claim background work without verifiable execution.
 ```
 
 ## References and maintenance
 
 The prompt combines the [shared agreements](../../templates/AGENTS.md.template), [tool catalog](../tools/README.md), [subagent policy](../tools/02-subagent-orchestration.md#part-b--model-selection-discipline) and existing templates. Actual names and commands are resolved during execution.
 
-References on [OpenAI harness engineering](https://openai.com/index/harness-engineering/) and [Anthropic long-running harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) guide discoverable context, incremental progress, feedback and resumption. Capability selection follows the guidance on [Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) and [Claude Code costs](https://code.claude.com/docs/en/costs), respecting client capabilities and authorization. The range of **3 to 8 reviews is a convention of this toolkit**, with the count and focus chosen for each change.
+References on [OpenAI harness engineering](https://openai.com/index/harness-engineering/) and [Anthropic long-running harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) guide discoverable context, incremental progress, feedback and resumption. Capability selection follows the guidance on [Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) and [Claude Code costs](https://code.claude.com/docs/en/costs), respecting client capabilities and authorization. Review scope follows risk, evidence, and explicit user-requested rounds; no fixed count guarantees correctness.

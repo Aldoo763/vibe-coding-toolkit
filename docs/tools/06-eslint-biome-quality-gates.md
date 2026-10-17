@@ -153,7 +153,7 @@ formatted.
 
 ## From warning to error: promotion as a migration tool
 
-A new rule does not start by blocking anyone. It first enters as `"warn"`
+In an existing codebase, a new rule first enters as `"warn"`
 across the entire codebase — making every existing violation
 visible without breaking anyone's build. From there, the warning count
 is a real, trackable number, not a "we'll tighten this
@@ -353,16 +353,21 @@ from yours):
 {
   "scripts": {
     "lint": "eslint .",
-    "lint:types": "eslint . --config eslint.type-aware.config.js"
+    "lint:typed": "eslint . --config eslint.typed.config.mjs"
   }
 }
 ```
 
-`lint` runs quickly and can block commits — everyone runs it constantly
-without a second thought. `lint:types` runs in CI (or manually,
-when someone actually needs it), not on every commit. This difference in
-purpose between the scripts makes the setup work without becoming
-friction: the fast check blocks early, the slow one runs in the background.
+For new TypeScript projects, `lint:typed` is an explicit `check`/CI gate with
+`no-floating-promises` and `no-misused-promises` at `error`. Use the
+[focused profile](../../templates/eslint/next.typed.config.mjs.example), which
+extends the fast configuration without a broad type-aware preset. In existing
+code, begin at `warn`, record counts, and promote each rule after reaching zero.
+Measure elapsed time and peak memory before adding typed rules or widening scope;
+keep the command separate from fast lint and Git hooks. The separate
+[advanced typed profile](../../templates/eslint/eslint.typed.config.mjs.example)
+retains the broader warning rules for gradual adoption. Preserve its checks in
+projects already using it; the focused profile is the greenfield Next baseline.
 
 ## Tutorial: building this setup from scratch in your project
 
@@ -414,39 +419,23 @@ disable it and document why ("The formatter, deliberately
 disabled" above) if you are **importing** a large existing codebase
 that has never used a formatter.
 
-### 4. Configure ESLint with TypeScript and type-aware rules
+### 4. Configure fast ESLint, then focused type-aware rules
 
 ```js
-// eslint.config.js
+// eslint.config.mjs
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
-export default tseslint.config(
-  js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      // Custom rules go here, on top of what the presets already
-      // provide — presets are a starting point, not the final
-      // word.
-    },
-  },
-);
+export default [js.configs.recommended, ...tseslint.configs.recommended];
 ```
 
-`tseslint.configs.recommendedTypeChecked` already includes the TypeScript
-ecosystem's most established type-aware rules. `parserOptions.projectService: true`
-enables the type-checking engine behind the rules — without this
-line, any rule requiring types simply does not run.
-`tsconfigRootDir: import.meta.dirname` tells ESLint where the project root
-is so it can find the right `tsconfig.json`. This is lint's heavier
-level — step 6 shows how to keep it off the fast path.
+For Next.js, preserve its official ESLint presets instead of replacing them with
+this generic baseline. Then copy the
+[focused typed configuration](../../templates/eslint/next.typed.config.mjs.example) to
+`eslint.typed.config.mjs`. Its `projectService: true` obtains TypeScript information;
+`tsconfigRootDir: import.meta.dirname` locates the project. Adjust the source glob
+to files included by the project's tsconfig. New projects use the two async-safety
+rules as errors; existing projects measure warnings before promoting them.
 
 ### 5. Install your framework's plugin, if it has one
 
@@ -462,18 +451,15 @@ starting point, not the final word" logic.
 {
   "scripts": {
     "lint": "eslint .",
-    "lint:types": "eslint . --config eslint.type-aware.config.js"
+    "lint:typed": "eslint . --config eslint.typed.config.mjs"
   }
 }
 ```
 
-If you put type-aware rules directly in the main `eslint.config.js`
-(step 4), you can keep just one script — but then every
-`npm run lint` pays the heavy cost. For teams feeling that cost, the
-most common pattern is to separate them into a second configuration file
-(`eslint.type-aware.config.js`, extending the main one) and run
-`lint:types` only in CI or manually. See "Type-aware lint,
-outside the fast path" above for the full reasoning.
+Keep type-aware rules in the second configuration. Include `npm run lint:typed`
+in the new project's explicit `check`/CI sequence. For legacy adoption, first measure
+its warnings and runtime, then promote each rule once clean. See "Type-aware lint,
+outside the fast path" above for the reasoning.
 
 <a id="7-connect-fast-lint-to-a-pre-commit-hook"></a>
 
@@ -483,7 +469,7 @@ Run lint through project scripts. This setup does not install Git hooks, hook ma
 
 Preserve existing hooks. If the user specifically requests this integration, use the mechanism already adopted by the project and keep type-aware lint off the fast path. Do not impose a new hook as a prerequisite for ESLint configuration.
 
-### 8. Introduce the first new rule in warning mode
+### 8. Introduce new rules gradually in existing code
 
 ```js
 // eslint.config.js (excerpt)
@@ -798,8 +784,8 @@ advantage for the most frequent checks.
 **What if my project is small — is all this configuration worthwhile?**
 
 For a small project, start with ESLint alone and an existing recommended
-preset (from `typescript-eslint`, for example) — no rule-by-rule
-curation, no separate type-aware tier, no custom rules.
+preset (from `typescript-eslint`, for example), plus the focused async-safety
+profile for TypeScript. Add custom rules only for demonstrated project needs.
 This entire split into two tools with curated rules solves a
 scale problem: many files, many warnings, long lint times.
 None of those problems exists yet in a small project. Revisit

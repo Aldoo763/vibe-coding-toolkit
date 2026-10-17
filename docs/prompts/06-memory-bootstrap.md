@@ -33,7 +33,8 @@ confirmation is data loss, not cleanup.
 
 - **`[MEMORY_DIR]`** — appears three times; the folder for the fast
   (always-loaded) tier. In Claude Code, a common convention is
-  `.claude/memory/` — adapt to your tool's equivalent.
+  `.claude/memory/` can be a custom folder — verify loading explicitly;
+  prefer the active client's native memory or existing repository docs.
 - **`[CONFIG_FILE]`** — the file your agent automatically loads at the start
   of every session, where memory's `INSTRUCTIONS.md` must be referenced to
   be read without asking. In Claude Code, this is usually the project's
@@ -61,12 +62,16 @@ confirmation is data loss, not cleanup.
 ## The prompt
 
 ````
+Reuse the active client's native memory or existing repository docs first.
+Do not add a vault, MCP server, or dependency. Verify how the client loads
+the index; a folder name alone does not enable automatic memory.
+
 Set up a two-tier memory system for this project: a small always-loaded
 index for facts a session needs before it starts working, and a place for
 everything else that doesn't need to load every time.
 
 ## 1. Tier one — the always-loaded index
-Create:
+Reuse existing equivalents; create only missing files:
 - `[MEMORY_DIR]/INSTRUCTIONS.md` — the rules below, wired into whatever
   this project auto-loads at session start (e.g. [CONFIG_FILE]), so every
   session reads them without being asked.
@@ -80,6 +85,10 @@ Create:
   description: one-line summary — used to judge relevance in a future session
   metadata:
     type: feedback | architecture | business-rule | reference
+  source: path, decision record, or approved reference
+  evidence: observation or check supporting the lesson
+  last_verified: YYYY-MM-DD
+  invalidate_when: change that would make the fact stale
   ---
   ```
 
@@ -101,6 +110,12 @@ Concretely:
 Err toward not saving. A memory nobody needed is clutter; a lesson
 relearned the hard way is expensive — but a small, high-signal index beats
 a large, ignored one every time.
+
+Keep temporary handoffs (objective, changed files, checks, blockers, next
+step) in the task record, separate from durable memory. Promote only verified
+lessons. Before using a memory, check its source and invalidation condition
+against the current state; reverify or mark stale entries superseded. Never
+invent evidence or verified dates, or store credentials and private dumps.
 
 ## 3. Growth policy — keep the index small forever
 Before adding a new entry, count the index's non-blank lines. Past

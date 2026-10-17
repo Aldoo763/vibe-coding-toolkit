@@ -105,19 +105,30 @@ This choice follows the guidance on [models and reasoning in Codex subagents](ht
 
 Use direct execution or deterministic tools when they solve the task with less coordination. Delegate to isolate context, use specialization, or execute independent parts. The names in Part A are illustrative roles, not automatically installed agents.
 
-Each briefing includes the objective, necessary context, applicable instructions, files, dependencies, acceptance criteria, and checks. Prefer clean context over copying the entire conversation. Request a short report with paths, findings, evidence, and limitations. Grant only necessary tools/permissions; a read-only reviewer does not implicitly become a writer. [Claude Code subagent best practices](https://code.claude.com/docs/en/sub-agents) document this isolation.
+Each briefing includes the objective, necessary context, applicable instructions, files, dependencies, mutable resources (ports, build directories, test databases, and services), acceptance criteria, and checks. Prefer clean context over copying the entire conversation. Request a short report with paths, findings, evidence, and limitations. Grant only necessary tools/permissions; a read-only reviewer does not implicitly become a writer. [Claude Code subagent best practices](https://code.claude.com/docs/en/sub-agents) document this isolation.
 
 The coordinator checks the diff and validates integration. Lockfiles, shared configuration, the ledger, and Git operations have a single owner. Control concurrency using the host's actual resources and limits; do not create agent trees without clear benefits. Record observed models/efforts without estimating tokens or savings when no measurements exist.
 
 ## Review after implementation or fixes
 
-As a toolkit convention, **always suggest 3 to 8 subsequent code review cycles to the user** after completing an implementation or fix cycle. The LLM chooses the count and focus areas based on the diff, risk, and uncertainty, with a one-sentence justification. This range is a workflow preference, not universal vendor guidance or a guarantee of bug-free code.
+Choose review scope from the changed contracts, risk, and unresolved evidence.
+There is no universal minimum of 3–8 cycles. A small documentation change may
+need one focused consistency check; security or data changes may need distinct
+specialist reviews and integration checks. Respect any review count explicitly
+requested by the user; internal fixes do not restart that count.
 
-Small changes tend toward the lower end; extensive or critical changes toward the higher end. Distribute complementary focus areas actually present in the change: requirements, behavior, regressions, tests, security, data, integrations, accessibility, measured performance, and maintainability. Include a final integration check; do not create empty reviews to fill a list.
+Before dispatch, freeze the target: exact base and head commits, or an explicit
+working-tree snapshot including staged, unstaged, and relevant untracked files.
+Reviewers inspect the diff plus connected callers, contracts, and tests. They
+remain read-only: no automatic fixes, commits, or publishing. The coordinator
+deduplicates findings by root cause and verifies evidence before reporting.
 
-Deliver a continuation prompt with the chosen count, focus areas, and actual commands. **Suggesting is not executing:** new rounds must be requested. Within an authorized round, each cycle inspects the current state and connected code, presents findings with severity, location, and evidence, and reevaluates authorized fixes with the affected checks. Internal fixes do not restart the count; stop at the agreed count with explicit findings and residual risks.
-
-Example suggestion for a small documentation change: “I recommend 3 cycles: contract consistency, instruction safety, and navigation/usability. Review the current diff in these 3 cycles, with findings by severity and path; check links and run `node scripts/validate-docs.mjs` and `git diff --check`. Present proposed fixes; implement them only within current authorization.” Adapt the count, focus areas, and commands to each project.
+Define the stop condition before review: the requested scope and rounds are
+covered, findings have evidence and disposition, and relevant checks are
+reported. Continue beyond that only for a newly identified risk or user request;
+report residual uncertainty instead of manufacturing more rounds. Suggest
+additional review only when a concrete gap justifies it. Fixes require existing
+or explicit authorization; review alone does not authorize implementation.
 
 ## Recovering an interrupted run
 
@@ -125,7 +136,7 @@ A worker's failure does not complete the coordinator's scope. Confirm that the a
 
 ## Before waves: deciding how to split tasks
 
-Everything Part C teaches — marking `Files:` and `Depends-on:`, grouping into
+Everything Part C teaches — marking `Files:`, `Depends-on:`, and `Resources:`, grouping into
 waves, serializing commits — starts from a question it does not
 answer: who decides where to split work into tasks? That
 decision happens **before** wave mechanics, not after the plan is already
@@ -174,7 +185,7 @@ This is a layer **preceding and complementing** Part C's wave execution,
 not replacing it: the post helps decide **how to
 split** work into tasks that each justify existing
 alone; Part C teaches **how to execute** those tasks
-safely once split — disjoint files, no
+once split — disjoint files, independent mutable resources, no
 cross-dependencies, commits always serialized by the orchestrator. One
 question does not replace the other; the second only makes sense after the
 first is answered.
@@ -199,21 +210,23 @@ race to run `git commit` first.
 
 ### The solution
 
-Three parts close both gaps without giving up speed:
+Three parts reduce these coordination risks:
 
 1. **Annotate each planned task** with the exact file paths it
-   touches and the other tasks it depends on. A task without these
+   touches, the other tasks it depends on, and `Resources:` identifying
+   ports, build directories, test databases, and services used by checks. A task without these
    annotations — or with any real uncertainty about its scope — is
    treated by safety default as depending on **everything**. This is
    the pattern's safety net: an underspecified task does not become a
    false-parallelism risk; it simply degrades to normal serial
    execution.
-2. **Two tasks enter the same wave only if both conditions hold
+2. **Two tasks enter the same wave only if all conditions hold
    simultaneously**: neither depends on the other, even transitively (that
    is, through a third task along the way); **and** the
    sets of files they touch are completely disjoint, with no shared
-   files. If either condition fails — even just one — the
-   tasks go into separate waves.
+   files; **and** mutable resources are independent or explicitly isolated.
+   If any condition fails or is uncertain, serialize the affected work.
+   Disjoint source files alone do not isolate builds or test services.
 3. **Implementers within a wave never commit on their own.** They
    edit files and report changes; the orchestrator makes all
    commits afterward, one per task in wave order, capturing the current
@@ -242,16 +255,16 @@ Three parts close both gaps without giving up speed:
 
 ### Escape hatch: worktree isolation
 
-Sometimes two tasks genuinely cannot be separated — they need to
-touch the same file — and further splitting would defeat the purpose of
-parallelizing. Only in that case, isolate each implementer in its own Git
+When tasks collide, serialize or combine them first. Optional isolation can
+justify parallelism when its benefit outweighs setup cost: use a separate Git
 *worktree* (a parallel repository copy in a separate folder, synchronized
 with the same history) and its own *branch*. This makes independent
 commits safe again because there is no shared index left to
 contend over.
 
-Be clear that this is expensive — there are real setup and disk costs per
-agent — and should be a last resort, never the default.
+Worktrees do not isolate ports, databases, or external services. Allocate those
+separately or serialize their checks. A branch name alone is not an isolated
+working directory; neither branches nor worktrees are required for this pattern.
 
 ### What changes (and what does not)
 
@@ -296,12 +309,12 @@ using it in a real plan by applying Part C's wave execution:
 
 5. **List the current plan's tasks.** For each: a short ID (`T01`,
    `T02`...), a one-line description, and the responsible specialist.
-6. **Annotate `Files:` and `Depends-on:` on every task.** Be exact about
+6. **Annotate `Files:`, `Depends-on:`, and `Resources:` on every task.** Be exact about
    file paths — when in doubt, list more files, not fewer. Any
    real uncertainty becomes `Depends-on: everything listed so far`.
-7. **Group tasks into waves**, applying both conditions from the
+7. **Group tasks into waves**, applying all conditions from the
    previous section: no dependencies (even transitive ones) and fully
-   disjoint files. Show the result as a table: wave number, its tasks,
+   disjoint files and independent mutable resources. Show the result as a table: wave number, its tasks,
    each task's specialist.
 8. **Execute wave by wave**, following Part C's loop: dispatch the
    wave's implementers in one message, wait for all, commit
@@ -324,12 +337,13 @@ in the backlog:
 | T04 | Fix broken date formatting in order history | `src/components/orders/OrderDate.tsx` | none | `frontend-specialist` |
 | T05 | Fix broken pagination in the admin user list | `src/app/admin/users/page.tsx` | none | `frontend-specialist` |
 
-Applying both conditions:
+Assume each task has independent build output, ports, and test data; otherwise
+serialize those checks. Applying the conditions:
 
 - **Wave 1 — T01, T04, T05.** None depends on anything, and the three
   file sets have nothing in common — even though T04 and T05 belong to the
   same domain (frontend) and specialist, they touch different
-  files, so they go together.
+  files and resources, so they go together.
 - **Wave 2 — T02, alone.** Depends on T01 already being committed — the table
   must exist before the endpoint tries to use it. No other
   dependency-free task remains to accompany it, and that is fine: a
@@ -355,7 +369,7 @@ Three tickets arrive on the same day for a blogging platform:
 | T02 | Author avatar looks blurry on the article page | `src/components/blog/ArticleHeader.tsx` | none |
 | T03 | Align the "share" button with the new design system (the product's visual guide) | `src/components/blog/ArticleHeader.tsx`, `src/styles/share-button.css` | none |
 
-None declares a dependency on another — at first glance all three seem
+Assume independent test/build resources for this example. None declares a dependency on another — at first glance all three seem
 perfect candidates for one wave. But T02 and T03 touch the same
 file, `ArticleHeader.tsx`. Lack of dependencies alone is insufficient;
 file sets must also be disjoint, and here they are not.
@@ -410,9 +424,9 @@ domains; an agent for a domain you do not have is dead weight in the
 table.
 
 **What if I get the `Depends-on:` annotation wrong?**
-The worst case is losing some parallelism — the task falls back to serial
-execution. It is not a race condition; that is exactly why the rule
-is "when in doubt, depend on everything": the safe mistake is the only one allowed.
+An omitted dependency can cause a race or invalid result. If scope is uncertain,
+serialize the task and inspect dependencies and resources before dispatch; the
+fallback helps only when the uncertainty is recognized.
 
 **Can I use this without Claude Code, with another AI tool?**
 Yes. The pattern is tool-independent — what matters is an
@@ -421,13 +435,11 @@ ability to dispatch more than one agent (or session) at a time.
 
 **Is there a maximum number of tasks per wave?**
 There is no universal number. First select tasks without dependencies and with
-disjoint files; then cap concurrency at the host's authorized slots,
+disjoint files and independent mutable resources; then cap concurrency at the host's authorized slots,
 resources, and budget. A structurally valid wave may need to
 run in smaller batches.
 
 **Can reviewers in one wave disagree about neighboring tasks?**
-Each reviewer handles only its own task's commit range, so this should
-not happen — if it does (both complain about the same code fragment,
-for example), it signals that the tasks were not as
-independent as the annotations assumed, and the annotations should be revisited before the
-next similar wave.
+Yes. Reviewers inspect connected callers and contracts, so findings may overlap.
+The coordinator verifies evidence, deduplicates root causes, and checks whether
+the overlap reveals a missed dependency before the next wave.

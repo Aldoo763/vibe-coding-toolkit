@@ -2,9 +2,9 @@
 
 ## What it is
 
-An Obsidian vault — plain Markdown files stored on disk and organized by a folder convention — used as a project's long-term memory. The central feature of this pattern: **no read or write touches these files directly.** Everything goes through an MCP server (*Model Context Protocol*, a protocol that exposes operations as structured tools — with names, parameters, and validation — for an AI agent to call, instead of letting the agent manipulate raw filesystem files).
+An Obsidian vault — plain Markdown files stored on disk and organized by a folder convention — used as a project's long-term memory. The access convention in this optional pattern is to route agent reads and writes through a validating MCP server (*Model Context Protocol*, a protocol that exposes operations as structured tools — with names, parameters, and validation — for an AI agent to call, instead of letting the agent manipulate raw filesystem files).
 
-This detail prevents the vault from becoming just another pile of notes that gradually drifts from its conventions. Every write goes through validation:
+A server configured with these checks can reduce drift for writes made through it:
 
 - **required frontmatter** — metadata at the top of a Markdown file, between two `---` lines, such as title and description;
 - **one template per folder**, defining which sections a note must have and in what order;
@@ -12,6 +12,12 @@ This detail prevents the vault from becoming just another pile of notes that gra
 - **a consistent slug style** (the "flattened" version of a filename — lowercase, without accents, with hyphens instead of spaces) **and tag style.**
 
 A manual edit directly in the file bypasses all of this — and only visibly breaks the convention much later, during an unrelated write.
+
+This is optional infrastructure. Prefer native client memory or existing
+repository documentation when those meet the need; no vault or new dependency
+is required. Follow the [portable storage and freshness rules](09-claude-memory-system.md#portable-storage-and-freshness): record source, evidence,
+last verified date, and invalidation condition. Daily task handoffs are
+working state, not automatically durable knowledge.
 
 ## Why use it
 
@@ -52,7 +58,7 @@ General installation steps:
    Exact command and environment variable names vary by server — check the README of your chosen server before copying this literally.
 
 4. Restart the agent session and confirm that vault tools appear in the list of available tools.
-5. Write the hook (a script that runs automatically at certain points in the session lifecycle — before a tool is called, for example) blocking direct vault access (the "Enforcing 'MCP only' with a hook" section below) — without it, steps 1 through 4 are merely a goodwill convention, easily forgotten under pressure.
+5. Optionally add the illustrative hook below to remind agents using the named tools about the access convention. It is not a security boundary.
 
 ## Folder structure
 
@@ -87,6 +93,10 @@ name:
 description:
 metadata:
   type:
+source:
+evidence:
+last_verified:
+invalidate_when:
 ---
 
 ## Context
@@ -106,7 +116,7 @@ Point it to the `vault/` folder (see "How to install" above).
 
 ### 4. Write the protection hook
 
-See "Enforcing 'MCP only' with a hook" below — copy the hook, adjust the path (`vault/`) to your actual folder name, and register it in your agent to run on `PreToolUse` (before any `Read`, `Grep`, `Glob`, `Write`, or `Edit` call).
+This optional step adds a convention guardrail, not protection against all access. See "Enforcing 'MCP only' with a hook" below for its limits; if used, adjust the literal path and register the named tools.
 
 ### 5. Test both paths
 
@@ -124,6 +134,10 @@ name: large-order-approval-rule
 description: Orders with 10 or more items require manual supervisor approval before proceeding to processing.
 metadata:
   type: business-rule
+source: approved order-processing decision
+evidence: supervisor-approval acceptance check
+last_verified: YYYY-MM-DD
+invalidate_when: approval threshold or processing policy changes
 ---
 
 ## Context
@@ -146,7 +160,7 @@ knowing this rule will look for a bug where none exists.
 - [[order-processing-flow]]
 ```
 
-Why it passes validation: `name` matches the filename (without the `.md` extension) and is in kebab-case (lowercase, with hyphens); `description` is filled in; `metadata.type` is an accepted type; the sections match the folder template in the same order, with `Related` last; and the wikilink `[[order-processing-flow]]` points to a note that actually exists in the vault.
+This illustrative note requires an actual source, check result, and verified date before saving. With those filled in, it passes validation when: `name` matches the filename (without the `.md` extension) and is in kebab-case (lowercase, with hyphens); `description` is filled in; `metadata.type` is an accepted type; the sections match the folder template in the same order, with `Related` last; and the wikilink `[[order-processing-flow]]` points to a note that actually exists in the vault.
 
 ### Example 2 — malformed note, rejected
 
@@ -185,7 +199,15 @@ Five problems at once, all things a manual edit directly in the file would let s
 
 ## Enforcing "MCP only" with a hook
 
-A written rule — "always use MCP tools" — is easy to forget mid-session under context pressure. Instead of relying only on convention, enforce it mechanically with a hook: a `PreToolUse` hook (runs before the tool executes) that denies any direct `Read`, `Grep`, `Glob`, `Write`, or `Edit` call whose path touches the vault folder. A narrow, read-only exception for the daily log folder is acceptable if useful — the rest of the vault remains exclusively MCP.
+The heading describes an access convention, not complete enforcement. This
+illustrative `PreToolUse` guardrail checks only the registered `Read`, `Grep`,
+`Glob`, `Write`, and `Edit` tools and literal path strings containing `vault/`.
+It fails open on invalid events. Shell commands, other tools, omitted paths,
+path aliases, and direct human edits can bypass it. The daily read exception
+also bypasses MCP for those reads. It is **not a security boundary** and does
+not guarantee MCP-only access; use actual filesystem permissions or sandbox
+controls if access isolation is required. No new hook logic is needed to use
+the memory convention.
 
 The same JSON stdin (standard input) reader as the token proxy hook: [`hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example), which exposes `readStdinRaw()` (reads stdin without ever throwing) and `parseHookEvent()` (attempts to parse, returning `null` for both invalid JSON and the literal value `null` — the two cases that often crash a hastily written hook):
 
@@ -218,12 +240,12 @@ See [Hook best practices](10-hooks-best-practices.md) for the general reasoning 
 
 ## Automating capture and consolidation
 
-Automate the "capture, then consolidate" cycle instead of relying on the agent to remember to do it — two hooks close the loop:
+If recurring capture warrants automation, two optional hooks can support it:
 
 - An **end-of-session** hook (runs when the session ends) records a short summary in the day's note — work done, decisions made, problems encountered.
-- A **start-of-session** hook (runs when a session starts on a later day) promotes yesterday's daily entries into permanent knowledge notes, and only then deletes the compiled raw daily log.
+- A **start-of-session** hook can propose durable lessons from daily entries. Verify each against its source, record evidence and freshness metadata, and confirm the saved note by reading it back before any authorized cleanup of the raw log.
 
-That "only then deletes" matters: it keeps the daily folder a rotating scratchpad instead of a second permanent store competing with the knowledge folder. A daily note that has never been compiled stays available until some future session start processes it.
+Retain unprocessed daily notes and unfinished handoffs. Cleanup follows the project's retention policy only after confirmed consolidation; automation must not treat every session summary as durable truth.
 
 ## Migrating from the always-loaded index to the vault
 
@@ -264,4 +286,4 @@ Not necessarily. The "vault" is just a Markdown folder with a convention — the
 We deliberately do not recommend a specific one — search for "obsidian" in an MCP registry and confirm that your chosen server supports mandatory frontmatter and templates if you want this exact pattern.
 
 **What happens to the daily log after compilation?**
-It is deleted, so the daily folder stays a rotating scratchpad instead of becoming a second permanent store competing with the knowledge folder.
+Follow the project's retention policy. Only clean up after verified lessons are saved and read back; an unfinished handoff remains available.

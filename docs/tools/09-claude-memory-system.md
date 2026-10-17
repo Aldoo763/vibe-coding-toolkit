@@ -27,6 +27,24 @@ to be maintained, rather than fall into either of two opposite traps:
 saving nothing, or saving everything until the index becomes too large to
 be worth loading.
 
+## Portable storage and freshness
+
+Use the active client's native memory when available, or the repository's
+existing documentation. The Claude-oriented paths below are examples, not
+portable auto-loading guarantees: verify the client's supported loading
+mechanism. Do not add a vault, MCP server, or dependency just to save memory.
+
+Durable memory records a reusable lesson. A task handoff records the current
+objective, changed files, checks, blockers, and next step; keep it in the task
+record and retire it when the task ends. Promote only verified durable lessons.
+
+Every durable entry records its source, supporting evidence (a decision,
+reproduction, or check), last verified date, and an invalidation condition.
+Before relying on it, compare those with current code and instructions. A
+changed contract or contradicted source makes the entry stale: reverify and
+update it, or mark it superseded so it no longer guides work. Never invent
+verification dates or evidence, and never store credentials or private dumps.
+
 ## Structure
 
 - **`MEMORY.md`**: an index file always loaded at session start, one line per
@@ -42,6 +60,10 @@ name: kebab-case-slug
 description: one-line summary used to determine relevance in future sessions
 metadata:
   type: feedback | architecture | business-rule | reference
+source: path, decision record, or approved reference
+evidence: observation or check supporting this lesson
+last_verified: YYYY-MM-DD
+invalidate_when: contract, dependency, or decision that would change this fact
 ---
 
 The fact or rule itself, why it matters, and when it applies.
@@ -131,7 +153,8 @@ loads automatically.
    code does not make it obvious. It deserves an entry.
 4. **Write the topic file.** Create
    `.claude/memory/image-upload-limit.md` with complete frontmatter (`name`,
-   `description`, and `type: architecture` in this case), and a body
+   `description`, `type: architecture`, source, evidence, last verified date,
+   and invalidation condition in this case), and a body
    explaining the fact, why it matters, and when it applies.
 5. **Add one index line.** In `MEMORY.md`:
    `- [Image upload limit](image-upload-limit.md) — the proxy silently drops uploads above X without returning an error`.
@@ -146,6 +169,9 @@ A ready-made prompt avoids setting this up manually each time: see
 steps in a new project or an existing project without memory.
 
 ## Examples — good and bad entries
+
+These illustrative bodies show the saving criterion; a real saved entry must
+also include the provenance and freshness fields above.
 
 ### Bad — derived from the code itself
 

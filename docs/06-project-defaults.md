@@ -15,7 +15,7 @@ For adoption or updates in an existing application, follow [prompt 12](prompts/1
 | Logging | Pino, structured fields, and known-secret redaction | Field redaction does not remove secrets written in free-form messages |
 | Tests | Vitest in Node.js for server logic and boundaries | DOM, Testing Library, and E2E are added with flows that need them |
 | UI | Accessible HTML, mobile first, Tailwind, and the `cn` helper | UI kits, tables, and form libraries depend on the actual interface |
-| Quality | Next.js/TypeScript presets, 350-line limit, logging, and data boundary | Drizzle rules guard `update/delete` without `where`; they do not replace review |
+| Quality | Next.js/TypeScript presets, focused typed async checks, 350-line limit, logging, and data boundary | Measure typed lint cost; Drizzle guards do not replace review |
 | Agents | Shared `AGENTS.md`, Claude bridge, official local skills | Preserve client, model, and authentication; configure each host in its supported format |
 
 Align Node.js types with the runtime and tool peers; retain supported combinations without forcing installation. The full lint profile and commands are in the [execution guide](04-project-bootstrap.md#6-apply-eslint-and-commands).
@@ -72,6 +72,8 @@ Create four root files and five supporting documents in `docs/`. The [manifest](
 In an existing project, preserve useful content. If `product.md` exists, consolidate it into `PRODUCT.md`, with an intermediate rename on case-insensitive filesystems. If two distinct versions exist, compare and merge content without blindly overwriting either. Update links in the same change.
 
 Record only implemented structure in `docs/architecture.md`; label plans as plans. `docs/design.md` may start with visual direction and accessibility criteria without inventing a component catalog. `docs/quality.md` does not claim nonexistent tests or coverage. Add other documents when they have content and their own responsibility.
+
+Both new and existing projects record the actual memory/index location, client loading mechanism, source/verification/invalidation rules, and observed retrieval in `docs/setup.md`. Reuse native memory and canonical documents; external memory remains optional. Temporary handoffs belong to an active task or plan, using the [handoff template](../templates/task-handoff.md.template) only when needed. `docs/quality.md` records the reusable [security review prompt](prompts/13-security-review.md), private report convention, and relevant [harness evaluations](07-harness-evaluation.md). These additions do not change the nine-document manifest.
 
 ## Features according to the product
 

@@ -4,13 +4,14 @@ The toolkit keeps no application or Next.js dependencies at the root. Validate d
 
 ```bash
 node --test scripts/validate-docs.test.mjs
+node --test scripts/validate-harness.test.mjs
 node scripts/validate-docs.mjs
 node scripts/validate-next.mjs
 ```
 
 Use Node.js 24, npm, Git, and network access. The [document check](../scripts/validate-docs.mjs) verifies local links, image `srcset` candidates, anchors, manifest destinations, JSON, and this repository’s GitHub/raw URLs, including shortcuts inside prompts. The [validator regression tests](../scripts/validate-docs.test.mjs) exercise missing images, broken fragments, raw shortcuts, and generated-document anchors in temporary Git repositories. The [application check](../scripts/validate-next.mjs) creates and removes a temporary project; dependencies and test resources stay there. ESLint checks run in a child process, releasing native addons before cleanup on Windows; the final result passes only after the temporary directory is removed. Neither check calls models, installs Git hooks, or changes global configuration.
 
-The [workflow](../.github/workflows/validate.yml) runs both on Ubuntu and Windows, with official actions pinned by commit and read-only permissions. Public names are part of the contract: update callers, indexes, and templates in the same change.
+The [workflow](../.github/workflows/validate.yml) runs these checks on Ubuntu and Windows, with official actions pinned by commit and read-only permissions. Public names are part of the contract: update callers, indexes, and templates in the same change.
 
 ## What validation proves
 
@@ -24,6 +25,7 @@ The [workflow](../.github/workflows/validate.yml) runs both on Ubuntu and Window
 | Application | Lint, types, self-checks, tests, and build; production server responds HTTP 200 with expected content |
 | Dependencies | Required production audit; full audit shows development counts and advisories |
 | Cleanup | Test schema restored, embedded database closed, own server stopped, and temporary directory removed |
+| Harness evaluator | Broken authorization rejected, complete fix accepted, and lost customization rejected; these deterministic tests do not run a model |
 
 PGlite runs embedded PostgreSQL; it does not prove TCP connectivity, SSL, or provider configuration. The `pg.Pool` lifecycle uses mocks, while SQL actually runs in the engine. The test app does not receive fictitious business tables as part of the template.
 
@@ -32,6 +34,24 @@ Skill presence does not prove host execution. Publishing, credentialed services,
 The fixture deliberately installs optional instruction packages to verify distribution; it does not initialize shadcn, adopt Supabase hosting, connect Sentry, or make every capability a product default. Matching Claude/Codex files verifies packaging, not support for every host-specific instruction. In particular, `gh-fix-ci` targets the Codex workflow. Next.js runtime MCP preflight, bundle optimization, authenticated CI queries, security findings, component behavior, and Sentry OAuth need their own actual task checks.
 
 ## Execution on October 17, 2026
+
+### Harness, memory, review, and typed lint update
+
+The updated disposable Next.js application passed on macOS with Node.js 24.21.0 and the component versions listed below. The scaffold's original `AGENTS.md` was preserved alongside the toolkit instructions. A clean typecheck, with no prior build artifacts, rejected an invalid route handler and accepted the valid application using `next typegen && tsc --noEmit`. The focused typed profile rejected floating promises and async callbacks assigned to void-returning functions, accepted an awaited promise, and the advanced profile retained its migration warnings. The combined quality gate, eight application tests, SQL checks, production build/HTTP, 15 skill packages, production audit, and temporary-directory cleanup passed.
+
+Three native Codex subagents, explicitly using the session's `gpt-6-astra` model and existing ChatGPT authentication, ran separate disposable copies of the harness fixture. These are dated smoke tests, not public model defaults or a cross-client reliability claim:
+
+| Case | Independently verified result |
+|---|---|
+| Boundary fix | Broken baseline failed two of seven checks; corrected copy passed all seven; only `access.mjs` changed |
+| Stale handoff | Agent rejected the false completion claim; final copy passed all seven checks; only code and handoff changed |
+| Read-only security review | The reusable security prompt produced a private report identifying the authorization defect with evidence and limitations; fixture hashes stayed unchanged and the report had mode `0600` |
+
+The coordinator reran the evaluator and compared file contents independently of agent completion messages. Deterministic regression tests also rejected the shipped bug and an incomplete truthiness-only fix, accepted a complete fix, and rejected overwritten local notes. Independent review caught and verified fixes for CRLF preservation, truthy non-string identity coverage, and copying security prompts without toolkit-relative links. The final typed-config export passed a focused ESLint check without warnings. Documentation regression tests passed (nine cases), harness regression tests passed (two cases), and all 592 local links/anchors resolved.
+
+Fresh subagent contexts do not prove client restart behavior. Repeated setup, shared-resource contention, external partial blockers, stop/resume, and complete host/network traces were not exercised in these smoke tests; elapsed model time and token totals were not measured. No account-dependent integration or other model/client was evaluated. Production audit remained clear; the nine development entries below remain disclosed.
+
+### Earlier capability expansion
 
 The expanded fixture passed on macOS with Node.js 24.21.0, without database credentials. It installed and checked **15 selected skills**: the prior web/discovery set plus `next-dev-loop`, `next-bundle-optimizer`, `supabase-postgres-best-practices`, `gh-fix-ci`, `differential-review`, and `shadcn`. Canonical names, lockfile entries, matching client files, and relative Claude links passed. The source `gh-fix-ci` uses a quoted frontmatter name, which the fixture accepts.
 
