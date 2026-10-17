@@ -14,6 +14,15 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const temporary = await mkdtemp(path.join(tmpdir(), "toolkit-next-"));
 const app = path.join(temporary, "starter");
 const env = { ...process.env, DISABLE_TELEMETRY: "1", NEXT_TELEMETRY_DISABLED: "1", GRAPHIFY_NO_AUTO_REFRESH: "1" };
+if (process.platform === "win32") {
+  // Skills clones Next's full repository; its fixture paths exceed Windows' default limit.
+  const count = Number(env.GIT_CONFIG_COUNT || 0);
+  assert(Number.isSafeInteger(count) && count >= 0, "Invalid inherited GIT_CONFIG_COUNT");
+  env[`GIT_CONFIG_KEY_${count}`] = "core.longpaths";
+  env[`GIT_CONFIG_VALUE_${count}`] = "true";
+  env.GIT_CONFIG_COUNT = String(count + 1);
+  assert.equal(execFileSync("git", ["config", "--get", "core.longpaths"], { env, encoding: "utf8" }).trim(), "true");
+}
 // Prove that validation does not depend on the caller's database credentials.
 for (const key of ["DATABASE_URL", "DATABASE_URL_UNPOOLED", "LOG_LEVEL"]) delete env[key];
 const expectedSkills = [

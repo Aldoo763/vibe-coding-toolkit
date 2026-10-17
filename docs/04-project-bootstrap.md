@@ -129,7 +129,7 @@ Evaluate the [scope matrix](tools/README.md#select-by-scope) as part of setup:
 
 Record applicability and evidence for every row. Availability does not authorize upgrading an older Next.js project, changing its bundler, adopting a UI kit, or purchasing a service. A missing dependency blocks only its capability.
 
-Version `.agents/skills/`, relative client links, and `skills-lock.json`. On Windows or a host without portable links, use `--copy`. Check local/global overlap without removing preferences from other projects. Installing deployment skills does not publish; React Native/Expo applies only to that platform.
+Version `.agents/skills/`, relative client links, and `skills-lock.json`. On Windows or a host without portable links, use `--copy`; for long clone paths, follow the [Next skill installation guidance](tools/17-nextjs-runtime-and-performance.md#install-and-discover). Check local/global overlap without removing preferences from other projects. Installing deployment skills does not publish; React Native/Expo applies only to that platform.
 
 ### 5. Document and integrate clients
 

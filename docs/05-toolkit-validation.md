@@ -11,7 +11,7 @@ node scripts/validate-next.mjs
 
 Use Node.js 24, npm, Git, and network access. The [document check](../scripts/validate-docs.mjs) verifies local links, image `srcset` candidates, anchors, manifest destinations, JSON, and this repository’s GitHub/raw URLs, including shortcuts inside prompts. The [validator regression tests](../scripts/validate-docs.test.mjs) exercise missing images, broken fragments, raw shortcuts, and generated-document anchors in temporary Git repositories. The [application check](../scripts/validate-next.mjs) creates and removes a temporary project; dependencies and test resources stay there. ESLint checks run in a child process, releasing native addons before cleanup on Windows; the final result passes only after the temporary directory is removed. Neither check calls models, installs Git hooks, or changes global configuration.
 
-The [workflow](../.github/workflows/validate.yml) runs these checks on Ubuntu and Windows, with official actions pinned by commit and read-only permissions. Public names are part of the contract: update callers, indexes, and templates in the same change.
+The [workflow](../.github/workflows/validate.yml) runs these checks on Ubuntu and Windows, with official actions pinned by commit and read-only permissions. The Windows validator enables Git's long-path support only in child processes, preserving inherited configuration, so Next.js skill clones can check out their deeply nested fixtures. Public names are part of the contract: update callers, indexes, and templates in the same change.
 
 ## What validation proves
 

@@ -27,6 +27,8 @@ npx --yes skills@latest list --agent codex claude-code
 
 Follow the [shared installation and update procedure](16-vercel-skills.md#local-installation): keep canonical sources and lockfile, use portable links or `--copy`, and verify discovery in a fresh client session. Inspect the installed `SKILL.md` before using its commands.
 
+On Windows, the skills CLI may clone the full Next.js repository, whose test fixture paths exceed the default Git path limit. If checkout reports `Filename too long`, enable `core.longpaths=true` for the installer's child Git processes through [Git's process-scoped configuration](https://git-scm.com/docs/git-config#Documentation/git-config.txt-GIT_CONFIG_COUNT). Append a `GIT_CONFIG_KEY_<n>`/`GIT_CONFIG_VALUE_<n>` pair and increment `GIT_CONFIG_COUNT`, preserving inherited entries; restore the shell environment afterward. Do not change global Git settings as a side effect. `--copy` addresses client links, not clone path length. The toolkit validator applies this process-only override automatically on Windows; [Git for Windows documents its scope](https://github.com/git-for-windows/git/blob/main/Documentation/config/core.adoc#corelongpaths).
+
 ## Development loop
 
 Start the existing development command on a free local port. Ask:
