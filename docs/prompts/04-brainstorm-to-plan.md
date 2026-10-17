@@ -1,49 +1,46 @@
-# Brainstorm até plano
+# Brainstorm to plan
 
-## Quando usar
+## When to use
 
-Use este prompt sempre que um pedido estiver aberto ou vago o bastante pra
-um agente conseguir, de boa consciência, construir três coisas diferentes
-a partir dele — por exemplo "adiciona um sistema de notificações", sem
-dizer qual canal (e-mail? push? dentro do app?), pra quem, ou quando
-disparar. Funciona tanto pra um pedido que chegou cru de um stakeholder (a
-pessoa ou área interessada no resultado, dentro ou fora do time técnico)
-quanto pra uma ideia que você mesmo esboçou rápido demais e ainda não
-amarrou os detalhes.
+Use this prompt whenever a request is open or vague enough that an agent
+could reasonably build three different things from it — for example, "add
+a notification system", without saying which channel (email? push? in-app?),
+for whom, or when to trigger it. It works both for a raw request from a
+stakeholder (the person or group interested in the outcome, inside or
+outside the technical team) and an idea you sketched too quickly and have
+not yet fleshed out.
 
-## Por que funciona
+## Why it works
 
-O modo de falha que esse prompt evita é bem concreto: o agente lê um
-pedido ambíguo, escolhe silenciosamente a interpretação que parece mais
-plausível, constrói em cima dela com total confiança — e o descompasso com
-o que você realmente queria só aparece depois que o trabalho já está
-pronto, quando desfazer custa muito mais caro do que teria custado
-perguntar antes. Separar "entender a intenção" de "planejar" e de
-"implementar" em fases distintas, cada uma com seu próprio checkpoint,
-impede que a ambiguidade vaze silenciosamente de uma fase pra outra. A
-primeira fase usa perguntas pontuais no estilo socrático (perguntas
-feitas pra te ajudar a destravar a própria resposta, em vez do agente
-simplesmente adivinhar) pra fixar o que "pronto" significa, o que está
-dentro e fora de escopo, e restrições que você nem citou mas provavelmente
-tem; quando o pedido admite mais de uma leitura razoável, o agente
-apresenta as interpretações lado a lado em vez de escolher uma sozinho e
-torcer pra acertar. E exigir uma checagem de verificação executável — um
-comando, um teste, um comportamento observável — em cada passo do plano,
-em vez de um "deveria funcionar", impede que o agente marque um passo
-como concluído antes de provar isso de verdade.
+The failure this prompt prevents is concrete: the agent reads an ambiguous
+request, silently chooses the most plausible interpretation, and confidently
+builds on it — the mismatch with what you really wanted appears only after
+the work is finished, when undoing it costs far more than asking beforehand
+would have. Separating "understanding intent", "planning" and "implementing"
+into distinct phases, each with its own checkpoint, prevents ambiguity from
+silently leaking from one phase into another. The first phase uses focused
+Socratic questions (questions designed to help you uncover your own answer,
+instead of the agent simply guessing) to establish what "done" means, what
+is in and out of scope, and constraints you did not mention but probably
+have; when the request allows more than one reasonable reading, the agent
+presents the interpretations side by side instead of choosing one alone
+and hoping to get it right. Requiring an executable verification check — a
+command, a test, an observable behavior — for every plan step, instead of
+"should work", prevents the agent from marking a step complete before
+actually proving it.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
 - **`[DESCRIBE THE REQUEST HERE — as short or open-ended as it actually
-  is]`** — substitua por exatamente o pedido do jeito que ele chegou até
-  você: uma frase solta, um requisito colado direto de uma conversa, ou
-  uma ideia que ainda nem virou requisito formal. Não pré-refine o pedido
-  antes de colar aqui — quanto mais cru e ambíguo ele estiver, mais valor
-  a Etapa 1 (as perguntas de esclarecimento) vai gerar. Se o pedido já
-  chegar bem definido, sem problema: o próprio prompt instrui o agente a
-  não interrogar por interrogar quando não há ambiguidade real.
+  is]`** — replace with the request exactly as it reached you: a loose
+  sentence, a requirement pasted straight from a conversation, or an idea
+  that has not yet become a formal requirement. Do not refine the request
+  before pasting it here — the more raw and ambiguous it is, the more value
+  Step 1 (clarification questions) provides. If the request is already well
+  defined, that is fine: the prompt itself tells the agent not to ask
+  questions for their own sake when there is no real ambiguity.
 
-## O prompt
+## The prompt
 
 ```
 Before writing any code for this request: [DESCRIBE THE REQUEST HERE — as
@@ -82,44 +79,41 @@ fails, stop and fix it before moving to the next step; don't build on an
 unverified foundation.
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine que alguém deixou cair, no meio de uma conversa, o seguinte
-pedido — sem dizer se o cupom é valor fixo ou percentual, se dá pra
-combinar mais de um, ou quando ele expira:
+Imagine someone casually made the following request — without saying
+whether the coupon gives a fixed amount or percentage, whether multiple
+coupons can be combined, or when it expires:
 
-- `[DESCRIBE THE REQUEST HERE...]` → "adiciona um sistema de cupom de
-  desconto no checkout."
+- `[DESCRIBE THE REQUEST HERE...]` → "add a discount coupon system to checkout."
 
-Na Etapa 1, o agente não escreve nada — ele devolve perguntas: "o cupom é
-valor fixo, percentual, ou os dois?", "dá pra aplicar mais de um cupom no
-mesmo pedido?", "o cupom expira por data, por número de usos, ou os
-dois?". Como "valor fixo vs. percentual" é genuinamente ambíguo, ele
-detalha as duas leituras lado a lado em vez de escolher sozinho.
+In Step 1, the agent writes nothing — it responds with questions: "does the
+coupon give a fixed amount, a percentage, or both?", "can multiple coupons
+apply to the same order?", "does the coupon expire by date, usage count,
+or both?" Since "fixed amount vs. percentage" is genuinely ambiguous, it
+lays out both readings side by side instead of choosing on its own.
 
-Depois que você responde ("percentual, não acumulável, expira só por
-data"), o agente escreve, na Etapa 2, um plano com passos como "criar
-tabela de cupons" → verificação: a migração roda sem erro; "validar cupom
-no endpoint de checkout" → verificação: teste cobrindo cupom válido,
-expirado e inexistente passa; "aplicar o desconto no total do pedido" →
-verificação: teste do cálculo passa.
+After you answer ("percentage, cannot be combined, expires only by date"),
+the agent writes a plan in Step 2 with steps such as "create a coupons
+table" → verification: the migration runs without errors; "validate the
+coupon in the checkout endpoint" → verification: tests covering valid,
+expired and nonexistent coupons pass; "apply the discount to the order
+total" → verification: the calculation test passes.
 
-Na Etapa 3, ele mostra esse plano e espera seu sinal verde — pode ser só
-um "ok" ou um ajuste pontual ("esquece expiração por uso, só por data
-mesmo"). Só na Etapa 4 ele começa a implementar, rodando e mostrando o
-resultado de cada verificação antes de marcar o passo como feito. Se o
-teste do cupom expirado falhar, ele para ali, corrige, e só então segue
-pro próximo passo — nunca constrói em cima de um passo que não provou que
-funciona.
+In Step 3, it shows the plan and waits for your go-ahead — a simple "okay"
+or a specific adjustment ("forget usage-based expiry, just the date") is
+enough. Only in Step 4 does implementation begin, running and showing each
+verification result before marking the step done. If the expired-coupon
+test fails, it stops there, fixes it, and only then proceeds to the next
+step — never building on a step it has not proven works.
 
-## Dicas
+## Tips
 
-- Pule as perguntas da Etapa 1 quando o pedido já for pequeno e
-  inequívoco — o próprio prompt já avisa isso; não force o ritual numa
-  correção de uma linha.
-- O sinal verde da Etapa 3 é pra ser barato — um "pode seguir" ou uma
-  correção pontual, não uma revisão de design completa. Guarde o
-  escrutínio de verdade pras checagens de verificação do plano.
-- Combina direto com as skills de brainstorm → plano → implementação →
-  review do [superpowers](../tools/01-superpowers.md); este prompt é uma
-  versão portátil e independente de ferramenta da mesma disciplina.
+- Skip Step 1 questions when the request is already small and unambiguous —
+  the prompt itself says this; do not force the ritual on a one-line fix.
+- The Step 3 go-ahead should be lightweight — "go ahead" or a specific
+  correction, not a full design review. Save the real scrutiny for the
+  plan's verification checks.
+- Combines directly with the brainstorm → plan → implementation → review
+  skills in [superpowers](../tools/01-superpowers.md); this prompt is a
+  portable, tool-independent version of the same discipline.

@@ -1,25 +1,25 @@
-# Código e arquitetura
+# Code and architecture
 
-## Stack efetiva
+## Actual stack
 
-[Framework, runtime, gerenciador, ORM, driver e versões observadas. Registre razões e exceções aos padrões; versões efetivas também ficam no lockfile.]
+[Framework, runtime, package manager, ORM, driver, and observed versions. Record reasons and exceptions to the defaults; actual versions also belong in the lockfile.]
 
-## Mapa do código
+## Code map
 
-[Árvore curta dos diretórios e arquivos que realmente existem. Indique a responsabilidade de cada um; não apresente uma arquitetura futura como implementada.]
+[Short tree of directories and files that actually exist. State each responsibility; do not present future architecture as implemented.]
 
-## Fronteiras e fluxo
+## Boundaries and flow
 
-[Caminho real entre apresentação, validação, lógica e dados. Código servidor guarda ambiente, logger e cliente de banco. Crie módulos por funcionalidade conforme a necessidade; evite camadas vazias.]
+[Actual path between presentation, validation, logic, and data. Server code owns environment, logging, and the database client. Create feature modules as needed; avoid empty layers.]
 
-## Dados e migrations
+## Data and migrations
 
-[Schema Drizzle, inferência de tipos, destino das migrations e ciclo de geração/revisão/aplicação. Registre pool, driver, runtime, consultas limitadas e uso de transação quando necessário. Se não houver persistência, explique essa decisão.]
+[Drizzle schema, inferred types, migration destination, and generation/review/application lifecycle. Record pooling, driver, runtime, bounded queries, and transactions where needed. Explain the decision if there is no persistence.]
 
-## Decisões
+## Decisions
 
-[Decisão, motivo, alternativa pertinente, fonte/data e condição para revisar. Não duplique os requisitos de PRODUCT.md.]
+[Decision, reason, relevant alternative, source/date, and condition for revisiting. Do not duplicate PRODUCT.md requirements.]
 
-## Manutenção
+## Maintenance
 
-Atualize este mapa ao alterar diretórios, dependências relevantes, contratos ou fronteiras. Registre comportamento comprovado; remova decisões que deixaram de valer.
+Update this map when directories, relevant dependencies, contracts, or boundaries change. Record verified behavior; remove decisions that no longer apply.

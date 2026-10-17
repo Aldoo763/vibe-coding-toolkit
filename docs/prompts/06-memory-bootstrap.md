@@ -1,68 +1,64 @@
 # Memory bootstrap
 
-## Quando usar
+## When to use
 
-Use este prompt ao começar um projeto do zero — ou ao adotar memória
-persistente num projeto que já existe — que ainda não tem nenhum sistema
-de memória entre sessões de agente. Sem isso, cada sessão nova reaprende
-do zero a mesma lição cara que uma sessão anterior já tinha pago o preço
-de descobrir: um bug sutil, uma decisão de arquitetura que só faz sentido
-sabendo o que já foi tentado e descartado, uma regra de negócio que o
-código não deixa óbvia. É a versão em prompt do padrão descrito em
-[sistema de memória do Claude](../tools/09-claude-memory-system.md) (a
-camada rápida) e [Obsidian como memória](../tools/08-obsidian-memory.md)
-(a camada de longo prazo).
+Use this prompt when starting a project from scratch — or adopting
+persistent memory in an existing project — that has no memory system
+between agent sessions yet. Without one, every new session relearns the
+same expensive lesson an earlier session already paid to discover: a
+subtle bug, an architecture decision that only makes sense with knowledge
+of what was tried and rejected, or a business rule the code does not make
+obvious. This is the prompt version of the pattern described in the
+[Claude memory system](../tools/09-claude-memory-system.md) (the fast tier)
+and [Obsidian as memory](../tools/08-obsidian-memory.md) (the long-term tier).
 
-## Por que funciona
+## Why it works
 
-O prompt monta duas camadas com propósitos diferentes. A primeira é um
-índice pequeno, carregado automaticamente em toda sessão — por isso
-precisa ficar enxuto: se crescer demais, para de ser lido de verdade e
-vira só mais um arquivo grande que ninguém abre. A segunda é um
-repositório de longo prazo sem limite de tamanho, consultado sob demanda
-em vez de carregado sempre. O critério de "vale salvar" (Etapa 2) é
-deliberadamente restritivo — a pergunta não é "isso é verdade sobre o
-projeto?", é "uma sessão futura ficaria surpresa e grata de saber disso
-antes de começar, em vez de descobrir do jeito difícil?" —, porque a
-maior ameaça a um sistema de memória não é esquecer algo importante, é
-acumular tanta coisa irrelevante que ninguém lê mais o índice. E a
-política de crescimento (Etapa 3) nunca deixa uma entrada sumir sem
-confirmação: ela só é apagada do índice depois de criada **e** lida de
-volta com sucesso no repositório de longo prazo — apagar antes dessa
-confirmação é perda de dado, não faxina.
+The prompt builds two tiers with different purposes. The first is a small
+index automatically loaded in every session — so it must stay lean: if it
+grows too large, it stops being read properly and becomes another large
+file nobody opens. The second is an unlimited long-term store, consulted
+on demand instead of always loaded. The "worth saving" criterion (Step 2)
+is deliberately restrictive — the question is not "is this true about the
+project?", but "would a future session be surprised and grateful to know
+this before starting, instead of learning it the hard way?" — because the
+biggest threat to a memory system is not forgetting something important,
+but accumulating so much irrelevant material that nobody reads the index
+anymore. The growth policy (Step 3) never lets an entry disappear without
+confirmation: it is deleted from the index only after being created **and**
+successfully read back from the long-term store — deleting before that
+confirmation is data loss, not cleanup.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[MEMORY_DIR]`** — aparece três vezes; é a pasta onde a camada rápida
-  (sempre carregada) vai morar. Em Claude Code, a convenção comum é
-  `.claude/memory/` — adapte pro equivalente da sua ferramenta.
-- **`[CONFIG_FILE]`** — o arquivo que seu agente já carrega sozinho no
-  começo de toda sessão, onde o `INSTRUCTIONS.md` da memória precisa
-  estar referenciado pra ser lido sem você pedir. Em Claude Code isso
-  normalmente é o `CLAUDE.md` do projeto.
-- **`[LINE_CAP]`** — o teto de linhas (não em branco) que o índice pode
-  ter antes de disparar a rotina de saneamento da Etapa 3. O prompt já
-  sugere 130 como ponto de partida — ajuste pro que fizer sentido no seu
-  caso.
-- **O bloco condicional inteiro na Etapa 4** (o parágrafo entre colchetes
-  que começa com "If this project has a long-term vault/wiki
-  already…") — não é um espaço simples pra preencher, é uma instrução
-  condicional pro próprio agente decidir sozinho, olhando o projeto. Se
-  já existe um repositório de longo prazo — um vault (cofre de notas de
-  longo prazo, tipo Obsidian ou Notion), uma wiki, uma pasta de docs —,
-  troque o bloco inteiro por uma frase direta nomeando onde é e como se
-  acessa, preenchendo o que o prompt chama de `[VAULT_TOOL/LOCATION]`
-  (nome ou local do repositório) e `[HOW — MCP tool, CLI, direct file
-  edit]` (o mecanismo de acesso — um servidor MCP, sigla de "Model
-  Context Protocol", o jeito padrão de um agente chamar ferramentas
-  externas; um CLI; ou edição direta de arquivo). Se nada disso existe
-  ainda, deixe o bloco como está — ele já instrui o agente a admitir
-  isso e entregar só a camada 1, sem inventar um destino que a política
-  de crescimento vai precisar mais cedo ou mais tarde.
-- **`[PROJECT NAME/STACK]`** — nome do projeto e stack técnica, só pra
-  dar contexto (ex.: "SaaS de gestão de tarefas, Next.js + PostgreSQL").
+- **`[MEMORY_DIR]`** — appears three times; the folder for the fast
+  (always-loaded) tier. In Claude Code, a common convention is
+  `.claude/memory/` — adapt to your tool's equivalent.
+- **`[CONFIG_FILE]`** — the file your agent automatically loads at the start
+  of every session, where memory's `INSTRUCTIONS.md` must be referenced to
+  be read without asking. In Claude Code, this is usually the project's
+  `CLAUDE.md`.
+- **`[LINE_CAP]`** — the maximum number of nonblank lines the index may have
+  before triggering the cleanup routine in Step 3. The prompt suggests
+  130 as a starting point — adjust to your situation.
+- **The entire conditional block in Step 4** (the bracketed paragraph
+  beginning "If this project has a long-term vault/wiki already…") — this
+  is not a simple blank to fill in, but a conditional instruction for the
+  agent to decide by inspecting the project. If a long-term store already
+  exists — a vault (a long-term notes repository such as Obsidian or
+  Notion), wiki, or docs folder — replace the entire block with a direct
+  sentence naming its location and access method, filling in what the
+  prompt calls `[VAULT_TOOL/LOCATION]` (the store's name or location) and
+  `[HOW — MCP tool, CLI, direct file edit]` (the access mechanism — an MCP
+  server, short for "Model Context Protocol", the standard way an agent
+  calls external tools; a CLI; or direct file editing). If none exists,
+  leave the block unchanged — it already tells the agent to acknowledge
+  that and deliver only tier 1, without inventing a destination the growth
+  policy will eventually need.
+- **`[PROJECT NAME/STACK]`** — the project name and technical stack, just
+  for context (e.g. "Task management SaaS, Next.js + PostgreSQL").
 
-## O prompt
+## The prompt
 
 ````
 Set up a two-tier memory system for this project: a small always-loaded
@@ -137,45 +133,40 @@ cap will eventually need to shed.]
 Project: [PROJECT NAME/STACK].
 ````
 
-## Exemplo de uso
+## Usage example
 
-Imagine que você está começando um SaaS de gestão de tarefas do zero —
-Next.js + PostgreSQL — e a equipe já usa uma wiki interna no Notion pra
-documentação de mais longo prazo:
+Imagine starting a task management SaaS from scratch — Next.js + PostgreSQL —
+and the team already uses an internal Notion wiki for longer-term documentation:
 
 - `[MEMORY_DIR]` → `.claude/memory`
 - `[CONFIG_FILE]` → `CLAUDE.md`
 - `[LINE_CAP]` → `130`
-- bloco condicional da Etapa 4 → "migre entradas de baixo valor pra wiki
-  interna do Notion, acessada via integração oficial"
+- Step 4 conditional block → "migrate low-value entries to the internal
+  Notion wiki, accessed through the official integration"
 - `[PROJECT NAME/STACK]` → "Task Tracker SaaS, Next.js + PostgreSQL"
 
-O agente cria `.claude/memory/INSTRUCTIONS.md` (linkado no `CLAUDE.md` do
-projeto), um `.claude/memory/MEMORY.md` vazio, e deixa a pasta
-`.claude/memory/` pronta pra receber arquivos de tópico. Duas semanas
-depois, numa sessão qualquer, o agente descobre — depois de duas
-tentativas erradas — que uma race condition (dois processos disputando o
-mesmo dado ao mesmo tempo) só acontece porque duas rotas escrevem na
-mesma tabela sem lock; ele salva isso como uma entrada do tipo
-`architecture` em `.claude/memory/race-condition-tabela-tarefas.md` e
-adiciona uma linha no índice. Meses depois, o índice passa de 130 linhas:
-antes de adicionar a próxima entrada, o agente pontua as existentes,
-escolhe as de menor valor (por exemplo, um detalhe de configuração que
-hoje já dá pra achar direto no código), migra cada uma pra wiki do Notion
-seguindo a sequência dedup → template → criar → confirmar lendo de volta,
-e só depois apaga a entrada correspondente do índice — nunca ao
-contrário.
+The agent creates `.claude/memory/INSTRUCTIONS.md` (linked in the project's
+`CLAUDE.md`), an empty `.claude/memory/MEMORY.md`, and prepares the
+`.claude/memory/` folder for topic files. Two weeks later, during a session,
+the agent discovers — after two failed attempts — that a race condition
+(two processes competing for the same data simultaneously) only happens
+because two routes write to the same table without a lock; it saves this
+as an `architecture` entry in `.claude/memory/tasks-table-race-condition.md`
+and adds an index line. Months later, the index exceeds 130 lines: before
+adding the next entry, the agent scores the existing ones, chooses the
+lowest-value entries (for example, a configuration detail now readily found
+in the code), migrates each to the Notion wiki following dedup → template →
+create → confirm by reading back, and only then deletes the corresponding
+index entry — never the other way around.
 
-## Dicas
+## Tips
 
-- O critério de salvamento da Etapa 2 é propositalmente restritivo — a
-  maior parte do que um agente aprende numa sessão não merece virar
-  memória permanente. Resista à tentação de registrar tudo "só por
-  garantia".
-- A ordem migrar-antes-de-apagar da Etapa 3 existe porque uma migração
-  não confirmada é perda de dado, não uma mudança de lugar — nunca pule
-  direto pra apagar a entrada do índice.
-- Se ainda não existe um repositório de longo prazo, entregue só a
-  camada 1 em vez de inventar um destino — veja [Obsidian como
-  memória](../tools/08-obsidian-memory.md) pra saber como montar um do
-  zero.
+- The saving criterion in Step 2 is deliberately restrictive — most of what
+  an agent learns during a session does not deserve permanent memory.
+  Resist recording everything "just in case".
+- The migrate-before-deleting order in Step 3 exists because an unconfirmed
+  migration is data loss, not relocation — never skip straight to deleting
+  the index entry.
+- If no long-term store exists yet, deliver tier 1 only instead of inventing
+  a destination — see [Obsidian as memory](../tools/08-obsidian-memory.md) for
+  how to build one from scratch.

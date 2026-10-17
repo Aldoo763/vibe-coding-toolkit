@@ -1,47 +1,47 @@
-# [Nome do produto]
+# [Product name]
 
-> Preencha a partir da descrição do usuário. Remova instruções e campos sem utilidade; registre hipóteses em vez de inventar decisões.
+> Fill this in from the user's description. Remove instructions and unused fields; record assumptions rather than inventing decisions.
 
-## Problema e objetivo
+## Problem and objective
 
-[Quem enfrenta qual problema, como resolve hoje e qual resultado o produto deve produzir.]
+[Who faces which problem, how they solve it today, and what outcome the product should produce.]
 
-## Público e papéis
+## Audience and roles
 
-[Usuários principais, contexto de uso e diferenças de acesso que realmente existirem.]
+[Primary users, usage context, and access differences that actually exist.]
 
-## Fluxos da versão inicial
+## Initial release flows
 
-[Fluxos essenciais, com entrada, ação e resultado esperado. Priorize os que comprovam o objetivo.]
+[Essential flows, with input, action, and expected result. Prioritize those that demonstrate the objective.]
 
 ## MVP
 
-[Funcionalidades incluídas na primeira versão, em ordem de prioridade.]
+[Features included in the first release, in priority order.]
 
-## Fora de escopo
+## Out of scope
 
-[O que foi explicitamente adiado ou não pertence ao pedido.]
+[What was explicitly deferred or is outside the request.]
 
-## Requisitos
+## Requirements
 
-[Regras de negócio conhecidas, dados necessários, acessibilidade, idioma, dispositivos e requisitos de segurança pertinentes.]
+[Known business rules, required data, accessibility, language, devices, and relevant security requirements.]
 
-## Restrições e decisões técnicas
+## Constraints and technical decisions
 
-[Next.js/App Router, TypeScript, versões observadas, gerenciador e limitações informadas. Persistência usa Drizzle ORM + PostgreSQL por padrão. Registre justificativa para outra escolha ou para um produto sem banco; preserve a stack de projetos existentes. Autenticação e serviços externos entram por necessidade concreta.]
+[Next.js/App Router, TypeScript, observed versions, package manager, and stated limitations. Persistence defaults to Drizzle ORM + PostgreSQL. Record the reason for another choice or a product without a database; preserve existing project stacks. Authentication and external services require a concrete need.]
 
-## Hipóteses e pendências
+## Assumptions and pending decisions
 
-[Diferencie hipótese reversível de decisão indispensável ainda sem resposta. Indique impacto e próximo passo.]
+[Distinguish reversible assumptions from essential unanswered decisions. State the impact and next step.]
 
-## Critérios de aceitação
+## Acceptance criteria
 
-[Resultados observáveis para os fluxos do MVP. Separe critérios do produto dos checks técnicos de setup.]
+[Observable outcomes for MVP flows. Separate product criteria from technical setup checks.]
 
-## Próxima entrega
+## Next delivery
 
-[A menor tarefa implementável que avança o MVP depois do bootstrap.]
+[The smallest implementable task that advances the MVP after bootstrap.]
 
-## Manutenção
+## Maintenance
 
-Atualize este documento quando objetivo, escopo, restrições ou critérios de aceitação mudarem. Decisões técnicas e evidências detalhadas ficam em docs/architecture.md e docs/setup.md. O nome do arquivo gerado é PRODUCT.md.
+Update this document when the objective, scope, constraints, or acceptance criteria change. Detailed technical decisions and evidence belong in docs/architecture.md and docs/setup.md. The generated file is named PRODUCT.md.

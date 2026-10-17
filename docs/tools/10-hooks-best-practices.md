@@ -1,124 +1,110 @@
-# Boas práticas para hooks
+# Hook best practices
 
-## O que é
+## What it is
 
-Um **hook**, no contexto de um agente de IA como o Claude Code, é um
-pedacinho de código que roda automaticamente em um momento específico do
-fluxo do agente — antes de uma ferramenta ser executada, depois que ela
-roda, quando uma sessão começa, quando ela termina, e assim por diante. O
-agente não "decide" chamar um hook: é o próprio **harness** (a camada que
-orquestra o agente — no nosso caso, o Claude Code) que dispara o hook no
-momento certo, sempre, sem exceção.
+A **hook**, in an AI agent such as Claude Code, is a small piece of code
+that runs automatically at a specific point in the agent's workflow:
+before or after a tool runs, when a session starts or ends, and so on.
+The agent does not decide to invoke it: the **harness** (the layer
+orchestrating the agent, Claude Code in this case) triggers the hook at
+the right moment, consistently and without exception.
 
-O contrato de um hook é simples e apertado: ele recebe um evento em
-**JSON** (um formato de texto para representar dados estruturados, em
-pares chave-valor) pela **entrada padrão** (*stdin* — o canal por onde um
-processo lê dados quando eles não vêm de um arquivo ou de um argumento de
-linha de comando), e responde de volta através do seu **código de saída**
-(*exit code* — o número que um processo devolve ao terminar; por
-convenção, `0` significa "deu tudo certo"), opcionalmente complementado
-por texto em stdout/stderr. É exatamente esse contrato estreito — evento
-por stdin, resposta por código de saída — onde mora a maioria dos bugs de
-hook, e é disso que trata a maior parte deste documento.
+A hook's contract is narrow: it receives an event as **JSON** (a text
+format representing structured data through key-value pairs) on
+**standard input** (*stdin*, the channel a process reads when data does
+not come from a file or command-line argument), and responds through its
+**exit code** (the number a process returns on termination; by convention,
+`0` means success), optionally with text on stdout/stderr. This narrow
+contract, events through stdin and responses through exit codes, is where
+most hook bugs live and what most of this document addresses.
 
-Hooks são registrados na configuração do harness (no Claude Code,
-normalmente `.claude/settings.json`), indexados pelo momento do ciclo de
-vida em que disparam: `PreToolUse` (antes de uma ferramenta rodar),
-`PostToolUse` (depois dela rodar), `SessionStart` (quando a sessão
-começa), `SessionEnd` (quando ela termina), `UserPromptSubmit` (a cada
-mensagem enviada pelo usuário), `Stop` (quando o agente conclui e a sessão
-vai parar), entre outros. Cada entrada associa um **matcher** (um filtro —
-por exemplo, "só dispare para a ferramenta Bash") a um comando a ser
-executado. Veja
+Hooks are registered in harness configuration, usually
+`.claude/settings.json` for Claude Code, indexed by lifecycle event:
+`PreToolUse` (before a tool runs), `PostToolUse` (afterward), `SessionStart`
+(when the session begins), `SessionEnd` (when it ends), `UserPromptSubmit`
+(on each user message), and `Stop` (when the agent finishes and the session
+is about to stop), among others. Each entry associates a **matcher** (a
+filter, such as “only trigger for Bash”) with a command to execute. See
 [`templates/settings.json.example`](../../templates/settings.json.example)
-para um exemplo concreto dessa configuração.
+for a concrete configuration example.
 
-## Por que usar
+## Why use it
 
-### A política de fail-open não é hábito, é regra
+### Fail-open is a policy, not a habit
 
-Chamamos de **fail-open** (falhar aberto) a estratégia de, diante de um
-erro dentro do hook, deixar a ação original seguir seu curso normal em vez
-de travar tudo. O oposto — bloquear por padrão sempre que algo dá errado —
-é **fail-closed** (falhar fechado), e também tem seu lugar, mas não é a
-regra geral (veja as perguntas frequentes, no final).
+**Fail-open** means allowing the original action to proceed normally when
+the hook encounters an error, instead of blocking everything. The opposite,
+blocking by default whenever something goes wrong, is **fail-closed**. It
+has its place, but is not the general rule (see the FAQ below).
 
-Escreva essa escolha como regra explícita, não como hábito implícito: um
-hook sai com código `0` (libera a ação) ou com um código de bloqueio
-designado — e **só** com esses dois. Qualquer outro código de saída, ou um
-erro não tratado que derruba o processo no meio do caminho, é um bug no
-próprio hook, ponto final.
+Write this choice as an explicit rule rather than an implicit habit: a
+hook exits with `0` (allow) or a designated blocking code, and **only**
+those two. Any other exit code, or an unhandled error crashing the process
+partway through, is a bug in the hook itself.
 
-O motivo de isso precisar virar regra escrita, e não só bom senso
-implícito: um hook que quebra em vez de degradar graciosamente pode
-trancar um desenvolvedor pra fora da própria sessão. Um hook de
-`SessionStart` que lança uma exceção antes de imprimir qualquer coisa pode
-impedir a sessão de sequer começar — o pior lugar possível pra essa falha
-acontecer, porque não sobra nem uma sessão de onde debugar o problema.
+This needs a written rule rather than assumed common sense because a hook
+that crashes instead of degrading gracefully can lock a developer out of
+their own session. A `SessionStart` hook throwing before printing anything
+can prevent the session from starting, the worst place for failure because
+there is no session left from which to debug it.
 
-A postura padrão deve ser **degradar silenciosamente** — pular o reforço,
-a checagem, o aviso, o que quer que o hook estivesse adicionando de
-"extra" — em vez de bloquear, para qualquer coisa que não seja um
-requisito duro de segurança. Um hook que adiciona um bônus (lembrar o
-agente de uma convenção do projeto, por exemplo) e um hook que impõe um
-limite de segurança real (bloquear a leitura de um arquivo de
-credenciais) não deveriam falhar da mesma forma quando algo dá errado.
+The default should be **silent degradation**: skip the reinforcement,
+check, warning, or other extra behavior rather than block, unless it is a
+hard security requirement. A hook adding a convenience, such as reminding
+the agent of a project convention, should not fail the same way as one
+enforcing a real security boundary, such as blocking credential-file reads.
 
-### O bug que vale nomear: `JSON.parse("null")`
+### The bug worth naming: `JSON.parse("null")`
 
-Esse bug merece nome próprio porque é fácil de escrever, difícil de notar
-numa revisão de código, e derruba a política de fail-open acima por
-acidente — sem que ninguém tenha feito nada obviamente errado.
+This bug deserves a name because it is easy to write, difficult to notice
+in review, and accidentally defeats the fail-open policy without anyone
+doing anything obviously wrong.
 
-`JSON.parse("null")` retorna o valor JavaScript `null` — **sem lançar
-erro**. É um JSON válido, do mesmo jeito que `"true"` ou `"42"` são.
-Então um padrão que parece defensivo, como este, não te protege de
-verdade:
+`JSON.parse("null")` returns JavaScript `null` **without throwing**. It is
+valid JSON, just like `"true"` or `"42"`. A seemingly defensive pattern
+therefore does not actually protect you:
 
 ```javascript
-let evento;
+let event;
 try {
-  evento = JSON.parse(lerStdin() || "{}");
+  event = JSON.parse(readStdin() || "{}");
 } catch {
-  evento = {}; // nunca é alcançado se o stdin for `null` — JSON.parse("null") não lança erro
+  event = {}; // never reached for `null` stdin — JSON.parse("null") does not throw
 }
 
-if (evento.tool_name === "Bash") { // TypeError: Cannot read properties of null
+if (event.tool_name === "Bash") { // TypeError: Cannot read properties of null
   // ...
 }
 ```
 
-Um payload de stdin igual ao texto literal `null` é uma string não-vazia e
-perfeitamente parseável — então o fallback `|| "{}"` nunca entra em ação
-(a string não está vazia) e o bloco `catch` nunca roda (o parse não
-falhou). Nada "deu errado" do ponto de vista do `try/catch`. `evento`
-simplesmente vira `null` silenciosamente, em vez do `{}` que o `catch`
-deveria garantir. A quebra acontece uma linha depois, na primeira leitura
-de propriedade sem proteção — **fora** de qualquer `try/catch` que
-estivesse protegendo o parse em si.
+A stdin payload containing literal `null` is a nonempty, perfectly
+parseable string. The `|| "{}"` fallback does not run because it is not
+empty; `catch` does not run because parsing succeeded. Nothing went wrong
+from the `try/catch` perspective. `event` silently becomes `null` rather
+than the `{}` that `catch` was meant to guarantee. The crash happens on
+the next line, at the first unguarded property read, **outside** any
+`try/catch` protecting parsing itself.
 
-Uma checagem `typeof` também não salva:
+A `typeof` check does not help either:
 
 ```javascript
-typeof evento.tool_name === "string" // ainda lança: Cannot read properties of null
+typeof event.tool_name === "string" // still throws: Cannot read properties of null
 ```
 
-O acesso à propriedade (`evento.tool_name`) acontece *antes* de `typeof`
-conseguir ver o resultado — então o acesso lança o erro primeiro, e
-`typeof` nunca chega a rodar.
+Property access (`event.tool_name`) happens *before* `typeof` can inspect
+the result, so access throws first and `typeof` never runs.
 
-#### A correção
+#### The fix
 
-Dois helpers pequenos e reutilizáveis resolvem isso de vez —
-`readStdinRaw` (lê o stdin bruto) e `parseHookEvent` (interpreta esse
-texto como um evento), os mesmos nomes usados no arquivo pronto pra
-copiar linkado no final desta seção:
+Two small reusable helpers solve this: `readStdinRaw` (reads raw stdin)
+and `parseHookEvent` (interprets the text as an event), the same names used
+in the ready-to-copy file linked at the end of this section:
 
-- `readStdinRaw` lê o stdin e **nunca lança erro** — qualquer falha
-  retorna uma string vazia.
-- `parseHookEvent` tenta interpretar essa string como JSON e retorna
-  `null` tanto para JSON inválido **quanto** para o valor JSON `null`
-  literal — colapsando as duas situações de falha numa só.
+- `readStdinRaw` reads stdin and **never throws**; any failure returns an
+  empty string.
+- `parseHookEvent` attempts to parse the string as JSON and returns `null`
+  for **both** invalid JSON and literal JSON `null`, collapsing both
+  failure cases into one signal.
 
 ```javascript
 import { readFileSync } from "node:fs";
@@ -133,151 +119,141 @@ export function readStdinRaw() {
 
 export function parseHookEvent(raw) {
   try {
-    return JSON.parse(raw); // "null" vira o valor `null` — mesma forma de uma falha de parse
+    return JSON.parse(raw); // "null" becomes `null`, the same signal as a parse failure
   } catch {
     return null;
   }
 }
 ```
 
-Não precisa de nenhum caso especial: `JSON.parse` já retorna o valor
-`null` para uma entrada `null` literal, então o mesmo `catch` que trata
-uma falha de parse de verdade também cobre esse caso, de graça. A partir
-daí, cada ponto de uso só precisa de uma checagem:
+No special case is required: `JSON.parse` already returns `null` for
+literal `null` input, producing the same signal as `catch` for an actual
+parse failure. Each call site then needs just one check:
 
 ```javascript
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // falha aberta — não há nada utilizável pra agir em cima
+const event = parseHookEvent(readStdinRaw());
+if (event === null) {
+  process.exit(0); // fail open: nothing usable to act on
 }
-// ...segue o hook — `evento` aqui é garantidamente um objeto de verdade
+// ...continue the hook — `event` here is guaranteed to be an actual object
 ```
 
-Veja [`templates/hooks/hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example)
-para uma versão pronta pra copiar dessas duas funções.
+See [`templates/hooks/hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example)
+for a ready-to-copy version of these two functions.
 
-### Dívida de migração é real — documente, não presuma
+### Migration debt is real — document it instead of assuming
 
-Não presuma que uma correção como essa foi aplicada de forma uniforme só
-porque a maioria dos hooks de um projeto já importa o helper
-compartilhado. Alguns podem não estar corrigidos e mesmo assim
-sobreviverem "por acidente", por motivos que não têm nada a ver com a
-correção em si:
+Do not assume a fix was applied uniformly just because most project hooks
+import the shared helper. Some may remain unfixed while surviving “by
+accident” for reasons unrelated to the fix:
 
-- Uma checagem diferente já roda antes e acaba pegando o caso `null` por
-  coincidência — um encadeamento opcional (`?.`) no próximo acesso, por
-  exemplo.
-- Um `try/catch` amplo envolve o handler inteiro e acaba engolindo esse
-  `TypeError` específico também, mesmo sem ter sido escrito pensando
-  nesse bug.
+- A different earlier check happens to catch `null`, such as optional
+  chaining (`?.`) on the next property access.
+- A broad `try/catch` around the entire handler happens to swallow this
+  `TypeError`, despite not being written for this bug.
 
-As duas situações acima são proteção real, funcionando hoje — e as duas
-estão a uma reordenação de código ou um refactor de distância de quebrar,
-porque nenhuma das duas foi escrita *como* proteção contra esse bug
-específico. Documente explicitamente quais hooks foram corrigidos de
-propósito e quais estão seguros por acidente, em vez de presumir
-cobertura uniforme. Migre os acidentais de forma oportunista — na próxima
-vez que cada um for tocado por outro motivo, não como correção urgente,
-já que nada está quebrado agora.
+Both protections work today, but both are one code reorder or refactor
+away from breaking because neither was written specifically for this bug.
+Explicitly document which hooks were deliberately fixed and which are
+accidentally safe, rather than assuming uniform coverage. Migrate the
+latter opportunistically when they are next touched for another reason,
+rather than as an urgent fix when nothing is currently broken.
 
-## Tutorial passo a passo — escrevendo um hook seguro do zero
+## Step-by-step tutorial — writing a safe hook from scratch
 
-Vamos construir um hook mínimo, mas real: um `PreToolUse` que avisa (e
-bloqueia) quando o agente tenta editar um arquivo que parece sensível —
-por exemplo, um `.env`. É pequeno o bastante pra caber num tutorial e usa
-exatamente os dois helpers explicados acima.
+Let's build a minimal real hook: a `PreToolUse` hook that warns and blocks
+when the agent tries to edit a potentially sensitive file, such as `.env`.
+It is small enough for a tutorial and uses the two helpers above.
 
-### Passo 1 — crie o arquivo do hook
+### Step 1 — create the hook file
 
-Crie `.claude/hooks/protect-env-files.mjs`. Todo hook aqui é um módulo
-Node.js (`.mjs`, o formato de módulo ECMAScript — o padrão do JavaScript
-moderno) que lê stdin, decide algo, e termina com um código de saída.
+Create `.claude/hooks/protect-env-files.mjs`. Every hook here is a Node.js
+module (`.mjs`, the ECMAScript module format used by modern JavaScript)
+that reads stdin, makes a decision, and exits with a code.
 
-### Passo 2 — importe os helpers de leitura segura
+### Step 2 — import the safe-reading helpers
 
 ```javascript
 import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
 ```
 
-Se você ainda não tem esse arquivo, copie
+If that file does not exist yet, copy
 [`templates/hooks/hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example)
-para `.claude/hooks/hook-io.mjs` — é o par de funções da seção anterior,
-prontas pra usar.
+to `.claude/hooks/hook-io.mjs`: the two functions from the preceding
+section, ready to use.
 
-### Passo 3 — leia e interprete o evento, com saída segura por padrão
+### Step 3 — read and parse the event with a safe default exit
 
 ```javascript
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // nada utilizável — falha aberta, não bloqueia por engano
+const event = parseHookEvent(readStdinRaw());
+if (event === null) {
+  process.exit(0); // nothing usable: fail open, avoiding accidental blocks
 }
 ```
 
-Esse é o primeiro reflexo de qualquer hook: antes de fazer qualquer outra
-coisa, garanta que o evento é um objeto de verdade. Tudo daqui pra frente
-assume que `evento` é seguro de acessar.
+This is the first reflex of every hook: before anything else, ensure the
+event is an actual object. Everything afterward assumes `event` is safe
+to access.
 
-### Passo 4 — extraia só o que você precisa, com fallback
+### Step 4 — extract only what you need with a fallback
 
 ```javascript
-const caminho = evento?.tool_input?.file_path ?? "";
+const path = event?.tool_input?.file_path ?? "";
 ```
 
-O encadeamento opcional (`?.`) evita quebrar se `tool_input` não existir
-por algum motivo; o `?? ""` garante que `caminho` é sempre uma string,
-mesmo que vazia — então o próximo passo (um teste de regex) nunca lança
-erro por receber `undefined`.
+Optional chaining (`?.`) prevents a crash if `tool_input` is missing;
+`?? ""` ensures `path` is always a string, even if empty, so the next
+step, a regex test, never throws because it received `undefined`.
 
-### Passo 5 — decida, e responda com o código de saída certo
+### Step 5 — decide and return the correct exit code
 
 ```javascript
-const pareceSensivel = /\.env(\..+)?$/.test(caminho);
-if (!pareceSensivel) {
-  process.exit(0); // não é o que estamos vigiando — libera
+const looksSensitive = /\.env(\..+)?$/.test(path);
+if (!looksSensitive) {
+  process.exit(0); // not what we are watching for: allow
 }
 
 console.error(
-  `Aviso: ${caminho} parece um arquivo de segredos. Confirme antes de editar.`
+  `Warning: ${path} looks like a secrets file. Confirm before editing.`
 );
-process.exit(2); // bloqueia — o agente vê a mensagem acima como motivo
+process.exit(2); // block: the agent sees the message above as the reason
 ```
 
-`/\.env(\..+)?$/` é uma **regex** (expressão regular — um padrão de texto
-usado pra casar strings que seguem um formato específico) que reconhece
-nomes terminando em `.env` ou `.env.algumacoisa`. E `2` aqui é um código
-de bloqueio de exemplo — confirme, na documentação do seu harness, qual
-código ele espera pra "bloquear com mensagem"; o Claude Code usa `2`. O
-que importa é a disciplina: só `0` ou o código de bloqueio documentado,
-nunca um terceiro valor por acidente (por exemplo, deixar uma exceção não
-tratada derrubar o processo com `1`).
+`/\.env(\..+)?$/` is a **regex** (regular expression, a text pattern for
+matching strings with a particular format) recognizing names ending in
+`.env` or `.env.something`. Here `2` is an example blocking code: check
+your harness documentation for its “block with a message” code; Claude
+Code uses `2`. The important discipline is using only `0` or the documented
+blocking code, never a third value accidentally, such as an unhandled
+exception terminating the process with `1`.
 
-### Passo 6 — o arquivo completo
+### Step 6 — the complete file
 
-Juntando os passos 2 a 5:
+Combining steps 2 through 5:
 
 ```javascript
 #!/usr/bin/env node
 import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
 
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // nada utilizável — falha aberta
+const event = parseHookEvent(readStdinRaw());
+if (event === null) {
+  process.exit(0); // nothing usable: fail open
 }
 
-const caminho = evento?.tool_input?.file_path ?? "";
-const pareceSensivel = /\.env(\..+)?$/.test(caminho);
+const path = event?.tool_input?.file_path ?? "";
+const looksSensitive = /\.env(\..+)?$/.test(path);
 
-if (!pareceSensivel) {
-  process.exit(0); // não é o que estamos vigiando — libera
+if (!looksSensitive) {
+  process.exit(0); // not what we are watching for: allow
 }
 
 console.error(
-  `Aviso: ${caminho} parece um arquivo de segredos. Confirme antes de editar.`
+  `Warning: ${path} looks like a secrets file. Confirm before editing.`
 );
-process.exit(2); // bloqueia — o agente vê a mensagem acima como motivo
+process.exit(2); // block: the agent sees the message above as the reason
 ```
 
-### Passo 7 — registre o hook
+### Step 7 — register the hook
 
 ```json
 {
@@ -294,190 +270,176 @@ process.exit(2); // bloqueia — o agente vê a mensagem acima como motivo
 }
 ```
 
-### Passo 8 — verifique o comportamento de fail-open manualmente
+### Step 8 — manually verify fail-open behavior
 
-Antes de confiar no hook, teste os dois extremos pelo terminal, simulando
-o que o harness manda por stdin:
+Before trusting the hook, test both extremes in the terminal, simulating
+the harness's stdin payload:
 
 ```bash
-# Evento normal, arquivo não sensível → deve sair 0 e nada acontece
-echo '{"tool_input":{"file_path":"src/index.js"}}' | node .claude/hooks/protect-env-files.mjs; echo "saída: $?"
+# Normal event, nonsensitive file → should exit 0 and do nothing
+echo '{"tool_input":{"file_path":"src/index.js"}}' | node .claude/hooks/protect-env-files.mjs; echo "exit: $?"
 
-# Arquivo sensível → deve sair 2 e imprimir o aviso
-echo '{"tool_input":{"file_path":".env.local"}}' | node .claude/hooks/protect-env-files.mjs; echo "saída: $?"
+# Sensitive file → should exit 2 and print the warning
+echo '{"tool_input":{"file_path":".env.local"}}' | node .claude/hooks/protect-env-files.mjs; echo "exit: $?"
 
-# O próprio bug que este documento existe pra evitar → deve sair 0, nunca travar
-echo 'null' | node .claude/hooks/protect-env-files.mjs; echo "saída: $?"
+# The bug this document aims to prevent → should exit 0, never crash
+echo 'null' | node .claude/hooks/protect-env-files.mjs; echo "exit: $?"
 ```
 
-Se o terceiro comando aí em cima imprimir um stack trace em vez de
-`saída: 0`, o hook ainda tem o bug — volte ao Passo 3.
+If the third command prints a stack trace instead of `exit: 0`, the hook
+still has the bug; return to Step 3.
 
-## Exemplos concretos
+## Concrete examples
 
-Dois exemplos adicionais, em pseudocódigo comentado, mostrando o padrão
-fail-open em situações diferentes de um bloqueio de segurança — aqui o
-que falha é sempre uma melhoria opcional, nunca uma trava dura.
+Two additional examples, in commented pseudocode, show fail-open outside
+security blocking. Here the failing behavior is always an optional
+improvement rather than a hard guardrail.
 
-### Exemplo 1 — reforçar um modo de comportamento persistente
+### Example 1 — reinforce a persistent behavior mode
 
 ```javascript
 #!/usr/bin/env node
-// UserPromptSubmit — reforça um "modo" ativo (por exemplo, um estilo de
-// resposta específico) a cada mensagem do usuário, lendo um arquivo de
-// estado gravado no início da sessão.
+// UserPromptSubmit: reinforce an active mode, such as a response style,
+// on each user message by reading a state file written at session start.
 import { readFileSync } from "node:fs";
 import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
 
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
-  process.exit(0); // sem evento utilizável — segue sem reforçar nada
+const event = parseHookEvent(readStdinRaw());
+if (event === null) {
+  process.exit(0); // no usable event: continue without reinforcement
 }
 
-let estado;
+let state;
 try {
-  estado = JSON.parse(readFileSync(".claude/state/modo-ativo.json", "utf8"));
+  state = JSON.parse(readFileSync(".claude/state/active-mode.json", "utf8"));
 } catch {
-  process.exit(0); // arquivo de estado ausente ou corrompido — não é motivo
-                    // pra travar a sessão, só significa "sem modo ativo agora"
+  process.exit(0); // missing or corrupt state is no reason to block the session;
+                   // it simply means there is no active mode right now
 }
 
 console.log(JSON.stringify({
-  hookSpecificOutput: { additionalContext: `Modo ativo: ${estado.nome}` },
+  hookSpecificOutput: { additionalContext: `Active mode: ${state.name}` },
 }));
 process.exit(0);
 ```
 
-Se o arquivo de estado não existir ou vier corrompido, o hook simplesmente
-não reforça nada nessa mensagem — a sessão continua normalmente, só sem o
-lembrete. Comparado a travar a mensagem do usuário inteira por causa de um
-arquivo de estado ilegível, essa degradação é claramente aceitável.
+If the state file is missing or corrupt, the hook simply adds no reminder
+to that message. The session proceeds normally without reinforcement.
+Compared with blocking the entire user message over an unreadable state
+file, this degradation is clearly acceptable.
 
-### Exemplo 2 — formatar um arquivo automaticamente após a edição
+### Example 2 — automatically format a file after editing
 
 ```javascript
 #!/usr/bin/env node
-// PostToolUse (Edit|Write) — roda um formatador no arquivo que acabou de
-// ser editado. Se o formatador não estiver instalado ou falhar, a edição
-// já aconteceu de qualquer forma — bloquear aqui não desfaz nada, só
-// atrapalha.
+// PostToolUse (Edit|Write): format the file just edited. If the formatter
+// is missing or fails, the edit has already happened; blocking here
+// cannot undo it and only gets in the way.
 import { execFileSync } from "node:child_process";
 import { readStdinRaw, parseHookEvent } from "./hook-io.mjs";
 
-const evento = parseHookEvent(readStdinRaw());
-if (evento === null) {
+const event = parseHookEvent(readStdinRaw());
+if (event === null) {
   process.exit(0);
 }
 
-const caminho = evento?.tool_input?.file_path ?? "";
-if (!caminho) {
-  process.exit(0); // sem caminho pra formatar — nada a fazer
+const path = event?.tool_input?.file_path ?? "";
+if (!path) {
+  process.exit(0); // no path to format: nothing to do
 }
 
 try {
-  execFileSync("npx", ["prettier", "--write", caminho], { stdio: "ignore" });
+  execFileSync("npx", ["prettier", "--write", path], { stdio: "ignore" });
 } catch {
-  process.exit(0); // formatador ausente, ou o arquivo tem um erro de sintaxe
-                    // temporário — deixa o arquivo como está, sem travar
+  process.exit(0); // missing formatter or temporary syntax error:
+                   // leave the file as it is without blocking
 }
 
 process.exit(0);
 ```
 
-Nos dois exemplos, o denominador comum é o mesmo: o hook está adicionando
-algo (reforço de contexto, formatação automática), não impondo um limite
-duro — então qualquer falha no meio do caminho tem que resultar em "a
-sessão continua sem o extra", nunca em "a sessão trava".
+Both examples share the same principle: the hook adds something, such as
+context reinforcement or automatic formatting, rather than enforcing a
+hard boundary. Any intermediate failure must mean the session continues
+without the extra, never that it becomes blocked.
 
-## Catálogo de categorias de hooks
+## Hook category catalog
 
-Esta é uma referência opcional de hooks do cliente, não uma lista de instalação obrigatória. O bootstrap não instala hooks Git nem bloqueios de edição/push em `main`.
+This is an optional client-hook reference, not a mandatory installation list. Bootstrap does not install Git hooks or edit/push blockers on `main`.
 
-Conforme o conjunto de hooks de um projeto amadurece, algumas categorias
-tendem a aparecer repetidamente. Vale conhecê-las como referência, mesmo
-antes de precisar de todas:
+As a project's hook collection matures, several categories tend to recur.
+They are useful references even before all are needed:
 
-- **Reescrever ou reforçar um comando de terminal proposto** antes dele
-  rodar. Veja [RTK — proxy de tokens para CLI](03-rtk-token-proxy.md).
-- **Injetar contexto de orientação** antes de uma busca ou leitura ampla,
-  se auto-instalando no primeiro uso. Veja [Graphify](07-graphify.md).
-- **Bloquear acesso direto ao sistema de arquivos** numa pasta protegida
-  e redirecionar para uma ferramenta mais segura e estruturada. Veja
-  [Obsidian como memória](08-obsidian-memory.md).
-- **Escanear conteúdo antes dele ser escrito**, procurando segredos
-  (chaves de API, senhas, tokens de acesso) commitados por acidente.
-- **Formatar um arquivo automaticamente** assim que ele é editado.
-- **Um par de hooks de início e fim de sessão** que registra um log
-  corrente da sessão e, depois, compila esse log em notas permanentes.
-- **Um hook de finalização** que roda uma verificação final — testes,
-  build — antes da sessão poder se considerar terminada.
+- **Rewrite or reinforce a proposed terminal command** before execution.
+  See [RTK — CLI token proxy](03-rtk-token-proxy.md).
+- **Inject orientation context** before broad searching or reading,
+  installing itself on first use. See [Graphify](07-graphify.md).
+- **Block direct filesystem access** in a protected folder and redirect to
+  a safer structured tool. See [Obsidian as memory](08-obsidian-memory.md).
+- **Scan content before writing**, looking for accidentally committed
+  secrets: API keys, passwords, and access tokens.
+- **Automatically format a file** immediately after editing.
+- **A pair of session-start and session-end hooks** recording a running
+  session log, then compiling it into permanent notes.
+- **A completion hook** performing final checks, such as tests and build,
+  before the session can be considered complete.
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-- **Fail-open não é a resposta certa pra tudo.** Reserve fail-closed
-  (bloquear por padrão diante de erro) para os poucos casos em que deixar
-  passar é pior do que atrapalhar — segurança de verdade, não
-  conveniência. Se você está em dúvida sobre qual dos dois um hook novo
-  deveria usar, essa dúvida sozinha já é sinal de que vale documentar a
-  decisão junto do código.
-- **`?.` (encadeamento opcional) e `?? valor` (nullish coalescing — troca
-  `null`/`undefined` por um valor padrão) resolvem a maioria dos acessos
-  inseguros** — mas nenhum dos dois substitui a checagem `=== null` logo
-  após interpretar o evento. Eles protegem acessos *depois* que você já
-  sabe que tem um objeto; não protegem o parse em si.
-- **Teste o caminho de falha, não só o caminho feliz.** O Passo 8 do
-  tutorial acima (mandar `null` literal pelo stdin) é o teste mais barato
-  que existe pra esse bug específico — e o mais fácil de esquecer de
-  escrever, porque o caminho feliz sempre passa primeiro na sua cabeça.
-- **Uma convergência que vale notar:** duas ferramentas construídas de
-  forma totalmente independente pra manter um "modo de comportamento
-  persistente" ao longo de uma sessão — [Ponytail](04-ponytail.md) e
-  [Caveman](05-caveman.md) — chegaram à mesma arquitetura de hooks sem
-  combinar nada entre si: um hook de início de sessão grava um arquivo de
-  estado e injeta o conjunto de regras ativo como saída do próprio hook, e
-  um hook que roda a cada mensagem do usuário (`UserPromptSubmit`) reforça
-  esse modo continuamente. Nenhuma das duas copiou a outra — o que é uma
-  evidência razoável de que essa arquitetura (estado gravado no início,
-  reforçado a cada turno) é simplesmente a forma certa de resolver esse
-  problema, não uma coincidência de implementação.
+- **Fail-open is not always right.** Reserve fail-closed, blocking on
+  errors, for cases where allowing access is worse than disruption: real
+  security rather than convenience. Uncertainty about which policy a new
+  hook needs is itself a reason to document the decision alongside code.
+- **`?.` (optional chaining) and `?? value` (nullish coalescing, replacing
+  `null`/`undefined` with a default) address most unsafe accesses**, but
+  neither replaces the `=== null` check immediately after parsing. They
+  protect accesses after you know you have an object, rather than parsing
+  itself.
+- **Test failures as well as the happy path.** Tutorial Step 8, sending
+  literal `null` through stdin, is the cheapest test for this specific bug
+  and the easiest to forget because the happy path comes to mind first.
+- **A convergence worth noticing:** [Ponytail](04-ponytail.md) and
+  [Caveman](05-caveman.md), independently built to maintain persistent
+  behavior modes throughout a session, arrived at the same hook
+  architecture without coordinating: a session-start hook writes state
+  and injects active rules in its output, then a `UserPromptSubmit` hook
+  reinforces the mode on every message. Neither copied the other, which
+  reasonably suggests that saving state at the start and reinforcing it
+  each turn is the appropriate solution rather than an implementation
+  coincidence.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Um hook realmente pode me trancar pra fora da minha própria sessão?**
-Sim — o caso mais grave é um hook de `SessionStart` que lança uma exceção
-não tratada antes de imprimir qualquer saída. Se o harness espera uma
-resposta do hook antes de liberar a sessão, e o hook nunca responde nada
-coerente, a sessão pode nem chegar a começar. É exatamente o cenário que a
-política de fail-open existe para prevenir.
+**Can a hook really lock me out of my own session?**
+Yes. The worst case is a `SessionStart` hook throwing an unhandled
+exception before printing any output. If the harness waits for a response
+before releasing the session and the hook never returns anything coherent,
+the session may never start. Fail-open is designed to prevent this.
 
-**Fail-open vale também para hooks de segurança?**
-Não necessariamente — e essa é a exceção explícita à regra. Um hook que
-impõe um limite duro de segurança (por exemplo, recusar acesso direto a
-uma pasta de credenciais) pode, e geralmente deve, falhar **fechado**: se
-ele não consegue avaliar a situação com confiança, bloquear é mais seguro
-do que liberar. A regra de fail-open, do jeito que este documento a
-descreve, é sobre hooks que adicionam uma melhoria opcional — não sobre os
-poucos que impõem uma trava real.
+**Does fail-open apply to security hooks too?**
+Not necessarily: this is the explicit exception. A hook enforcing a hard
+security boundary, such as refusing direct access to a credentials folder,
+can and usually should fail **closed**. If it cannot assess the situation
+confidently, blocking is safer than allowing. The fail-open rule described
+here concerns optional improvements rather than the few real security
+barriers.
 
-**Preciso usar exatamente os dois helpers mostrados aqui?**
-Não — o nome dos arquivos e das funções não importa. O que importa é a
-forma: uma função de leitura de stdin que nunca lança erro, e uma função
-de parse que trata JSON inválido e o valor `null` literal como o mesmo
-sinal de "nada utilizável aqui". Qualquer implementação que preserve essa
-forma resolve o mesmo problema.
+**Must I use these exact two helpers?**
+No: file and function names do not matter. The shape matters: a stdin
+reader that never throws and a parser that treats invalid JSON and literal
+`null` as the same “nothing usable” signal. Any implementation preserving
+that shape solves the same problem.
 
-**Que código eu uso pra bloquear — sempre `2`?**
-Depende do harness. O Claude Code usa `2` como código de bloqueio (com a
-mensagem de stderr sendo mostrada ao agente); outros harnesses de agente
-podem usar uma convenção diferente. Confirme na documentação do seu
-harness — o que não muda entre eles é a disciplina de só usar `0` ou o
-código documentado, nunca deixar um terceiro valor escapar por acidente.
+**Which code blocks execution — always `2`?**
+It depends on the harness. Claude Code uses `2`, with stderr shown to the
+agent; other harnesses may use a different convention. Check your harness
+documentation. The shared discipline is using only `0` or the documented
+code, never accidentally allowing a third value to escape.
 
-**Como eu sei se um hook do meu projeto já está corrigido pra esse bug, ou
-só "seguro por acidente"?**
-Você não sabe, a não ser que alguém tenha documentado isso explicitamente.
-É exatamente por isso que a seção sobre dívida de migração, acima,
-recomenda registrar a decisão em vez de presumir cobertura uniforme — um
-comentário curto no próprio hook (algo como "usa parseHookEvent —
-corrigido" vs. "ainda não migrado, mas o try/catch amplo cobre por
-enquanto") já resolve.
+**How can I tell whether a project hook is fixed or merely accidentally
+safe?**
+You cannot unless someone documented it explicitly. That is why the
+migration-debt section recommends recording the decision rather than
+assuming uniform coverage. A short comment in the hook is enough, such as
+“uses parseHookEvent: fixed” versus “not migrated yet; the broad try/catch
+covers it for now.”

@@ -1,22 +1,23 @@
 # Templates
 
-Copie apenas a peça necessária. Os arquivos são fontes para adaptação, não uma aplicação pronta nem um instalador independente. O [bootstrap](../docs/04-project-bootstrap.md) define a ordem; os [padrões](../docs/06-project-defaults.md), as decisões.
+Copy only the component you need. These files are sources for adaptation, not a ready-made application or standalone installer. The [bootstrap](../docs/04-project-bootstrap.md) defines the order; the [defaults](../docs/06-project-defaults.md) define the decisions.
 
-Em projeto existente, o [prompt 12](../docs/prompts/12-existing-project-setup.md) concilia estes templates com a estrutura, as ferramentas e os documentos já adotados.
+For an existing project, [prompt 12](../docs/prompts/12-existing-project-setup.md) reconciles these templates with the structure, tools, and documents already adopted.
 
-| Pasta ou arquivo | Uso | Destino |
+| Directory or file | Use | Destination |
 |---|---|---|
-| [project-docs/manifest.json](project-docs/manifest.json) | Mapa único da documentação inicial | Quatro arquivos na raiz e cinco em `docs/` |
-| [product.md.template](product.md.template) | Produto, MVP, hipóteses e aceite | `PRODUCT.md`; caminho da fonte preservado por compatibilidade |
-| [AGENTS.md.template](AGENTS.md.template) e [CLAUDE.md.template](CLAUDE.md.template) | Instruções compartilhadas e ponte Claude | Raiz, conciliando instruções existentes |
-| [next/](next/) | Ambiente, logger, conexão Drizzle, helper UI e testes | Mesma árvore no app; remover apenas o sufixo `.example`, preservando `.env.example` |
-| [eslint/next-app.config.mjs.example](eslint/next-app.config.mjs.example) | Perfil completo para o núcleo com Drizzle | `eslint.config.mjs` e pasta `eslint-rules/` |
-| [eslint/next.config.mjs.example](eslint/next.config.mjs.example) | Perfil Next leve, sem exigir logger/banco | `eslint.config.mjs` e pasta `eslint-rules/` |
-| [eslint/eslint.config.mjs.example](eslint/eslint.config.mjs.example) e [perfil com tipos](eslint/eslint.typed.config.mjs.example) | Adoção avançada em base existente | Incorporar ao lint existente |
-| [eslint/verify.mjs](eslint/verify.mjs) | Self-check das regras locais | `scripts/verify-quality-rules.mjs` |
-| [project/](project/) | Context7 por cliente e exclusões Graphify | `.codex/config.toml`, `.mcp.json` ou `.graphifyignore`, quando necessários |
-| [environment-manifest.json.example](environment-manifest.json.example) | Inventário do setup da máquina | Conforme o [guia global](../docs/03-environment-setup.md) |
-| [settings.json.example](settings.json.example) e [hooks/](hooks/) | Exemplos opcionais de hooks do cliente | Somente na integração escolhida; não são hooks Git |
-| [rules/](rules/) | Protocolo de delegação quando utilizado | Instruções pertinentes do projeto |
+| [project-docs/manifest.json](project-docs/manifest.json) | Single map of initial documentation | Four root files and five in `docs/` |
+| [product.md.template](product.md.template) | Product, MVP, assumptions, and acceptance | `PRODUCT.md`; source path retained for compatibility |
+| [AGENTS.md.template](AGENTS.md.template) and [CLAUDE.md.template](CLAUDE.md.template) | Shared instructions and Claude bridge | Root, merging existing instructions |
+| [next/](next/) | Environment, logger, Drizzle connection, UI helper, and tests | Same application tree; remove only the `.example` suffix, preserving `.env.example` |
+| [eslint/next-app.config.mjs.example](eslint/next-app.config.mjs.example) | Full profile for the core with Drizzle | `eslint.config.mjs` and the `eslint-rules/` directory |
+| [eslint/next.config.mjs.example](eslint/next.config.mjs.example) | Lightweight Next.js profile without mandatory logging/database | `eslint.config.mjs` and the `eslint-rules/` directory |
+| [eslint/eslint.config.mjs.example](eslint/eslint.config.mjs.example) and [typed profile](eslint/eslint.typed.config.mjs.example) | Advanced adoption in an existing codebase | Merge into existing lint configuration |
+| [eslint/verify.mjs](eslint/verify.mjs) | Local rule self-check | `scripts/verify-quality-rules.mjs` |
+| [project/](project/) | Context7 per client and Graphify exclusions | `.codex/config.toml`, `.mcp.json`, or `.graphifyignore`, when needed |
+| [Sentry Codex](project/sentry.codex.config.toml.example) and [Sentry Claude](project/sentry.mcp.json.example) | Optional project-scoped OAuth connection for a chosen service | Merge into `.codex/config.toml` or `.mcp.json`, replace scope identifiers, and follow the [Sentry guide](../docs/tools/22-sentry-mcp.md) |
+| [environment-manifest.json.example](environment-manifest.json.example) | Machine setup inventory | Follow the [global guide](../docs/03-environment-setup.md) |
+| [settings.json.example](settings.json.example) and [hooks/](hooks/) | Optional client hook examples | Only in the chosen integration; these are not Git hooks |
+| [rules/](rules/) | Delegation protocol, when used | Relevant project instructions |
 
-Preencha documentos com fatos do projeto; remova instruções e placeholders. Os links nos templates de documentos são relativos ao **destino**, definido no manifesto. Os módulos Next precisam das dependências e scripts do guia; não os copie para a raiz deste toolkit.
+Fill documents with project facts; remove instructions and placeholders. Document template links are relative to the **destination**, defined in the manifest. Next.js modules require the guide's dependencies and scripts; do not copy them into this toolkit's root.

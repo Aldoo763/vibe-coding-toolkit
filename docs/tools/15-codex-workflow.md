@@ -1,128 +1,128 @@
-# Codex: instalação, instruções e integrações
+# Codex: installation, instructions, and integrations
 
-O Codex tem CLI, aplicativo e integrações próprias. Este guia mostra como usar o toolkit nele, com `AGENTS.md`, plugins, skills e MCPs. Para preparar o computador inteiro, use o [setup do ambiente](../03-environment-setup.md); para o fluxo narrado do Claude Code, use o [playbook](../02-playbook-onboarding.md).
+Codex has its own CLI, application, and integrations. This guide explains how to use the toolkit with `AGENTS.md`, plugins, skills, and MCPs. To prepare the whole computer, use [environment setup](../03-environment-setup.md); for the narrated Claude Code workflow, use the [playbook](../02-playbook-onboarding.md).
 
-Para configurar ou atualizar o toolkit aplicável em um projeto existente, use o [prompt 12](../prompts/12-existing-project-setup.md), com diagnóstico, brainstorming, harness e validação.
+To configure or update the applicable toolkit in an existing project, use [prompt 12](../prompts/12-existing-project-setup.md), covering diagnosis, brainstorming, harness, and validation.
 
-Referências conferidas em **14 de outubro de 2026**. Consulte as fontes novamente antes de instalar ou migrar: comandos e formatos podem mudar.
+References checked on **October 14, 2026**. Consult the sources again before installing or migrating: commands and formats can change.
 
-## Instale e autentique
+## Install and authenticate
 
-A [documentação oficial da CLI](https://learn.chatgpt.com/docs/codex/cli) oferece instalador nativo, npm e Homebrew. Escolha um método e preserve o método já usado quando suportado.
+The [official CLI documentation](https://learn.chatgpt.com/docs/codex/cli) offers a native installer, npm, and Homebrew. Choose one method and preserve the existing method when supported.
 
 ```bash
-# Alternativa para quem já usa Node.js/npm
+# Alternative for existing Node.js/npm users
 npm install -g @openai/codex
 
-# Verifique o executável disponível
+# Check the available executable
 codex --version
 
-# Abra o agente no projeto
+# Open the agent in the project
 codex
 ```
 
-Na primeira execução, escolha **Sign in with ChatGPT**. A [autenticação oficial](https://learn.chatgpt.com/docs/auth) também descreve outras modalidades; a preferência deste setup é preservar ChatGPT e não habilitar cobrança por API. Não grave credenciais em templates, instruções do projeto ou manifesto.
+On first run, choose **Sign in with ChatGPT**. The [official authentication guide](https://learn.chatgpt.com/docs/auth) describes other methods too; this setup prefers preserving ChatGPT authentication without enabling API billing. Do not store credentials in templates, project instructions, or the manifest.
 
-## Use `AGENTS.md` como instrução do projeto
+## Use `AGENTS.md` for project instructions
 
-O Codex [descobre instruções](https://learn.chatgpt.com/docs/agent-configuration/agents-md) em escopos diferentes: o diretório global de configuração e o caminho da raiz do projeto até o diretório de trabalho. Em cada diretório, `AGENTS.override.md` tem prioridade sobre `AGENTS.md`. Instruções mais próximas do diretório de trabalho refinam as anteriores.
+Codex [discovers instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md) at different scopes: the global configuration directory and the path from the project root to the working directory. In each directory, `AGENTS.override.md` takes precedence over `AGENTS.md`. Instructions closer to the working directory refine earlier ones.
 
-Use o [template compartilhado](../../templates/AGENTS.md.template) para criar um `AGENTS.md` no projeto de destino. Preencha stack, comandos canônicos e convenções. Se o arquivo já existir, incorpore somente as partes úteis, sem sobrescrever preferências.
+Use the [shared template](../../templates/AGENTS.md.template) to create `AGENTS.md` in the target project. Fill in the stack, canonical commands, and conventions. If the file already exists, incorporate only useful parts without overwriting preferences.
 
-No Claude Code, você pode importar esse arquivo a partir do `CLAUDE.md`, conforme a [documentação de memória](https://code.claude.com/docs/en/memory):
+In Claude Code, you can import this file from `CLAUDE.md`, as described in the [memory documentation](https://code.claude.com/docs/en/memory):
 
 ```markdown
 @AGENTS.md
 
 ## Claude Code
 
-[Instruções específicas deste cliente, se necessárias.]
+[Client-specific instructions, if needed.]
 ```
 
-O Codex descobre `AGENTS.md` diretamente. Não presuma que toda sintaxe de importação do Claude seja interpretada da mesma maneira pelos outros clientes. Caminhos pessoais absolutos devem ficar em configurações do usuário, sem entrar no template compartilhado.
+Codex discovers `AGENTS.md` directly. Do not assume every Claude import syntax is interpreted the same way by other clients. Absolute personal paths belong in user configuration, outside the shared template.
 
-## Instale plugins e confira as skills
+## Install plugins and check skills
 
-Plugins podem distribuir skills, MCPs e hooks. Para [Superpowers no Codex](https://github.com/obra/superpowers#codex-cli), abra `/plugins` na sessão, busque Superpowers e instale a distribuição oficial. No aplicativo, use a área de Plugins. Instalar o plugin do Claude Code não o instala no Codex.
+Plugins can distribute skills, MCPs, and hooks. For [Superpowers in Codex](https://github.com/obra/superpowers#codex-cli), open `/plugins` in the session, search for Superpowers, and install the official distribution. In the application, use the Plugins area. Installing the Claude Code plugin does not install it in Codex.
 
-Para os plugins que documentam marketplace próprio, os exemplos atuais são:
+For plugins documenting their own marketplace, current examples are:
 
 ```bash
 # Ponytail: terminal
 codex plugin marketplace add DietrichGebert/ponytail
 codex plugin add ponytail@ponytail
 
-# Context7: escolha o plugin OU o MCP direto da próxima seção
+# Context7: choose the plugin OR the direct MCP in the next section
 codex plugin marketplace add upstash/context7
 codex plugin add context7@context7-marketplace
 ```
 
-Fontes: [Ponytail](https://github.com/DietrichGebert/ponytail#install) e [clientes do Context7](https://context7.com/docs/resources/all-clients). No Ponytail, abra `/hooks`, confira e confie nos hooks conforme o fluxo do cliente; depois inicie uma nova conversa. Mantenha intensidade `full` para programação.
+Sources: [Ponytail](https://github.com/DietrichGebert/ponytail#install) and [Context7 clients](https://context7.com/docs/resources/all-clients). For Ponytail, open `/hooks`, inspect and trust the hooks through the client's workflow, then start a new conversation. Keep intensity at `full` for coding.
 
-Se uma ferramenta for distribuída como skill independente, use os caminhos de [descoberta de skills](https://learn.chatgpt.com/docs/build-skills): `.agents/skills/<nome>/SKILL.md` no projeto ou `~/.agents/skills/<nome>/SKILL.md` no usuário. Links simbólicos são suportados. Plugins cuidam dos próprios arquivos; copiar também as mesmas skills para esses diretórios pode criar entradas duplicadas.
+If a tool is distributed as a standalone skill, use the [skill discovery](https://learn.chatgpt.com/docs/build-skills) paths: `.agents/skills/<name>/SKILL.md` in the project or `~/.agents/skills/<name>/SKILL.md` for the user. Symbolic links are supported. Plugins manage their own files; copying the same skills into these directories can create duplicates.
 
-No Codex, selecione a skill pelo nome mostrado no cliente ou invoque-a com `$nome`. Plugins podem acrescentar namespace, como `$ponytail:ponytail-review`. Não suponha que os comandos `/plugin` ou os nomes de subagentes do Claude Code existam no Codex.
+In Codex, select a skill by the name shown in the client or invoke it with `$name`. Plugins may add a namespace, such as `$ponytail:ponytail-review`. Do not assume Claude Code's `/plugin` commands or subagent names exist in Codex.
 
-Peça ao agente para listar as skills descobertas e conferir a origem antes de validar. Diretório existente sem skill descoberta continua sendo configuração incompleta.
+Ask the agent to list discovered skills and check their origin before validation. An existing directory without a discovered skill remains an incomplete setup.
 
-## Continuidade do trabalho
+## Work continuity
 
-Adote os [acordos de continuidade](../02-playbook-onboarding.md#continuidade-de-execução) e o bloco do [AGENTS compartilhado](../../templates/AGENTS.md.template). Perguntas de status não encerram trabalho autorizado; bloqueios afetam só dependências. Confirme a parada de um trabalhador antes de assumir arquivos, confira o checkout na retomada e preserve permissões/limites. Essas instruções não garantem execução após o turno nem substituem processos ativos verificáveis.
+Adopt the [execution continuity agreements](../02-playbook-onboarding.md#execution-continuity) and the block in the [shared AGENTS template](../../templates/AGENTS.md.template). Status questions do not end authorized work; blockers affect only dependent work. Confirm a worker has stopped before taking over files, check the checkout when resuming, and preserve permissions and limits. These instructions do not guarantee execution after the turn or replace verifiable active processes.
 
-## Configuração e skills do projeto
+## Project configuration and skills
 
-Para iniciar Next com produto, lint e skills, siga o [bootstrap](../04-project-bootstrap.md). Instale a coleção Vercel localmente conforme o [catálogo](16-vercel-skills.md), selecionando `--agent codex`; se também usar Claude, selecione os dois clientes. Não copie um cache global nem duplique plugins já descobertos.
+To start Next with product documentation, lint, and skills, follow the [bootstrap](../04-project-bootstrap.md). Install the Vercel collection locally as described in the [catalog](16-vercel-skills.md), selecting `--agent codex`; if you also use Claude, select both clients. Do not copy a global cache or duplicate already-discovered plugins.
 
-Configuração local pertence a `.codex/config.toml` e só é carregada em projeto confiável. O [template Context7](../../templates/project/codex.config.toml.example) é uma alternativa quando faltar conexão ativa; concilie-o com a configuração existente e preserve autenticação fora do repositório. Não acrescente opções de modelo, provedor ou permissões pessoais ao template. Fonte: [configuração oficial](https://learn.chatgpt.com/docs/config-file/config-advanced).
+Local configuration belongs in `.codex/config.toml` and loads only in trusted projects. The [Context7 template](../../templates/project/codex.config.toml.example) is an alternative when no active connection exists; reconcile it with existing configuration and keep authentication outside the repository. Do not add personal model, provider, or permission options to the template. Source: [official configuration](https://learn.chatgpt.com/docs/config-file/config-advanced).
 
-Plugins globais continuam globais. `AGENTS.md`, skills locais, produto, lint e exclusões Graphify pertencem ao projeto. O bootstrap não instala bloqueios Git ou hooks de commit/push.
+Global plugins remain global. `AGENTS.md`, local skills, product documentation, lint, and Graphify exclusions belong to the project. Bootstrap does not install Git blockers or commit/push hooks.
 
-## Conecte o Context7 por MCP
+## Connect Context7 through MCP
 
-Use esta alternativa quando não estiver usando o plugin que já fornece o mesmo servidor. A [documentação do Context7](https://context7.com/docs/resources/all-clients) descreve clientes locais e remotos; o endpoint remoto dispensa instalar um pacote MCP local.
+Use this alternative when no plugin already provides the same server. The [Context7 documentation](https://context7.com/docs/resources/all-clients) describes local and remote clients; the remote endpoint avoids installing a local MCP package.
 
 ```bash
 codex mcp add context7 --url https://mcp.context7.com/mcp
 codex mcp list
 ```
 
-Se o serviço exigir autenticação ou limitar o modo anônimo, siga o fluxo oficial e preserve segredos fora do repositório. Comece uma nova sessão e teste uma consulta de documentação. `codex mcp list` comprova o registro, mas não a resposta do servidor.
+If the service requires authentication or limits anonymous access, follow its official flow and keep secrets outside the repository. Start a new session and test a documentation query. `codex mcp list` proves registration, but not a server response.
 
-O fluxo de consulta é `resolve-library-id` com biblioteca e objetivo, seguido de `query-docs` com `libraryId` e `query`. Faça uma consulta por conceito e confira a versão usada pelo projeto. Não envie código privado, credenciais ou dados pessoais. Veja [Context7](12-context7.md) para os exemplos completos.
+The lookup workflow is `resolve-library-id` with the library and objective, followed by `query-docs` with `libraryId` and `query`. Use one query per concept and check the project's version. Do not send private code, credentials, or personal data. See [Context7](12-context7.md) for complete examples.
 
-## Integre RTK e Graphify
+## Integrate RTK and Graphify
 
-O [RTK documenta hooks nativos para Codex](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/supported-agents.md). Depois de instalar o binário e fazer backup das configurações existentes:
+[RTK documents native Codex hooks](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/supported-agents.md). After installing the binary and backing up existing configuration:
 
 ```bash
 rtk init --global --codex
 ```
 
-Abra uma nova sessão e confirme a reescrita de um comando suportado. O hook altera o comando antes da execução; não deve executar uma cópia dele por conta própria. Se já houver integração equivalente, concilie as configurações e evite registrar outro hook para a mesma finalidade.
+Open a new session and confirm a supported command is rewritten. The hook changes the command before execution; it must not execute a separate copy itself. If an equivalent integration exists, reconcile configurations and avoid another hook for the same purpose.
 
-Sem hook ativo nessa superfície, use `rtk git status`, por exemplo. Para saída completa ou comandos não suportados, use `rtk proxy <comando>`. Mais detalhes: [RTK](03-rtk-token-proxy.md).
+Without an active hook on that surface, use `rtk git status`, for example. For complete output or unsupported commands, use `rtk proxy <command>`. More details: [RTK](03-rtk-token-proxy.md).
 
-O [Graphify](https://github.com/Graphify-Labs/graphify) fornece instalação por `graphify install`, que detecta os agentes compatíveis. Confira a instalação da skill no Codex em uma nova sessão. Para extração semântica ou delegação, preserve Codex nativo, o modelo principal e login ChatGPT. Sem política de seleção autorizada, passe o modelo da sessão; com essa política, siga o [roteamento por tarefa](02-subagent-orchestration.md#parte-b--disciplina-de-escolha-de-modelo), respeitando restrições explícitas. Não configure um backend de API ou outra LLM como substituto silencioso. Veja [Graphify](07-graphify.md).
+[Graphify](https://github.com/Graphify-Labs/graphify) provides installation through `graphify install`, which detects compatible agents. Check Codex skill installation in a new session. For semantic extraction or delegation, preserve native Codex, the main model, and ChatGPT login. Without an authorized selection policy, pass the session model; with one, follow [task-based routing](02-subagent-orchestration.md#part-b--model-selection-discipline), respecting explicit restrictions. Do not silently substitute an API backend or another LLM. See [Graphify](07-graphify.md).
 
-## Permissões e persistência
+## Permissions and persistence
 
-O prompt de setup pede acesso completo e ausência de aprovações rotineiras. Na CLI que usa as chaves documentadas de sandbox, o trecho correspondente em `~/.codex/config.toml` é:
+The setup prompt requests full access without routine approvals. In the CLI using the documented sandbox keys, the corresponding block in `~/.codex/config.toml` is:
 
 ```toml
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 ```
 
-Essas opções dão acesso amplo ao sistema de arquivos e à rede, conforme a [referência de configuração](https://learn.chatgpt.com/docs/config-file/config-reference). Faça backup e incorpore o trecho ao arquivo existente; não substitua configurações de modelo, provedor ou MCP. Use esse modo somente no contexto em que foi autorizado, como o setup solicitado.
+These options grant broad filesystem and network access, as described in the [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference). Back up the existing file and incorporate the block without replacing model, provider, or MCP settings. Use this mode only in its authorized context, such as the requested setup.
 
-Versões e superfícies também podem expor perfis de permissões próprios. Confira o mecanismo suportado pela instalação atual e verifique o estado efetivo em uma nova sessão. Políticas da organização e permissões do sistema operacional podem limitar o resultado. A CLI configurada não prova que o aplicativo desktop ou uma sessão já aberta recebeu a mesma permissão.
+Versions and surfaces may also expose their own permission profiles. Check the mechanism supported by the current installation and verify the effective state in a new session. Organization policies and operating-system permissions can limit the result. A configured CLI does not prove the desktop application or an already-open session received the same permissions.
 
-## Valide sem depender da sessão antiga
+## Validate without relying on the old session
 
-- Abra terminal e conversa novos; confira executável, autenticação e modelo.
-- Confirme quais arquivos de instruções foram carregados e a precedência de overrides.
-- Descubra e use uma skill adequada a uma tarefa pequena, sem publicação ou chamadas pagas de teste.
-- Faça uma consulta real ao Context7 e confira o resultado.
-- Confira uma execução de comando com RTK, sem duplicação, e a saída completa via `rtk proxy`.
-- Verifique a integração do Graphify sem iniciar uma extração semântica paga.
-- Registre pendências de hooks, login, permissões ou políticas; não trate presença no disco como validação.
+- Open a new terminal and conversation; check the executable, authentication, and model.
+- Confirm which instruction files were loaded and override precedence.
+- Discover and use a suitable skill for a small task, without publishing or paid test calls.
+- Run a real Context7 query and check the result.
+- Check one RTK command execution without duplication, and complete output through `rtk proxy`.
+- Verify Graphify integration without starting paid semantic extraction.
+- Record outstanding hooks, login, permissions, or policy issues; do not treat files on disk as validation.

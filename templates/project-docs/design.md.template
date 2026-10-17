@@ -1,21 +1,21 @@
-# Design e acessibilidade
+# Design and accessibility
 
-## Direção
+## Direction
 
-[Público, idioma, dispositivos e tom visual ligados a PRODUCT.md. Decisões ainda não implementadas ficam identificadas como direção.]
+[Audience, language, devices, and visual tone tied to PRODUCT.md. Label decisions not yet implemented as direction.]
 
-## Sistema existente
+## Existing system
 
-[Tokens, tipografia, cores, espaçamento e componentes presentes. Aponte seus arquivos e a fonte de verdade; não mantenha valores divergentes neste documento.]
+[Existing tokens, typography, colors, spacing, and components. Point to their files and source of truth; do not maintain conflicting values here.]
 
-## Interação
+## Interaction
 
-Use HTML semântico, navegação por teclado, foco visível e contraste adequado. Dê nome a controles e campos. Erros de validação ficam junto do campo; operações assíncronas exibem espera e resultado. Respeite movimento reduzido.
+Use semantic HTML, keyboard navigation, visible focus, and adequate contrast. Label controls and fields. Place validation errors beside fields; asynchronous operations show progress and results. Respect reduced motion.
 
-## Layout e revisão
+## Layout and review
 
-[Breakpoints e critérios reais de leitura em celular e desktop. Liste estados de vazio, erro e carregamento pertinentes. Registre revisão de interface feita e o que ainda não existe.]
+[Actual breakpoints and reading criteria for mobile and desktop. List relevant empty, error, and loading states. Record completed interface reviews and what does not exist yet.]
 
-## Manutenção
+## Maintenance
 
-Mudanças visuais e de interação atualizam a fonte de tokens/componentes e esta orientação quando houver alteração de regra. Consulte as skills de UI instaladas nas revisões pertinentes.
+Visual and interaction changes update the token/component source and this guidance when a rule changes. Consult installed UI skills during relevant reviews.

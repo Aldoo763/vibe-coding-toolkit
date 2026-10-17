@@ -1,40 +1,38 @@
-# Code review multi-agente
+# Multi-agent code review
 
-## Quando usar
+## When to use
 
-Use este prompt antes de fazer merge de qualquer mudança não-trivial, em
-vez de confiar numa única passada de revisão — que inevitavelmente
-favorece qualquer que seja a lente que aquele revisor usa por padrão. Um
-revisor focado em segurança tende a não pegar uma violação de regra de
-hook do React, e vice-versa. Funciona tanto pra um PR (*pull request*, a
-mudança proposta pra ser mesclada no projeto) isolado quanto pra revisar
-uma branch inteira antes de abrir o PR.
+Use this prompt before merging any nontrivial change, instead of relying
+on a single review pass — which inevitably favors whichever perspective
+that reviewer uses by default. A security-focused reviewer tends to miss a
+React hook rule violation, and vice versa. It works both for an individual
+PR (*pull request*, a proposed change to merge into the project) and for
+reviewing an entire branch before opening the PR.
 
-## Por que funciona
+## Why it works
 
-Rodar vários especialistas estreitos em paralelo encontra mais problemas
-reais do que uma única passada generalista — cada lente (segurança,
-qualidade geral, tipagem, framework) enxerga o que as outras não foram
-desenhadas pra ver. Mas isso só funciona se a etapa de síntese realmente
-descartar ruído em vez de só concatenar a saída de todo mundo: sem
-deduplicação e sem filtro por cenário de falha concreto, quatro revisores
-só produzem uma lista quatro vezes mais longa e menos confiável — não
-quatro vezes mais sinal.
+Running several narrowly focused specialists in parallel finds more real
+problems than one generalist pass — each lens (security, general quality,
+typing, framework) sees what the others were not designed to see. But this
+only works if synthesis actually discards noise rather than concatenating
+everyone's output: without deduplication and a concrete failure scenario
+filter, four reviewers merely produce a list four times longer and less
+reliable — not four times more signal.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[DIFF/PR/BRANCH]`** — o alvo da revisão: um diff (a comparação linha
-  a linha entre duas versões do código) literal, o número/link de um PR,
-  ou o nome de uma branch comparada com a base.
-- **`[LANGUAGE]`** — a linguagem principal do código alterado. Define
-  quais preocupações de tipagem específicas da linguagem entram na
-  revisão (ex.: TypeScript, Python, Go, Rust).
-- **`[FRAMEWORK]`** — o framework usado no código alterado, quando o diff
-  toca código voltado a framework (ex.: React, Next.js, Django). O
-  próprio prompt já orienta a descartar essa lente quando a mudança é
-  puramente backend/CLI, sem superfície de framework nenhuma.
+- **`[DIFF/PR/BRANCH]`** — the review target: a literal diff (the line-by-line
+  comparison between two versions of the code), a PR number/link, or a
+  branch name compared with its base.
+- **`[LANGUAGE]`** — the main language of the changed code. Determines which
+  language-specific typing concerns enter the review (e.g. TypeScript,
+  Python, Go, Rust).
+- **`[FRAMEWORK]`** — the framework used in the changed code, when the diff
+  touches framework-facing code (e.g. React, Next.js, Django). The prompt
+  itself already says to drop this lens when the change is purely
+  backend/CLI, without any framework surface.
 
-## O prompt
+## The prompt
 
 ```
 Review [DIFF/PR/BRANCH] using a panel of independent specialist reviewers,
@@ -83,40 +81,36 @@ valid, useful result, not a failure to find something.
 Target: [DIFF/PR/BRANCH]. Stack: [LANGUAGE] / [FRAMEWORK].
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine que você acabou de terminar um PR que adiciona um novo endpoint
-numa API (backend) e o formulário em React que consome esse endpoint. Você
-preencheria:
+Imagine you just finished a PR adding a new API endpoint (backend) and the
+React form that consumes it. Fill in:
 
-- `[DIFF/PR/BRANCH]` → `PR #482` (ou `git diff main...feature/formulario-cadastro`)
+- `[DIFF/PR/BRANCH]` → `PR #482` (or `git diff main...feature/signup-form`)
 - `[LANGUAGE]` → "TypeScript"
 - `[FRAMEWORK]` → "React + Next.js"
 
-O agente despacha as quatro lentes em paralelo — qualidade geral,
-segurança (OWASP, sigla de "Open Web Application Security Project", a
-referência das vulnerabilidades web mais comuns), tipagem TypeScript e a
-lente específica de React/Next.js — cada uma revisando o diff
-isoladamente, sem ver o que as outras encontraram. Cada revisor reporta
-achados como `arquivo:linha — severidade — frase — cenário de falha
-concreto`. Na síntese, dois revisores diferentes apontam o mesmo problema
-(o endpoint não valida um campo no servidor, mesmo o formulário validando
-no cliente) — isso vira uma única entrada, marcada como confirmada por
-dois revisores. Um comentário vago do tipo "esse componente poderia estar
-mais limpo", sem cenário de falha, é descartado. O relatório final sai
-ordenado por severidade — por exemplo: CRÍTICO (validação ausente no
-servidor, contornável chamando a API direto), ALTO (uma dependência nova
-com uma vulnerabilidade conhecida — CVE, na sigla em inglês), MÉDIO (um
-componente sem tratamento de estado de erro), e assim por diante.
+The agent dispatches the four lenses in parallel — general quality,
+security (OWASP, the "Open Web Application Security Project", the reference
+for the most common web vulnerabilities), TypeScript typing, and the
+React/Next.js-specific lens — each reviewing the diff independently, without
+seeing what the others found. Each reviewer reports findings as
+`file:line — severity — sentence — concrete failure scenario`. During
+synthesis, two different reviewers identify the same problem (the endpoint
+does not validate a field on the server, even though the form validates it
+on the client) — this becomes one entry, marked as confirmed by two
+reviewers. A vague comment such as "this component could be cleaner", with
+no failure scenario, is discarded. The final report is ordered by severity
+— for example: CRITICAL (missing server validation, bypassed by calling the
+API directly), HIGH (a new dependency with a known vulnerability — CVE),
+MEDIUM (a component without error-state handling), and so on.
 
-## Dicas
+## Tips
 
-- Descarte as lentes de revisor que não se aplicam — sem lente de
-  framework numa mudança pura de backend/CLI — em vez de forçar as
-  quatro toda vez.
-- A etapa de deduplicação e filtro da parte 2 importa tanto quanto o
-  painel em si; quatro revisores enchendo a lista com achados de baixa
-  confiança só produzem um relatório mais longo e menos confiável.
-- Veja [orquestração de subagentes](../tools/02-subagent-orchestration.md)
-  pra disparar isso de fato como subagentes paralelos, em vez de turnos
-  sequenciais.
+- Drop reviewer lenses that do not apply — no framework lens for a pure
+  backend/CLI change — instead of forcing all four every time.
+- Deduplication and filtering in part 2 matter as much as the panel itself;
+  four reviewers filling the list with low-confidence findings only make
+  a longer, less reliable report.
+- See [subagent orchestration](../tools/02-subagent-orchestration.md) to
+  actually dispatch this as parallel subagents instead of sequential turns.

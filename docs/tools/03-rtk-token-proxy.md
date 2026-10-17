@@ -1,27 +1,27 @@
-# RTK — proxy de tokens para CLI
+# RTK — CLI token proxy
 
-RTK significa **Rust Token Killer**. É uma ferramenta pública em [rtk-ai/rtk](https://github.com/rtk-ai/rtk), distribuída como binário de linha de comando. Ela executa comandos suportados e filtra a saída antes de o agente recebê-la, reduzindo texto repetitivo na janela de contexto.
+RTK stands for **Rust Token Killer**. It is a public tool at [rtk-ai/rtk](https://github.com/rtk-ai/rtk), distributed as a command-line binary. It runs supported commands and filters their output before the agent receives it, reducing repetitive text in the context window.
 
-Um **hook** é uma integração executada antes ou depois de uma ação do agente. No RTK, o hook pode reescrever o comando proposto para usar o binário. Isso permite usar comandos comuns sem depender de o modelo lembrar do prefixo em toda chamada.
+A **hook** is an integration that runs before or after an agent action. In RTK, the hook can rewrite the proposed command to use the binary. This lets you use ordinary commands without relying on the model to remember the prefix on every call.
 
-Esta página substitui o antigo exemplo de proxy personalizado. Prefira a integração oficial: ela conhece os formatos de cada cliente e evita manter um parser de shell e um hook próprios. Veja [boas práticas para hooks](10-hooks-best-practices.md) quando precisar de uma integração adicional.
+This page replaces the old custom proxy example. Prefer the official integration: it understands each client's formats and avoids maintaining your own shell parser and hook. See [hook best practices](10-hooks-best-practices.md) when you need an additional integration.
 
-## Instale pelo método oficial
+## Install using the official method
 
-Com Homebrew disponível, a [documentação de instalação](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/installation.md) indica:
+With Homebrew available, the [installation documentation](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/installation.md) specifies:
 
 ```bash
 brew install rtk-ai/tap/rtk
 rtk --version
 ```
 
-Em outros ambientes, use o instalador ou binário de release indicado pelo projeto para o sistema e a arquitetura. Confirme a origem antes de instalar: um pacote chamado `rtk` em outro ecossistema pode ser uma ferramenta diferente.
+On other environments, use the installer or release binary the project specifies for your system and architecture. Confirm the source before installing: a package named `rtk` in another ecosystem may be a different tool.
 
-Se já houver RTK instalado, identifique caminho, versão e gerenciador responsável antes de atualizar. Para uma instalação pelo tap acima, use `brew upgrade rtk-ai/tap/rtk`. Não instale outra cópia só para trocar o método.
+If RTK is already installed, identify its path, version, and managing package manager before updating. For an installation from the tap above, use `brew upgrade rtk-ai/tap/rtk`. Do not install another copy just to change methods.
 
-## Configure cada agente
+## Configure each agent
 
-Faça backup das configurações existentes antes de inicializar a integração. A [lista oficial de agentes suportados](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/supported-agents.md) diferencia os mecanismos de cada cliente.
+Back up existing settings before initializing the integration. The [official list of supported agents](https://github.com/rtk-ai/rtk/blob/develop/docs/guide/getting-started/supported-agents.md) distinguishes each client's mechanisms.
 
 ### Claude Code
 
@@ -30,7 +30,7 @@ rtk init --global
 rtk init --show
 ```
 
-Esse fluxo instala o hook e atualiza a configuração do Claude Code. Abra uma nova sessão e confira o registro. Se já houver um hook de proxy personalizado para a mesma finalidade, remova ou concilie apenas a integração redundante depois de confirmar suas referências.
+This workflow installs the hook and updates the Claude Code configuration. Open a new session and check its registration. If a custom proxy hook already serves the same purpose, remove or reconcile only the redundant integration after confirming its references.
 
 ### Codex CLI
 
@@ -38,15 +38,15 @@ Esse fluxo instala o hook e atualiza a configuração do Claude Code. Abra uma n
 rtk init --global --codex
 ```
 
-O mecanismo atual registra o hook nativo de `PreToolUse` do Codex. O processador `rtk hook codex` devolve o comando reescrito por `updatedInput`; o Codex executa o comando e aplica suas próprias permissões. O hook não precisa executar uma cópia do comando antes disso.
+The current mechanism registers Codex's native `PreToolUse` hook. The `rtk hook codex` handler returns the rewritten command through `updatedInput`; Codex runs the command and applies its own permissions. The hook does not need to run a copy of the command beforehand.
 
-A alternativa `rtk init --codex` instala no projeto atual. Escolha um escopo por necessidade: não registre o mesmo hook globalmente e no projeto sem conferir o efeito combinado. No setup da máquina, prefira o escopo global para preservar os projetos.
+Alternatively, `rtk init --codex` installs it in the current project. Choose the scope you need: do not register the same hook globally and in the project without checking the combined effect. For machine setup, prefer global scope to preserve projects.
 
-Reinicie o Codex e conclua a confiança de hooks quando o cliente pedir. Confira `rtk init --help` e a documentação da versão instalada se a opção não existir. O suporte da CLI não comprova que todas as superfícies desktop ou remotas executem o mesmo hook.
+Restart Codex and complete hook trust when the client prompts you. Check `rtk init --help` and your installed version's documentation if the option does not exist. CLI support does not prove that every desktop or remote surface runs the same hook.
 
-## Use comandos suportados ou saída completa
+## Use supported commands or full output
 
-Sem hook ativo, prefixe os comandos suportados explicitamente:
+Without an active hook, prefix supported commands explicitly:
 
 ```bash
 rtk git status
@@ -54,59 +54,59 @@ rtk git diff
 rtk git log -5 --oneline
 ```
 
-Com um hook nativo ativo, proponha os comandos normais e deixe a integração reescrevê-los. Não acrescente um segundo wrapper ou outro hook de reescrita.
+With a native hook active, propose ordinary commands and let the integration rewrite them. Do not add a second wrapper or another rewrite hook.
 
-Para preservar a saída inteira ou usar um comando que não tem filtro específico, use `rtk proxy`:
+To preserve the entire output or use a command without a dedicated filter, use `rtk proxy`:
 
 ```bash
 rtk proxy git diff
 rtk proxy git log -5 --oneline
 ```
 
-Essa é a via de escape quando um resumo omite o detalhe necessário ao diagnóstico. Não use uma saída condensada como prova de que uma linha, aviso ou arquivo não existe sem conferir os dados completos quando a decisão depende disso.
+This is the escape hatch when a summary omits a detail needed for diagnosis. Do not use condensed output as proof that a line, warning, or file does not exist without checking the full data when the decision depends on it.
 
-Não prefixe cegamente pipelines, redirecionamentos, heredocs ou comandos compostos. O suporte de sintaxe varia; preserve a semântica do shell e consulte `rtk --help` para os comandos disponíveis.
+Do not blindly prefix pipelines, redirections, heredocs, or compound commands. Syntax support varies; preserve shell semantics and check `rtk --help` for available commands.
 
-## Meça e valide
+## Measure and validate
 
 ```bash
 rtk gain
 rtk gain --history
 ```
 
-As métricas mostram o histórico de uso observado pelo RTK. Elas descrevem redução de saída dos comandos, não o total de tokens da sessão, economia garantida na assinatura ou custo de todo o trabalho do modelo. Chamadas via `rtk proxy` preservam a saída e podem aparecer sem redução.
+The metrics show usage history observed by RTK. They describe reduced command output, not total session tokens, guaranteed subscription savings, or the cost of all model work. Calls through `rtk proxy` preserve output and may appear without a reduction.
 
-Para testar a integração:
+To test the integration:
 
-1. Abra um terminal e uma sessão de agente novos.
-2. Confirme `rtk --version` e o caminho do executável resolvido pelo shell.
-3. Peça um `git status` em um repositório conhecido e confira que a chamada foi reescrita uma vez.
-4. Confira o registro em `rtk gain --history`.
-5. Execute `rtk proxy git status` e confira a saída completa.
+1. Open a new terminal and agent session.
+2. Confirm `rtk --version` and the executable path resolved by the shell.
+3. Request `git status` in a known repository and check that the call was rewritten once.
+4. Check the entry in `rtk gain --history`.
+5. Run `rtk proxy git status` and check the full output.
 
-Se o histórico não mostrar uso, investigue descoberta do binário, escopo do hook, confiança e suporte da superfície. Instalação no disco não comprova integração ativa.
+If the history shows no usage, investigate binary discovery, hook scope, trust, and surface support. Installation on disk does not prove an active integration.
 
-## Pegadinhas que importam
+## Important pitfalls
 
-- **Duplicação de hooks:** dois interceptadores podem aplicar wrappers duas vezes ou executar trabalho repetido. Inventarie configurações globais e do projeto antes de consolidar.
-- **Saída incompleta:** filtros são úteis para leitura rotineira; diagnósticos, flags incomuns e verificações exatas podem exigir `rtk proxy`.
-- **Permissões:** compactar saída não autoriza instalar, publicar, apagar ou acessar um recurso. O agente e o sistema continuam responsáveis pelas permissões.
-- **Erro de comando:** preserve códigos de saída e evidência suficiente da falha. Um resumo aparentemente normal não transforma uma execução malsucedida em sucesso.
-- **Atualização:** atualize o binário pelo gerenciador responsável e confira as instruções de integração da release. Preserve hooks personalizados com outra finalidade.
+- **Duplicate hooks:** two interceptors can apply wrappers twice or repeat work. Inventory global and project settings before consolidating.
+- **Incomplete output:** filters help with routine reading; diagnosis, unusual flags, and exact checks may require `rtk proxy`.
+- **Permissions:** compressing output does not authorize installing, publishing, deleting, or accessing a resource. The agent and system remain responsible for permissions.
+- **Command errors:** preserve exit codes and enough evidence of failure. An apparently normal summary does not turn a failed run into success.
+- **Updates:** update the binary through its managing package manager and check the release's integration instructions. Preserve custom hooks serving other purposes.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Preciso construir meu próprio proxy?**
-Não. Instale o RTK público e use o mecanismo documentado para seu agente. Um hook personalizado só se justifica por uma necessidade que a integração oficial não cobre.
+**Do I need to build my own proxy?**
+No. Install the public RTK tool and use the mechanism documented for your agent. A custom hook is justified only by a need the official integration does not cover.
 
-**Funciona sem hook?**
-Sim. Use o prefixo explícito nos comandos suportados e `rtk proxy` quando precisar de saída completa.
+**Does it work without a hook?**
+Yes. Use the explicit prefix on supported commands and `rtk proxy` when you need full output.
 
-**Instalar no Claude configura o Codex?**
-Não. Configure e valide os dois clientes separadamente.
+**Does installing it for Claude configure Codex?**
+No. Configure and validate the two clients separately.
 
-**Isso troca meu modelo ou provedor?**
-O fluxo de CLI e hooks descrito aqui filtra saída de comandos. Não exige trocar o modelo, a autenticação ou o provedor do agente.
+**Does this change my model or provider?**
+The CLI and hook workflow described here filters command output. It does not require changing the agent's model, authentication, or provider.
 
-**Como entra no setup completo?**
-RTK é obrigatório no [prompt de ambiente](../prompts/10-development-environment-setup.md). O agente deve instalar, integrar e validar, sem duplicar wrappers ou hooks.
+**How does it fit into the full setup?**
+RTK is required by the [environment prompt](../prompts/10-development-environment-setup.md). The agent must install, integrate, and validate it without duplicating wrappers or hooks.

@@ -1,29 +1,31 @@
-# Qualidade
+# Quality
 
-## Comandos
+## Commands
 
-[Liste scripts existentes e o que provam: lint, typecheck, testes Vitest, self-check das regras e build. Informe o comando composto check e quando executar um teste escopado ou a suíte.]
+[List existing scripts and what they prove: lint, typecheck, Vitest tests, rule self-check, and build. State the combined check command and when to run a scoped test or the suite.]
 
-## Regras de base
+## Baseline rules
 
-- TypeScript strict e presets oficiais do framework.
-- Teto de 350 linhas e organização proporcional ao comportamento.
-- Logger estruturado no servidor; dados não acessados diretamente pela apresentação.
-- Com Drizzle, guarda contra update/delete sem where e revisão das queries/migrations.
-- Validação de entradas e ambiente, erros sem segredos e testes de fronteiras relevantes.
+- Strict TypeScript and official framework presets.
+- A 350-line limit and organization proportional to behavior.
+- Structured server logging; no direct data access from presentation.
+- With Drizzle, guard update/delete without where and review queries/migrations.
+- Input and environment validation, errors without secrets, and relevant boundary tests.
 
-## Estratégia de testes
+## Testing strategy
 
-[Cubra comportamento, decisões, falhas e regressões. Indique ambientes de teste existentes e como isolar serviços. Não escreva testes que apenas repetem o código. Não invente cobertura, suíte E2E ou garantia de segurança.]
+[Cover behavior, decisions, failures, and regressions. State existing test environments and how to isolate services. Do not write tests that only repeat the code. Do not invent coverage, an E2E suite, or a security guarantee.]
 
-## Revisão após implementação ou correção
+[For adopted capabilities, document runtime/browser preflight, comparable bundle measurements, SQL/migration checks, actual CI run evidence, security report range/coverage, UI interaction checks, and read-only Sentry evidence. Omit inapplicable checks with a reason. Installation and discovery alone do not prove these workflows ran.]
 
-Ao concluir um ciclo de implementação ou correção, sugira de 3 a 8 ciclos posteriores de code review, com quantidade proporcional ao risco, focos complementares e prompt de continuação preenchido. Essa faixa é convenção do projeto; revisões adicionais dependem de pedido do usuário.
+## Review after implementation or fixes
 
-Cada ciclo verifica o estado atual e o código conectado, registra achados com severidade, local e evidência e reavalia correções autorizadas com os checks afetados. Correções da mesma rodada não reiniciam a contagem. Termine com verificação integrada e riscos residuais, sem criar ciclos artificiais ou afirmar que uma quantidade de revisões prova ausência de bugs.
+After an implementation or fix cycle, suggest 3 to 8 subsequent code review cycles, with a count proportional to risk, complementary focuses, and a completed continuation prompt. This range is a project convention; additional reviews require a user request.
 
-## Dependências e entrega
+Each cycle checks the current state and connected code, records findings with severity, location, and evidence, and reassesses authorized fixes using affected checks. Fixes within the same round do not reset the count. Finish with integrated verification and residual risks, without creating artificial cycles or claiming that a review count proves the absence of bugs.
 
-Confira auditorias completas e de produção. Investigue advisories e registre risco conhecido e correção disponível. Lint/build aprovados não significam auditoria zerada.
+## Dependencies and delivery
 
-Checks são comandos explícitos. Hooks Git, bloqueios de push e exigências de branch não fazem parte do padrão. Atualize este documento junto dos scripts e regras que mudarem.
+Check full and production audits. Investigate advisories and record known risk and available fixes. Passing lint/build does not mean a clean audit.
+
+Checks are explicit commands. Git hooks, push blockers, and branch requirements are not defaults. Update this document together with scripts and rules that change.

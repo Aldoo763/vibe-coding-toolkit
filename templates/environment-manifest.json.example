@@ -60,11 +60,13 @@
       "status": "pending",
       "version_or_revision": null,
       "source": "https://cli.github.com/",
-      "scope": null,
+      "scope": "machine",
       "path": null,
       "install_method": null,
       "update_method": null,
-      "notes": []
+      "notes": [
+        "Selected GitHub CI workflow; authenticate through the client without recording secrets."
+      ]
     },
     {
       "id": "node-version-manager",
@@ -290,6 +292,111 @@
       "install_method": null,
       "update_method": null,
       "notes": []
+    },
+    {
+      "id": "agent-browser",
+      "name": "agent-browser",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://github.com/vercel-labs/agent-browser",
+      "scope": "machine",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "Selected Next.js browser workflow; verify browser dependencies and current skill compatibility."
+      ]
+    },
+    {
+      "id": "nextjs-skills",
+      "name": "Next.js runtime and bundle skills",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://github.com/vercel/next.js/tree/canary/skills",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "next-dev-loop and next-bundle-optimizer; check version, bundler, browser, and analyzer support per project."
+      ]
+    },
+    {
+      "id": "postgresql-skill",
+      "name": "PostgreSQL guidance",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://github.com/supabase/agent-skills",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "supabase-postgres-best-practices applies to PostgreSQL with any provider."
+      ]
+    },
+    {
+      "id": "github-ci-skill",
+      "name": "GitHub CI repair",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "gh-fix-ci for a compatible Codex workflow and authorized GitHub Actions PR."
+      ]
+    },
+    {
+      "id": "security-review-skill",
+      "name": "Differential security review",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://github.com/trailofbits/skills/tree/main/plugins/differential-review",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "differential-review for security-sensitive changes; record range and report destination."
+      ]
+    },
+    {
+      "id": "shadcn-skill",
+      "name": "shadcn/ui guidance",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://ui.shadcn.com/docs/skills",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "shadcn only where the UI system is adopted or explicitly selected."
+      ]
+    },
+    {
+      "id": "sentry-mcp",
+      "name": "Sentry MCP",
+      "required": false,
+      "status": "pending",
+      "version_or_revision": null,
+      "source": "https://mcp.sentry.dev/",
+      "scope": "project",
+      "path": null,
+      "install_method": null,
+      "update_method": null,
+      "notes": [
+        "Selected service only; record intended scope, client, discovery, OAuth, and read-only checks separately. No credentials."
+      ]
     }
   ],
   "configuration": {
@@ -299,7 +406,7 @@
     "node_project_auto_switch": null,
     "preferences": {
       "ponytail_intensity": "full",
-      "conversation_language": "pt-BR",
+      "conversation_language": "user-preference",
       "caveman_enabled": true,
       "normal_code_docs_commits": true,
       "context7_no_secrets": true

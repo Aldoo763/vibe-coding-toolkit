@@ -1,82 +1,87 @@
-# Instalar os quality gates de ESLint (teto de 350 linhas)
+# Install ESLint quality gates (350-line ceiling)
 
-## Atalho: só o link
+## Shortcut: just the link
 
-Se você não quer copiar prompt nenhum, cole esta linha no seu agente. Ela
-funciona em qualquer agente que consiga ler uma URL — Claude Code, Codex,
-Cursor:
+If you do not want to copy a prompt, paste this line into your agent. It
+works with any agent that can read a URL — Claude Code, Codex, Cursor:
 
 ```
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md
-e execute o prompt que está nesse arquivo neste projeto. Use MAX_LINES=350
-e o gerenciador de pacotes que você encontrar no repositório.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md
+and execute the prompt in that file in this project. Use MAX_LINES=350
+and the package manager you find in the repository.
 ```
 
-O resto deste documento é o mesmo prompt, aberto, pra quem prefere colar o
-texto inteiro ou adaptá-lo antes.
+The rest of this document contains the same prompt in full, for those who
+prefer to paste the entire text or adapt it first.
 
-## Quando usar
+## When to use
 
-Use este prompt quando você quer, num projeto JavaScript ou TypeScript
-qualquer, as três regras de lint que este toolkit defende — teto de
-tamanho por arquivo, proibição de `console` direto e proibição de a
-camada de apresentação importar o cliente do banco — já funcionando, sem
-reconstruir o raciocínio por trás delas.
+Use this prompt when you want the three lint rules this toolkit advocates
+running in any JavaScript or TypeScript project — a file-size ceiling, a
+ban on direct `console` calls, and a ban on the presentation layer importing
+the database client — without reconstructing the reasoning behind them.
 
-A diferença pro [`07-eslint-complete-setup.md`](07-eslint-complete-setup.md)
-é o que cada um entrega. O 07 descreve os padrões em prosa e deixa o
-agente escrever as regras do zero, adaptadas à sua stack: mais flexível,
-mas cada execução produz um código diferente. Este aqui aponta o agente
-pra três arquivos `.cjs` que já existem, já foram testados, e ele só
-copia e conecta. Use o 07 quando quiser que o agente raciocine sobre a
-sua stack inteira, incluindo regras de framework; use este quando quiser
-o teto de 350 linhas valendo hoje.
+The difference from [`07-eslint-complete-setup.md`](07-eslint-complete-setup.md)
+is what each delivers. Prompt 07 describes the patterns in prose and lets
+the agent write the rules from scratch, adapted to your stack: more flexible,
+but every run produces different code. This one points the agent to three
+existing, tested `.cjs` files to copy and connect. Use 07 when you want the
+agent to reason about your whole stack, including framework rules; use this
+one when you want the 350-line ceiling enforced today.
 
-Depois de instalar, o passo natural é
-[`09-file-size-refactor.md`](09-file-size-refactor.md) — é ele que manda o
-agente quebrar os arquivos que estouraram o teto.
+After installation, the natural next step is
+[`09-file-size-refactor.md`](09-file-size-refactor.md) — it tells the agent
+to split the files exceeding the ceiling.
 
-## Por que funciona
+## Why it works
 
-A parte difícil de uma regra de lint caseira não é a ideia, é o código.
-Uma regra escrita na hora, por descrição, erra em silêncio: ela isenta
-arquivo de teste demais ou de menos, não sabe que um `index.ts` que só
-reexporta não tem tamanho que signifique alguma coisa, e reporta em
-posição errada. Nenhum desses erros aparece como falha — aparece como uma
-regra que "não pega nada" ou que "pega tudo", e a pessoa desliga.
+The hard part of a custom lint rule is not the idea, but the code. A rule
+written on the fly from a description fails silently: it exempts too many
+or too few test files, does not know that the size of an `index.ts` that
+only re-exports has no meaningful limit, and reports at the wrong position.
+None of these errors looks like a failure — it looks like a rule that
+"catches nothing" or "catches everything", and someone turns it off.
 
-O teto distingue barrels pelo AST, sem isentar `index.*`, `types.*` ou `constants.*` por nome. Imports, reexportações ESM e declarações de tipos sem lógica própria podem ser isentos; código executável conta. Os sufixos `.test`, `.spec`, `-test` e `-spec` (incluindo `.e2e-spec`) e diretórios de testes compartilham a classificação das três regras. `includeTests` permite medir esses testes com orçamento próprio.
+The ceiling identifies barrels through the AST, without exempting `index.*`,
+`types.*` or `constants.*` by name. Imports, ESM re-exports and type
+declarations with no logic of their own may be exempt; executable code
+counts. The `.test`, `.spec`, `-test` and `-spec` suffixes (including
+`.e2e-spec`) and test directories share the three rules' classification.
+`includeTests` measures those tests with their own budget.
 
-Ao atualizar uma instalação existente, recopie os três `.cjs` da mesma revisão, rode o self-check e meça a linha de base novamente: módulos com lógica antes isentos pelo nome podem passar a aparecer no relatório. A atualização deste toolkit não altera cópias já instaladas em outros projetos.
+When updating an existing installation, recopy the three `.cjs` files from
+the same revision, run the self-check and measure the baseline again:
+modules with logic previously exempted by name may start appearing in the
+report. Updating this toolkit does not change copies already installed in
+other projects.
 
-Por isso o prompt não pede pro agente escrever as regras. Ele pede pra
-copiar. O que o agente decide é só o que realmente depende do seu
-projeto: onde fica a camada de apresentação, qual módulo exporta o
-cliente do banco, qual arquivo é o adaptador de log, quais diretórios
-ignorar.
+That is why the prompt does not ask the agent to write rules. It asks it to
+copy. The agent decides only what actually depends on your project: where
+the presentation layer lives, which module exports the database client,
+which file is the log adapter, and which directories to ignore.
 
-E o passo final é medir, não consertar. O prompt manda o agente rodar o
-linter, contar as violações por regra, e escolher a severidade a partir
-dessa contagem: regra com zero violação nasce em `error`; regra com
-violação nasce em `warn` com a contagem anotada como linha de base. Um
-gate que nasce vermelho em cima de código que já existia não é gate, é
-ruído que alguém vai desligar na primeira sexta-feira.
+The final step is measuring, not fixing. The prompt tells the agent to run
+the linter, count violations per rule, and choose severity from that count:
+a rule with zero violations starts as `error`; a rule with violations starts
+as `warn`, with the count recorded as a baseline. A gate that starts red
+because of preexisting code is not a gate, but noise someone will disable
+by the first Friday.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-Este prompt tem poucos placeholders de propósito — quase tudo que ele
-precisa saber, o passo 1 manda o agente descobrir lendo o projeto.
+This prompt deliberately has few placeholders — step 1 tells the agent to
+discover almost everything it needs by reading the project.
 
-- **`[MAX_LINES]`** — o teto de linhas por arquivo. O padrão do toolkit é
-  `350`. Abaixo de ~200 a regra vira briga constante em código legítimo;
-  acima de ~500 ela para de exercer pressão.
-- **`[PACKAGE_MANAGER]`** — `npm`, `pnpm`, `yarn` ou `bun`. Se não souber,
-  deixe `npm` e o agente corrige quando ler o projeto.
-- **`[SOURCE_URL]`** — de onde o agente pega os arquivos. Se você clonou
-  este repositório, use o caminho local `templates/eslint`. Se não, use a
-  URL raw do GitHub que já está preenchida no prompt.
+- **`[MAX_LINES]`** — the per-file line ceiling. The toolkit default is
+  `350`. Below ~200, the rule constantly fights legitimate code; above
+  ~500, it stops applying pressure.
+- **`[PACKAGE_MANAGER]`** — `npm`, `pnpm`, `yarn` or `bun`. If unsure, leave
+  `npm` and the agent will correct it after reading the project.
+- **`[SOURCE_URL]`** — where the agent gets the files. If you cloned this
+  repository, use the local path `templates/eslint`. Otherwise, use the
+  GitHub raw URL already filled in the prompt.
 
-## O prompt
+## The prompt
 
 ```
 Install this project's ESLint quality gates by COPYING pre-written rule
@@ -226,37 +231,36 @@ Do NOT enable a framework preset because it exists. Uncomment a block only
 for a framework this project actually uses.
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine um projeto Next.js em TypeScript, com alias `@/*`, banco em
-`src/db/index.ts` exportando `db`, componentes em `src/components/` e
-rotas em `src/app/`. Você preencheria:
+Imagine a Next.js TypeScript project with the `@/*` alias, the database
+client in `src/db/index.ts` exported as `db`, components in `src/components/`
+and routes in `src/app/`. Fill in:
 
 - `[MAX_LINES]` → `350`
 - `[PACKAGE_MANAGER]` → `npm`
-- `[SOURCE_URL]` → a URL raw padrão, já preenchida no prompt
+- `[SOURCE_URL]` → the default raw URL, already filled in the prompt
 
-O agente baixa os seis arquivos, lê o `tsconfig.json` e descobre o alias
-sozinho, aponta `modules` pra `@/db`, `layers` pra `/src/app/` e
-`/src/components/`, roda `node verify.mjs` (três `ok`), roda o lint e
-volta com algo como: `quality/no-direct-console` zero violações, fica em
-`error`; `quality/no-direct-data-access` duas violações, cai pra `warn`
-com a contagem anotada; `quality/max-lines` onze arquivos acima de 350,
-listados do maior pro menor. E para por aí — não conserta nada.
+The agent downloads the six files, reads `tsconfig.json` and discovers the
+alias itself, points `modules` to `@/db`, `layers` to `/src/app/` and
+`/src/components/`, runs `node verify.mjs` (three `ok`s), runs lint, and
+returns something like: `quality/no-direct-console` has zero violations,
+stays at `error`; `quality/no-direct-data-access` has two violations, drops
+to `warn` with the count recorded; `quality/max-lines` has eleven files over
+350 lines, listed largest first. It stops there — fixes nothing.
 
-Essa lista dos onze arquivos é exatamente a entrada do
+That eleven-file list is exactly the input for
 [`09-file-size-refactor.md`](09-file-size-refactor.md).
 
-## Dicas
+## Tips
 
-- Se o agente reescrever os `.cjs` em vez de copiar, mande refazer. O
-  ponto inteiro do prompt é que essas três regras sejam sempre o mesmo
-  código, já testado — uma regra escrita na hora erra em silêncio.
-- Rode `node verify.mjs` antes de acreditar em qualquer contagem de
-  violação. Se as regras chegaram quebradas, um lint que passa limpo não
-  quer dizer nada.
-- Instale primeiro só o `quality/max-lines` se o projeto for grande e
-  você quiser um gate de cada vez. As três são independentes.
-- O raciocínio completo por trás dessas escolhas — por que aviso vira
-  erro, por que fronteira de arquitetura mora no lint — está em
+- If the agent rewrites the `.cjs` files instead of copying them, have it
+  redo the work. The whole point is that these three rules always use the
+  same tested code — a rule written on the fly fails silently.
+- Run `node verify.mjs` before trusting any violation count. If the rules
+  arrived broken, clean lint output means nothing.
+- Install just `quality/max-lines` first if the project is large and you
+  want one gate at a time. All three are independent.
+- The full reasoning behind these choices — why warnings become errors,
+  why architecture boundaries belong in lint — is in
   [`../tools/06-eslint-biome-quality-gates.md`](../tools/06-eslint-biome-quality-gates.md).

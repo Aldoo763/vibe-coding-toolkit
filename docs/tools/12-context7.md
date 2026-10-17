@@ -1,151 +1,151 @@
 # Context7
 
-## O que é
+## What it is
 
-Context7 é um servidor MCP (sigla de *Model Context Protocol* — o protocolo que conecta um agente de IA a ferramentas e fontes de dado externas, expondo cada uma como uma operação com nome, parâmetros e validação) mantido pela [Upstash](https://upstash.com). A origem é [`upstash/context7`](https://github.com/upstash/context7). Use a documentação do cliente e da versão em execução para configurar a integração.
+Context7 is an MCP server (*Model Context Protocol*: the protocol connecting an AI agent to external tools and data sources, exposing each as an operation with a name, parameters, and validation) maintained by [Upstash](https://upstash.com). Its source is [`upstash/context7`](https://github.com/upstash/context7). Use the documentation for your client and running version to configure the integration.
 
-Ele resolve um problema bem concreto: um modelo de linguagem tem uma data de corte de conhecimento (o ponto até onde o treinamento dele enxergou informação), mas bibliotecas de código continuam mudando depois disso — uma assinatura de função muda, um hook novo aparece, uma opção de configuração passa a se chamar outra coisa ou muda de lugar. Sem ajuda externa, o agente preenche essa lacuna "alucinando": inventa, com total confiança, uma API que parece plausível mas não existe mais (ou nunca existiu daquele jeito). Context7 fecha essa lacuna injetando documentação real, atual e específica da versão certa, direto no contexto do agente, através de duas ferramentas:
+It solves a concrete problem: a language model has a knowledge cutoff (the latest information its training included), but code libraries keep changing afterward. Function signatures change, new hooks appear, and configuration options change names or locations. Without external help, the agent fills the gap by “hallucinating”: confidently inventing a plausible API that no longer exists, or never existed in that form. Context7 closes this gap by injecting real, current documentation for the right version directly into the agent's context through two tools:
 
-- **`resolve-library-id`** — recebe `libraryName` e `query`, o objetivo da consulta, e devolve candidatos a identificador da biblioteca.
-- **`query-docs`** — recebe `libraryId` e `query`, com uma pergunta específica, e devolve os trechos relevantes. Confira a versão instalada no projeto ao escolher o identificador.
+- **`resolve-library-id`** takes `libraryName` and `query`, the lookup objective, and returns candidate library identifiers.
+- **`query-docs`** takes `libraryId` and `query`, containing a specific question, and returns relevant excerpts. Check the project's installed version when choosing the identifier.
 
-(Documentação e tutoriais mais antigos às vezes chamam a segunda ferramenta de `get-library-docs` — veja "Dicas e pegadinhas" mais abaixo.)
+(Older documentation and tutorials sometimes call the second tool `get-library-docs`; see “Tips and pitfalls” below.)
 
-O projeto está listado no `marketplace.json` oficial do [`anthropics/claude-plugins-official`](https://github.com/anthropics/claude-plugins-official) — o mesmo marketplace que este toolkit usa pra instalar o [Superpowers](01-superpowers.md) — como o plugin `context7`, mantido pela Upstash e marcado como "community-managed" (mantido pela comunidade, não pela própria Anthropic, mas distribuído através do marketplace oficial dela). Essa combinação — chancela de distribuição oficial mais uma tração independente enorme — é rara, e é parte do motivo do Context7 aparecer em praticamente toda conversa sobre ferramentas MCP pra desenvolvimento.
+The project appears in the official `marketplace.json` of [`anthropics/claude-plugins-official`](https://github.com/anthropics/claude-plugins-official), the same marketplace this toolkit uses to install [Superpowers](01-superpowers.md), as the `context7` plugin, maintained by Upstash and marked “community-managed” (maintained by the community rather than Anthropic itself, but distributed through its official marketplace). This combination of official distribution and considerable independent adoption is rare, and helps explain why Context7 comes up in almost every discussion of MCP development tools.
 
-Importante: **Context7 não é exclusivo do Claude Code.** Funciona com qualquer cliente que fale MCP — Cursor, Windsurf, VS Code, Claude Desktop, e outros — cada um com seu próprio guia de conexão.
+Important: **Context7 is not exclusive to Claude Code.** It works with any MCP-capable client, including Cursor, Windsurf, VS Code, Claude Desktop, and others, each with its own connection guide.
 
-## Por que usar
+## Why use it
 
-Peça pra qualquer agente de IA "como eu configuro X na versão mais nova de uma biblioteca Y" e existe uma chance real de a resposta vir de um período em que a API era diferente. O problema não é o agente "não saber" — é ele saber uma versão que já não é a atual, e responder com a mesma confiança de sempre, sem sinalizar a incerteza. O resultado comum: código que não compila, uma opção de configuração que o linter ou o build rejeita, uma chamada de API que devolve erro de método inexistente.
+Ask any AI agent “how do I configure X in the latest version of library Y” and there is a real chance its answer comes from a time when the API was different. The problem is not that the agent knows nothing: it knows an older version and answers with the same confidence, without flagging uncertainty. Common results include code that will not compile, a configuration option rejected by the linter or build, or an API call returning a method-not-found error.
 
-Sem o Context7, corrigir isso vira um ciclo de tentativa e erro: o agente escreve algo plausível, você roda, quebra, cola o erro de volta, o agente tenta de novo — cada rodada gastando tempo (seu) e tokens (dele) até, por sorte ou pesquisa manual, chegar na sintaxe certa. Com o Context7, o agente busca a documentação real da versão instalada *antes* de escrever a resposta — o ciclo de tentativa e erro não desaparece por completo (documentação também pode estar incompleta ou ambígua num caso de borda), mas encolhe bastante, porque a base da resposta já nasce fato, não memória de treinamento desatualizada.
+Without Context7, fixing this becomes trial and error: the agent writes something plausible, you run it, it breaks, you paste the error back, and the agent tries again. Each round consumes your time and its tokens until luck or manual research finds the right syntax. With Context7, the agent fetches the installed version's actual documentation *before* answering. Trial and error does not disappear entirely (documentation can also be incomplete or ambiguous around an edge case), but it shrinks considerably because the answer starts from facts rather than outdated training memories.
 
-## Como instalar
+## How to install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o Context7 pra mim: rode `npx ctx7 setup --claude` no terminal.
+> Install Context7 for me: run `npx ctx7 setup --claude` in the terminal.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda o comando pra você. Uma ressalva importante, diferente da maioria das outras ferramentas deste toolkit: esse comando abre um fluxo de login OAuth (uma aba do navegador abre sozinha, pedindo pra você confirmar a autenticação) — a instalação não é 100% "peça e esqueça", o agente dispara o comando, mas o clique de confirmação no navegador é seu. Prefere fazer você mesmo? É o mesmo comando, direto no seu terminal.
+> Claude Code has terminal (Bash) access and runs the command for you. Unlike most tools in this toolkit, this command opens an OAuth login flow: a browser tab opens automatically and asks you to confirm authentication. Installation is not entirely “ask and forget”: the agent starts the command, but you must confirm in the browser. Prefer doing it yourself? Run the same command directly in your terminal.
 
-`npx ctx7 setup --claude` (fonte: [documentação oficial de clientes do Context7](https://context7.com/docs/clients/claude-code)) autentica via OAuth, gera uma API key automaticamente, e deixa você escolher entre modo CLI ou MCP pro Claude Code. Alternativa, pra quem quer os recursos extras — skills que disparam sozinhas ao mencionar uma biblioteca, agentes dedicados, e o comando manual `/context7:docs` — é instalar o plugin completo (fonte: [README oficial do projeto](https://github.com/upstash/context7)):
+`npx ctx7 setup --claude` (source: [official Context7 client documentation](https://context7.com/docs/clients/claude-code)) authenticates through OAuth, generates an API key automatically, and lets you choose CLI or MCP mode for Claude Code. For additional features, including skills triggered by mentioning a library, dedicated agents, and the manual `/context7:docs` command, install the full plugin instead (source: [official project README](https://github.com/upstash/context7)):
 
 ```bash
 /plugin marketplace add upstash/context7
 /plugin install context7@context7-marketplace
 ```
 
-Autenticação e limites dependem do método e do plano vigentes. Prefira o fluxo oficial de OAuth quando fornecido pelo plugin/setup. Se optar por uma chave, configure o cliente pelo mecanismo documentado e mantenha o segredo fora do projeto e do chat. Exportar uma variável chamada `CONTEXT7_API_KEY` por si só não garante que a conexão MCP a utilize.
+Authentication and limits depend on the current method and plan. Prefer the official OAuth flow when provided by the plugin/setup. If you choose a key, configure the client through the documented mechanism and keep the secret out of the project and chat. Exporting a variable named `CONTEXT7_API_KEY` alone does not guarantee the MCP connection uses it.
 
-Confirme que a conexão funcionou pedindo pro agente listar as ferramentas MCP disponíveis, ou simplesmente fazendo uma pergunta que dependa de doc de biblioteca (próxima seção) e reparando se ele consulta o Context7 antes de responder.
+Confirm the connection worked by asking the agent to list available MCP tools, or simply asking a question that requires library documentation (next section) and observing whether it consults Context7 before answering.
 
-### Codex: plugin ou conexão direta
+### Codex: plugin or direct connection
 
-O [guia oficial de clientes](https://context7.com/docs/resources/all-clients) inclui plugin para Codex. No terminal:
+The [official client guide](https://context7.com/docs/resources/all-clients) includes a Codex plugin. In the terminal:
 
 ```bash
 codex plugin marketplace add upstash/context7
 codex plugin add context7@context7-marketplace
 ```
 
-Uma alternativa é registrar diretamente o servidor remoto:
+Alternatively, register the remote server directly:
 
 ```bash
 codex mcp add context7 --url https://mcp.context7.com/mcp
 ```
 
-Escolha um dos métodos quando ambos fornecerem o mesmo servidor. No Claude Code, a alternativa remota usa `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp`. Complete a autenticação exigida pelo serviço e abra uma nova sessão. Uma conexão listada ainda precisa responder a uma consulta real para ser validada.
+Choose one method when both provide the same server. In Claude Code, the remote alternative uses `claude mcp add --scope user --transport http context7 https://mcp.context7.com/mcp`. Complete the authentication required by the service and open a new session. A listed connection must still respond to a real query to be validated.
 
-Veja também o [guia do Codex](15-codex-workflow.md). Para clientes sem suporte ao método escolhido, use a alternativa documentada em vez de copiar a configuração de outro agente.
+See also the [Codex guide](15-codex-workflow.md). For clients that do not support the chosen method, use the documented alternative instead of copying another agent's configuration.
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-### 1. Instale
+### 1. Install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o Context7 pra mim: rode `npx ctx7 setup --claude` no terminal.
+> Install Context7 for me: run `npx ctx7 setup --claude` in the terminal.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda o comando pra você, mas o clique de confirmação no fluxo de login OAuth (numa aba do navegador) é seu. Prefere fazer você mesmo? É o mesmo comando, direto no seu terminal.
+> Claude Code has terminal (Bash) access and runs the command for you, but you must confirm the OAuth login in the browser tab. Prefer doing it yourself? Run the same command directly in your terminal.
 
-### 2. Faça uma pergunta que dependa de doc atual
+### 2. Ask a question requiring current documentation
 
-Peça algo que só a documentação da versão certa responde direito — não um conceito geral, e sim um detalhe de API que muda de versão pra versão:
+Ask something only the right version's documentation can answer properly: an API detail that changes between versions, rather than a general concept:
 
 ```
-Como eu uso o hook `use()` do React pra ler uma Promise dentro de
-um componente, na versão mais recente?
+How do I use React's `use()` hook to read a Promise inside
+ a component in the latest version?
 ```
 
-### 3. O agente resolve a biblioteca certa primeiro
+### 3. The agent resolves the right library first
 
-Antes de responder, o agente chama `resolve-library-id` pra encontrar o identificador exato:
+Before answering, the agent calls `resolve-library-id` to find the exact identifier:
 
 ```
 resolve-library-id({
   libraryName: "React",
-  query: "Como ler uma Promise com use em um componente React?"
+  query: "How do I read a Promise with use in a React component?"
 })
 ```
 
-Exemplo ilustrativo de candidatos; use os identificadores realmente retornados:
+Illustrative candidates; use the identifiers actually returned:
 
 ```
-/reactjs/react.dev  — React — a documentação oficial
-/facebook/react      — React — código-fonte no GitHub
+/reactjs/react.dev  — React — official documentation
+/facebook/react      — React — source code on GitHub
 ...
 ```
 
-### 4. O agente busca a doc real daquela versão
+### 4. The agent fetches that version's actual documentation
 
-Com o identificador em mãos, ele chama `query-docs`, geralmente com um tópico pra focar a busca:
+With the identifier, it calls `query-docs`, usually with a topic to focus the lookup:
 
 ```
 query-docs({
   libraryId: "/reactjs/react.dev",
-  query: "Como ler uma Promise com use e tratar a suspensão do componente?"
+  query: "How do I read a Promise with use and handle component suspension?"
 })
 ```
 
-Formato típico de saída (trecho):
+Typical output (excerpt):
 
 ```
 ## use
 
-`use(promise)` ou `use(context)` — lê o valor de um recurso, como uma
-Promise ou um Context, diretamente durante a renderização.
+`use(promise)` or `use(context)` reads the value of a resource, such as a
+Promise or Context, directly during rendering.
 
-Diferente de outros hooks, `use` pode ser chamado dentro de
-condicionais e loops...
+Unlike other hooks, `use` can be called inside
+conditionals and loops...
 
-Exemplo:
+Example:
   function Comments({ commentsPromise }) {
     const comments = use(commentsPromise);
     ...
   }
 ```
 
-### 5. A resposta final já vem apoiada na doc real
+### 5. The final answer is backed by actual documentation
 
-O agente responde citando a assinatura e o comportamento exatos que acabou de buscar — não uma lembrança de treinamento, uma consulta feita na hora, contra a documentação de verdade.
+The agent answers with the exact signature and behavior it just fetched: a live lookup against real documentation, rather than a training memory.
 
-Faça uma consulta por conceito. Se a pergunta envolver assuntos independentes, como rotas e autenticação, consulte cada um separadamente. Nunca inclua segredos, dados pessoais ou código privado na busca; descreva o comportamento público da biblioteca.
+Make one query per concept. If the question covers independent subjects, such as routing and authentication, query each separately. Never include secrets, personal data, or private code in the search; describe the library's public behavior.
 
-## Exemplos concretos
+## Concrete examples
 
-### Exemplo 1 — uma biblioteca que mudou recentemente
+### Example 1 — a library that changed recently
 
-**Pergunta:** "Como eu configuro cores customizadas no Tailwind CSS, na versão mais nova?"
+**Question:** “How do I configure custom colors in the latest Tailwind CSS version?”
 
-O Tailwind CSS passou por uma mudança grande entre a versão 3 e a 4: configuração deixou de ser um arquivo JavaScript (`tailwind.config.js`, com um objeto `theme.extend.colors`) e passou a ser CSS-first, direto no arquivo de estilos, com a diretiva `@theme`. Um agente sem Context7 — ou com Context7 disponível, mas não consultado — tende a responder com o padrão antigo, porque é o que apareceu com muito mais frequência nos dados de treinamento até a data de corte:
+Tailwind CSS changed substantially between versions 3 and 4: configuration moved from a JavaScript file (`tailwind.config.js`, with a `theme.extend.colors` object) to a CSS-first approach, directly in the stylesheet through the `@theme` directive. An agent without Context7, or with Context7 available but unused, tends to answer with the older pattern because it appeared much more frequently in training data before the cutoff:
 
 ```js
-// resposta plausível, mas desatualizada pro Tailwind v4
+// plausible answer, but outdated for Tailwind v4
 module.exports = {
   theme: {
     extend: {
@@ -155,10 +155,10 @@ module.exports = {
 };
 ```
 
-Com o Context7 consultado, a resposta vem alinhada com a versão instalada no projeto:
+After consulting Context7, the answer matches the project's installed version:
 
 ```css
-/* Tailwind CSS v4 — configuração direto no CSS */
+/* Tailwind CSS v4 — configuration directly in CSS */
 @import "tailwindcss";
 
 @theme {
@@ -166,55 +166,55 @@ Com o Context7 consultado, a resposta vem alinhada com a versão instalada no pr
 }
 ```
 
-### Exemplo 2 — um caso em que o agente erraria sem o Context7
+### Example 2 — a case the agent would get wrong without Context7
 
-**Pergunta:** "Como eu leio um cookie numa Server Action do Next.js?"
+**Question:** “How do I read a cookie in a Next.js Server Action?”
 
-A partir do Next.js 15, as funções `cookies()` e `headers()` passaram a ser assíncronas — precisam de `await` — depois de terem sido síncronas por várias versões anteriores. Um agente respondendo de memória, sem checar a versão instalada, tem uma chance real de devolver o padrão síncrono antigo:
+Starting in Next.js 15, `cookies()` and `headers()` became asynchronous, requiring `await`, after being synchronous for several previous versions. An agent answering from memory without checking the installed version has a real chance of returning the old synchronous pattern:
 
 ```ts
-// erra na v15+: cookies() agora retorna uma Promise
+// wrong in v15+: cookies() now returns a Promise
 import { cookies } from "next/headers";
 
-export async function minhaAction() {
-  const cookieStore = cookies(); // falta o await
-  return cookieStore.get("sessao");
+export async function myAction() {
+  const cookieStore = cookies(); // missing await
+  return cookieStore.get("session");
 }
 ```
 
-Isso não dá erro de digitação — dá erro em tempo de execução (ou de build, dependendo do uso), porque `cookieStore` vira uma `Promise` não resolvida, não o objeto esperado. Com a doc real da versão instalada consultada via Context7, a resposta já vem com o `await` no lugar certo:
+This is not a typo: it causes a runtime error (or build error, depending on usage), because `cookieStore` becomes an unresolved `Promise` rather than the expected object. After checking the installed version's actual documentation through Context7, the answer includes `await` in the right place:
 
 ```ts
 import { cookies } from "next/headers";
 
-export async function minhaAction() {
+export async function myAction() {
   const cookieStore = await cookies();
-  return cookieStore.get("sessao");
+  return cookieStore.get("session");
 }
 ```
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-**A segunda ferramenta já teve outro nome.** Documentação e tutoriais mais antigos se referem a ela como `get-library-docs`; a versão atual, hospedada pela Upstash, expõe `query-docs`. Se um guia que você está seguindo menciona um nome e a lista de ferramentas do seu agente mostra outro, não é erro de instalação — é só uma diferença de versão/momento da documentação que você está lendo.
+**The second tool used to have another name.** Older documentation and tutorials call it `get-library-docs`; the current Upstash-hosted version exposes `query-docs`. If a guide mentions one name while your agent's tool list shows another, that is a difference in the documentation's version or date, rather than an installation error.
 
-**Sem chave de API, o limite de requisições é compartilhado com todo mundo no modo anônimo.** Numa sessão de uso intenso, ou num time inteiro atrás do mesmo IP, isso pode significar respostas mais lentas ou negadas por limite de taxa. A chave é gratuita — vale gerar uma antes de bater nesse limite, não depois.
+**Without an API key, the request limit is shared with everyone using anonymous mode.** During a busy session, or for a whole team behind one IP, this can mean slower responses or rate-limit rejections. The key is free: generate one before hitting that limit rather than afterward.
 
-**O Context7 só sabe o que já indexou.** Se a biblioteca não resolver, tente um nome ou consulta mais preciso. Persistindo a ausência, consulte a documentação oficial do projeto e identifique essa fonte alternativa; não trate uma resposta de memória como documentação verificada.
+**Context7 only knows what it has indexed.** If a library does not resolve, try a more precise name or query. If it is still missing, consult the project's official documentation and identify that alternative source; do not treat a memory-based answer as verified documentation.
 
-**O motor por trás da busca é fechado.** O cliente MCP (o que você instala e conecta) é MIT — código aberto. O backend que faz o rastreamento, o parsing e a busca de verdade é da Upstash, hospedado, e não é código aberto. Isso não muda como você usa a ferramenta no dia a dia, mas explica por que não dá pra simplesmente rodar "sua própria instância" do Context7 inteiro.
+**The search engine behind it is closed.** The MCP client (what you install and connect) is MIT-licensed open source. Upstash's hosted backend performs the actual crawling, parsing, and searching and is not open source. This does not change everyday usage, but explains why you cannot simply run your own instance of the entire Context7 service.
 
-**Context7 não substitui entender a biblioteca.** Ele é ótimo pra sintaxe de API exata — a assinatura certa, o parâmetro certo, o exemplo de uso atualizado. Pra decisão de design ("por que essa biblioteca escolheu esse padrão", "quando usar X em vez de Y") a documentação em prosa completa, lida por uma pessoa, ainda vale mais.
+**Context7 does not replace understanding the library.** It is excellent for exact API syntax: the right signature, parameter, and current usage example. For design decisions (“why did this library choose this pattern,” “when should I use X instead of Y”), the complete prose documentation, read by a person, remains more valuable.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Preciso pagar?**
-Não, pra uso normal. O cliente MCP é gratuito e de código aberto (MIT); o backend hospedado pela Upstash tem um nível gratuito — anônimo, com limite de taxa compartilhado, ou com uma API key gratuita, com limite individual mais alto. Times com uso muito pesado devem conferir os planos atuais direto no site da Upstash.
+**Do I need to pay?**
+Not for normal use. The MCP client is free and open source (MIT); Upstash's hosted backend has a free tier, either anonymous with a shared rate limit or with a free API key and a higher individual limit. Teams with heavy usage should check current plans directly on Upstash's website.
 
-**Funciona com qualquer linguagem ou framework?**
-Na prática, com qualquer biblioteca que já tenha sido indexada pelo Context7 — o que cobre um volume enorme do ecossistema JavaScript/TypeScript, Python, e vários outros. Uma biblioteca nova demais, interna da empresa, ou nunca rastreada não vai resolver.
+**Does it work with any language or framework?**
+In practice, with any library Context7 has indexed, covering a large portion of JavaScript/TypeScript, Python, and other ecosystems. A library that is too new, internal to a company, or has never been crawled will not resolve.
 
-**Isso substitui ler a documentação oficial?**
-Não. É uma camada de busca rápida, pensada pra injetar o trecho certo no contexto do agente na hora que ele precisa — não um substituto pra entender a biblioteca por conta própria quando a dúvida é de design, não de sintaxe.
+**Does this replace reading official documentation?**
+No. It is a quick lookup layer designed to inject the right excerpt into the agent's context when needed, rather than replace your own understanding of a library when the question concerns design instead of syntax.
 
-**Preciso reiniciar a sessão do agente depois de instalar?**
-Sim, geralmente — como qualquer servidor MCP novo, o agente só enxerga as ferramentas dele a partir de uma sessão nova, depois da conexão configurada.
+**Do I need to restart the agent session after installation?**
+Usually yes: as with any new MCP server, the agent only sees its tools in a new session after the connection has been configured.

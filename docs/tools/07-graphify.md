@@ -1,96 +1,96 @@
-<a id="o-que-é"></a>
-<a id="por-que-usar"></a>
+<a id="what-it-is"></a>
+<a id="why-use-it"></a>
 
 # Graphify
 
-[Graphify](https://github.com/Graphify-Labs/graphify) transforma código e documentos em um grafo consultável. A CLI é `graphify`; o pacote Python é **`graphifyy`**, com dois “y”. Ele combina extração estrutural, relações semânticas e exportações para investigação do projeto.
+[Graphify](https://github.com/Graphify-Labs/graphify) turns code and documents into a queryable graph. The CLI is `graphify`; the Python package is **`graphifyy`**, with two “y” characters. It combines structural extraction, semantic relationships, and exports for project investigation.
 
-<a id="como-instalar"></a>
-<a id="1-instale"></a>
+<a id="how-to-install"></a>
+<a id="1-install"></a>
 
-## Global e projeto
+## Global and project scope
 
-A CLI e a skill do agente pertencem ao ambiente/cliente. O projeto mantém `.graphifyignore` e a saída `graphify-out/`. No [bootstrap Next](../04-project-bootstrap.md), instalações globais funcionais são reutilizadas; não copie skills de um cache pessoal nem instale hooks Git.
+The CLI and agent skill belong to the environment/client. The project maintains `.graphifyignore` and the `graphify-out/` output. In the [Next bootstrap](../04-project-bootstrap.md), working global installations are reused; do not copy skills from a personal cache or install Git hooks.
 
-Instalação isolada do pacote, quando solicitada:
+Isolated package installation, when requested:
 
 ```bash
 uv tool install graphifyy
-# Alternativa: pipx install graphifyy
+# Alternative: pipx install graphifyy
 ```
 
-Escolha um método. Confira a CLI antes de integrar:
+Choose one method. Check the CLI before integrating:
 
 ```bash
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify --version
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify --help
 ```
 
-A origem documenta `graphify install` para integrar clientes. Confira flags e efeitos da versão instalada antes de executar: instalações podem modificar instruções e hooks. No starter, prefira a integração global já descoberta e instruções compartilhadas concisas. Não use uma instalação automática para substituir adaptações locais ou acrescentar travas.
+The upstream project documents `graphify install` for client integration. Check your installed version's flags and effects before running it: installations may modify instructions and hooks. In the starter, prefer the already discovered global integration and concise shared instructions. Do not use an automatic installation to replace local adaptations or add restrictions.
 
-<a id="tutorial-passo-a-passo"></a>
-<a id="2-rode-o-pipeline-completo"></a>
-<a id="3-veja-o-que-foi-gerado"></a>
+<a id="step-by-step-tutorial"></a>
+<a id="2-run-the-full-pipeline"></a>
+<a id="3-inspect-the-output"></a>
 
-## Código sem chamada de modelo
+## Code without a model call
 
-Para o grafo inicial de uma aplicação:
+For an application's initial graph:
 
 ```bash
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify extract . --code-only --no-cluster
 ```
 
-Esse modo restringe a extração a código e evita a etapa de agrupamento. Confira os arquivos esperados em `graphify-out/graph.json`; ele não cobre automaticamente requisitos de `PRODUCT.md` ou relações semânticas dos documentos.
+This mode restricts extraction to code and avoids the clustering stage. Check the expected files in `graphify-out/graph.json`; it does not automatically cover requirements from `PRODUCT.md` or semantic relationships in documents.
 
-Copie e adapte [as exclusões](../../templates/project/.graphifyignore.example). Exclua credenciais, `.env*`, dependências, skills vendorizadas, caches e saída do próprio grafo. Ignore `graphify-out/` no Git por padrão; exportações deliberadamente compartilhadas precisam ser revisadas quanto ao conteúdo.
+Copy and adapt [the exclusions](../../templates/project/.graphifyignore.example). Exclude credentials, `.env*`, dependencies, vendored skills, caches, and the graph's own output. Ignore `graphify-out/` in Git by default; deliberately shared exports require content review.
 
-`GRAPHIFY_NO_AUTO_REFRESH=1` impede refresh automático da integração. Use-o quando houver adaptações locais que precisem ser preservadas. Confira suporte na versão instalada.
+`GRAPHIFY_NO_AUTO_REFRESH=1` prevents the integration's automatic refresh. Use it when local adaptations need to be preserved. Check support in the installed version.
 
-<a id="codex-modelo-e-autenticação"></a>
+<a id="codex-model-and-authentication"></a>
 
-## Documentos e extração semântica
+## Documents and semantic extraction
 
-Use a skill descoberta pelo cliente, como `$graphify` no Codex ou a invocação equivalente documentada no outro agente. Preserve **cliente nativo, modelo principal e autenticação autorizados**. Sem política de seleção autorizada, passe o modelo da sessão na delegação suportada; com essa política, siga a [seleção por tarefa e risco](02-subagent-orchestration.md#parte-b--disciplina-de-escolha-de-modelo), respeitando restrições explícitas a modelos.
+Use the skill discovered by the client, such as `$graphify` in Codex or the equivalent invocation documented for another agent. Preserve the **authorized native client, main model, and authentication**. Without an authorized selection policy, pass the session model in supported delegation; with such a policy, follow [selection by task and risk](02-subagent-orchestration.md#part-b--model-selection-discipline), respecting explicit model restrictions.
 
-No Codex, preserve login ChatGPT quando utilizado; no Claude, preserve sua modalidade vigente. Não ative backend de API, proxy ou outro modelo por efeito do setup. A CLI `graphify extract` sozinha **não herda automaticamente a autenticação da conversa**. Uma opção `--backend openai` não equivale ao login ChatGPT.
+In Codex, preserve ChatGPT login when used; in Claude, preserve the current authentication mode. Do not activate an API backend, proxy, or another model as a side effect of setup. The `graphify extract` CLI alone **does not automatically inherit conversation authentication**. A `--backend openai` option is not equivalent to ChatGPT login.
 
-Se não houver integração semântica nativa compatível, registre a limitação e continue com extração determinística. Não invente suporte para uma LLM apenas porque ela consegue executar a CLI.
+If no compatible native semantic integration exists, record the limitation and continue with deterministic extraction. Do not invent support for an LLM merely because it can run the CLI.
 
-<a id="comandos-principais"></a>
-<a id="4-faça-uma-pergunta-ao-grafo"></a>
-<a id="5-explore-um-conceito-específico"></a>
-<a id="exemplos"></a>
-<a id="exemplo-1--graphify-explain-olhando-um-nó-específico"></a>
-<a id="exemplo-2--graphify-path-a-relação-entre-dois-conceitos"></a>
-<a id="exemplo-3--atualização-incremental-depois-de-editar-código"></a>
-<a id="automação-com-hooks-de-git"></a>
-<a id="hook-de-orientação"></a>
+<a id="main-commands"></a>
+<a id="4-ask-the-graph-a-question"></a>
+<a id="5-explore-a-specific-concept"></a>
+<a id="examples"></a>
+<a id="example-1--graphify-explain-inspecting-a-specific-node"></a>
+<a id="example-2--graphify-path-the-relationship-between-two-concepts"></a>
+<a id="example-3--incremental-update-after-editing-code"></a>
+<a id="automation-with-git-hooks"></a>
+<a id="orientation-hook"></a>
 
-## Consultar e manter
+## Query and maintain
 
-Com um grafo existente e pertinente:
+With an existing, relevant graph:
 
 ```bash
-GRAPHIFY_NO_AUTO_REFRESH=1 graphify query 'O que depende deste módulo?'
+GRAPHIFY_NO_AUTO_REFRESH=1 graphify query 'What depends on this module?'
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify path 'AuthModule' 'Database'
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify explain 'AuthModule'
 ```
 
-Troque nomes pelos nós reais. Relações extraídas, inferidas e ambíguas não têm a mesma força de evidência. Confirme achados importantes no código; registre se o grafo estiver desatualizado ou não incluir a parte necessária.
+Replace the names with real nodes. Extracted, inferred, and ambiguous relationships do not carry the same evidentiary weight. Confirm important findings in the code; record whether the graph is outdated or does not include the necessary part.
 
-Após alterar código, confira os modos determinísticos de extração/atualização da versão instalada. Para um grafo só de código, repetir o comando com `--code-only --no-cluster` mantém o escopo explícito. Uma atualização sem flags não garante que documentos novos deixarão de disparar extração semântica.
+After changing code, check the installed version's deterministic extraction/update modes. For a code-only graph, repeating the command with `--code-only --no-cluster` keeps the scope explicit. An update without flags does not guarantee that new documents will avoid triggering semantic extraction.
 
-A CLI oferece exportações, incluindo HTML, wiki, Obsidian, SVG, GraphML e formatos de bancos de grafos. Confira `graphify --help`; exportar um arquivo e enviar dados para um serviço são ações distintas. Não envie o grafo a um banco externo ou plataforma durante o bootstrap.
+The CLI offers exports including HTML, wiki, Obsidian, SVG, GraphML, and graph database formats. Check `graphify --help`; exporting a file and sending data to a service are separate actions. Do not send the graph to an external database or platform during bootstrap.
 
-<a id="dicas-e-pegadinhas"></a>
-<a id="perguntas-frequentes"></a>
+<a id="tips-and-pitfalls"></a>
+<a id="frequently-asked-questions"></a>
 
-## Validar
+## Validate
 
-- Confira versão e executável efetivo.
-- Confira descoberta da skill em cada cliente usado; diretório presente não comprova carregamento.
-- Gere um corpus pequeno sem LLM externo e confira nós/arquivos na saída.
-- Teste uma consulta ao grafo gerado.
-- Registre escopo, evidências, limitações e atualização necessária em `docs/setup.md`.
+- Check the version and actual executable.
+- Check skill discovery in every client used; a directory's presence does not prove loading.
+- Generate a small corpus without an external LLM and check nodes/files in the output.
+- Test a query against the generated graph.
+- Record scope, evidence, limitations, and required updates in `docs/setup.md`.
 
-Referências: [projeto oficial](https://github.com/Graphify-Labs/graphify), [guia Codex](15-codex-workflow.md), [setup da máquina](../03-environment-setup.md) e [bootstrap](../04-project-bootstrap.md). A CLI evolui; confira flags da versão em execução em vez de copiar comandos de outra instalação.
+References: [official project](https://github.com/Graphify-Labs/graphify), [Codex guide](15-codex-workflow.md), [machine setup](../03-environment-setup.md), and [bootstrap](../04-project-bootstrap.md). The CLI evolves; check flags in the running version instead of copying commands from another installation.

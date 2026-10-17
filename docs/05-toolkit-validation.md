@@ -1,38 +1,55 @@
-# Validar o toolkit
+# Validate the toolkit
 
-O toolkit não mantém aplicação nem dependências Next na raiz. Valide documentos e templates em ambiente separado:
+The toolkit keeps no application or Next.js dependencies at the root. Validate documents and templates in a separate environment:
 
 ```bash
+node --test scripts/validate-docs.test.mjs
 node scripts/validate-docs.mjs
 node scripts/validate-next.mjs
 ```
 
-Use Node.js 24, npm, Git e rede. O [check de documentos](../scripts/validate-docs.mjs) verifica links locais, âncoras, destinos do manifesto e JSON. O [check do app](../scripts/validate-next.mjs) cria e remove um projeto temporário; dependências e recursos de teste ficam nele. Os checks ESLint rodam em processo filho, liberando extensões nativas antes da limpeza no Windows; o resultado final só é aprovado após remover o temporário. Nenhum dos dois chama modelos, instala hooks Git ou altera configuração global.
+Use Node.js 24, npm, Git, and network access. The [document check](../scripts/validate-docs.mjs) verifies local links, image `srcset` candidates, anchors, manifest destinations, JSON, and this repository’s GitHub/raw URLs, including shortcuts inside prompts. The [validator regression tests](../scripts/validate-docs.test.mjs) exercise missing images, broken fragments, raw shortcuts, and generated-document anchors in temporary Git repositories. The [application check](../scripts/validate-next.mjs) creates and removes a temporary project; dependencies and test resources stay there. ESLint checks run in a child process, releasing native addons before cleanup on Windows; the final result passes only after the temporary directory is removed. Neither check calls models, installs Git hooks, or changes global configuration.
 
-O [workflow](../.github/workflows/validate.yml) executa os dois em Ubuntu e Windows, com ações oficiais fixadas por commit e permissão somente de leitura. Preservar nomes públicos é parte do contrato: atualize callers, índices e templates no mesmo trabalho.
+The [workflow](../.github/workflows/validate.yml) runs both on Ubuntu and Windows, with official actions pinned by commit and read-only permissions. Public names are part of the contract: update callers, indexes, and templates in the same change.
 
-## O que a validação prova
+## What validation proves
 
-| Check | Evidência |
+| Check | Evidence |
 |---|---|
-| Documentação | Nove fontes/destinos do manifesto e links relativos ao destino; a LLM ainda deve preencher conteúdo específico |
-| Skills | Nove fontes locais, nomes do frontmatter, lockfile e conteúdo Claude/Codex; links relativos ou cópias no Windows |
-| ESLint | Perfis completo, leve e avançado carregam; negativos de tamanho inclusive em `index/types/constants`, Next, TypeScript, console, dados e Drizzle; barrels/tipos puros e sufixos de teste têm casos positivos |
-| Servidor | Oito testes Vitest de ambiente, redação de logs e ciclo de vida de pool; compilação rejeita ambiente servidor em Client Component |
-| SQL | Drizzle Kit gera sem URL; SQL de uma tabela de teste migra/reaplica em PGlite, com CRUD parametrizado e rollback |
-| Aplicação | Lint, tipos, self-checks, testes e build; servidor de produção responde HTTP 200 com conteúdo esperado |
-| Dependências | Auditoria de produção obrigatória; auditoria completa mostra contagem e advisories de desenvolvimento |
-| Limpeza | Schema de teste restaurado, banco embarcado fechado, servidor próprio encerrado e diretório temporário removido |
+| Documentation | Nine manifest sources/destinations and destination-relative links; the LLM must still fill in specific content |
+| Skills | Explicit fixture selections from the Vercel, Next.js, Supabase, OpenAI, Trail of Bits, and shadcn sources; frontmatter names, lockfile, and Claude/Codex content; relative links or copies on Windows |
+| ESLint | Full, lightweight, and advanced profiles load; negative cases for size including `index/types/constants`, Next.js, TypeScript, console, data, and Drizzle; positive cases for pure barrels/types and test suffixes |
+| Server | Eight Vitest tests for environment, log redaction, and pool lifecycle; compilation rejects server environment imports in a Client Component |
+| SQL | Drizzle Kit generates without a URL; SQL for one test table migrates/reapplies in PGlite, with parameterized CRUD and rollback |
+| Application | Lint, types, self-checks, tests, and build; production server responds HTTP 200 with expected content |
+| Dependencies | Required production audit; full audit shows development counts and advisories |
+| Cleanup | Test schema restored, embedded database closed, own server stopped, and temporary directory removed |
 
-PGlite executa PostgreSQL embarcado; não comprova conexão TCP, SSL ou configuração de um provedor. O ciclo de vida do `pg.Pool` usa mocks, enquanto o SQL roda de fato no engine. O app de teste não recebe tabelas de negócio fictícias como parte do template.
+PGlite runs embedded PostgreSQL; it does not prove TCP connectivity, SSL, or provider configuration. The `pg.Pool` lifecycle uses mocks, while SQL actually runs in the engine. The test app does not receive fictitious business tables as part of the template.
 
-A presença de skills não prova sua execução pelo host. Publicação, serviços com credenciais, cobertura E2E e tarefas completas por todas as LLMs também não são garantias destes checks.
+Skill presence does not prove host execution. Publishing, credentialed services, E2E coverage, and complete tasks performed by every LLM are also outside these checks' guarantees.
 
-## Execução em 14 de outubro de 2026
+The fixture deliberately installs optional instruction packages to verify distribution; it does not initialize shadcn, adopt Supabase hosting, connect Sentry, or make every capability a product default. Matching Claude/Codex files verifies packaging, not support for every host-specific instruction. In particular, `gh-fix-ci` targets the Codex workflow. Next.js runtime MCP preflight, bundle optimization, authenticated CI queries, security findings, component behavior, and Sentry OAuth need their own actual task checks.
 
-O núcleo completo passou em macOS com Node.js 24.21.0 e npm, sem `DATABASE_URL`. Versões observadas:
+## Execution on October 17, 2026
 
-| Componente | Versão |
+The expanded fixture passed on macOS with Node.js 24.21.0, without database credentials. It installed and checked **15 selected skills**: the prior web/discovery set plus `next-dev-loop`, `next-bundle-optimizer`, `supabase-postgres-best-practices`, `gh-fix-ci`, `differential-review`, and `shadcn`. Canonical names, lockfile entries, matching client files, and relative Claude links passed. The source `gh-fix-ci` uses a quoted frontmatter name, which the fixture accepts.
+
+Observed application versions were Next.js 16.4.2, React 19.3.0, Drizzle ORM 0.45.4, Drizzle Kit 0.31.11, pg 8.23.1, Zod 4.6.7, Pino 10.4.0, and Vitest 5.0.5. The eight tests, three rule self-checks, full/lightweight/advanced lint profiles, types, server-only rejection, generated SQL, embedded CRUD/rollback, build, production audit, and HTTP checks passed. The temporary application was removed. These are dated observations; the fixture's explicit selection is not a permanent upstream catalog size.
+
+Documentation regression tests passed (nine cases). JSON/TOML examples parsed. All local navigation targets were checked after the expansion. Hero screenshots at desktop/mobile sizes showed no clipping; reduced motion selected the static source. SVG structure, attributes, and animation styles remained unchanged, and the translated READMEs retained matching navigation targets.
+
+The preceding English migration completed five review cycles. The capability expansion then received one fresh whole-change review, with no remaining critical, important, or minor findings. An additional inventory check caught a duplicate GitHub CLI identifier; it was consolidated into the existing foundation entry, and final identifiers are unique.
+
+A subsequent five-cycle polish review covered English and README parity, paths and validation, technical contracts, SVG/accessibility, and final integration. It corrected the playbook's mandatory-delegation wording and a reversed memory-migration heading. The round ended with no remaining findings; a fresh full disposable-project run and the nine validator regression cases passed, with all 550 local targets resolving.
+
+The new Sentry examples received configuration/syntax review only. No Sentry OAuth, account-dependent CI query, new native-client skill session, runtime MCP loop, bundle audit, full differential security task, or shadcn component task was executed for this expansion. Windows/Ubuntu changes require the repository workflow; this local run was macOS. The production audit returned zero vulnerabilities; the full audit retained the nine development entries described below.
+
+## Execution on October 14, 2026
+
+The full core passed on macOS with Node.js 24.21.0 and npm, without `DATABASE_URL`. Observed versions:
+
+| Component | Version |
 |---|---|
 | Next.js / React | 16.4.1 / 19.3.0 |
 | Drizzle ORM / Kit | 0.45.4 / 0.31.11 |
@@ -40,37 +57,37 @@ O núcleo completo passou em macOS com Node.js 24.21.0 e npm, sem `DATABASE_URL`
 | Zod / Pino | 4.6.7 / 10.4.0 |
 | Vitest | 5.0.4 |
 
-Os oito testes, os três self-checks, lint, tipos, SQL/rollback, build, produção HTTP e nove skills passaram. O conflito entre os tipos Node 20 do scaffold e os peers do Vitest 5 foi resolvido com tipos Node 24, sem forçar peers. A configuração Vitest usa `.mts` para ESM explícito.
+The eight tests, three self-checks, lint, types, SQL/rollback, build, production HTTP, and nine skills passed. The conflict between the scaffold's Node 20 types and Vitest 5 peers was resolved using Node 24 types without forcing peers. Vitest configuration uses `.mts` for explicit ESM.
 
-Essas versões são evidência, não um pin eterno. Em outro setup, confira documentação oficial/Context7, CLI, canais estáveis e peers; valide o conjunto e registre fontes/data. O lockfile do projeto guarda as versões efetivas.
+These versions are evidence, not permanent pins. In another setup, check official documentation/Context7, the CLI, stable channels, and peers; validate the combination and record sources/date. The project lockfile holds actual versions.
 
-### Evidências anteriores dos clientes e sistemas
+### Previous client and system evidence
 
-A [execução nativa anterior](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/runs/38517653505), em Ubuntu e Windows, aprovou a base Next 16.4.0, skills locais, lint, tipos, regras, build, auditoria de produção e HTTP. Essa execução antecede o núcleo Drizzle descrito acima; consulte o workflow da revisão atual para a validação ampliada.
+The [previous native run](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/runs/38517653505), on Ubuntu and Windows, passed the Next.js 16.4.0 foundation, local skills, lint, types, rules, build, production audit, and HTTP. That run predates the Drizzle core described above; consult the current revision's workflow for expanded validation.
 
-No macOS, a base anterior também teve extração Graphify determinística e consulta ao grafo, além de consultas reais Context7. Sessões novas de Claude Code e Codex descobriram as nove skills por APIs nativas sem iniciar turno de modelo. Isso comprova descoberta naquele ambiente; outros hosts precisam da própria verificação.
+On macOS, the earlier foundation also had deterministic Graphify extraction and graph queries, as well as real Context7 queries. New Claude Code and Codex sessions discovered the nine skills through native APIs without starting a model turn. This proves discovery in that environment; other hosts need their own verification.
 
-## Auditoria de dependências
+## Dependency audit
 
-A amostra completa retornou **zero vulnerabilidades de produção** e **nove entradas de desenvolvimento** (cinco altas e quatro moderadas), provenientes de dois advisories:
+The full sample returned **zero production vulnerabilities** and **nine development entries** (five high and four moderate), originating from two advisories:
 
-- [Braces / GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm): esgotamento de pilha com padrões profundamente aninhados, pela cadeia de lint Next. Sem versão corrigida publicada na verificação.
-- [Esbuild / GHSA-67mh-4wv8-2f99](https://github.com/advisories/GHSA-67mh-4wv8-2f99): CORS do servidor de desenvolvimento em versões até 0.24.2, pela cadeia legada `@esbuild-kit` do Drizzle Kit estável. Esbuild tem correção desde 0.25.0; o caminho instalado pelo Kit ainda traz a versão afetada. O bootstrap usa geração/migration, sem iniciar o servidor `serve` do esbuild.
+- [Braces / GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm): stack exhaustion with deeply nested patterns, through the Next.js lint dependency chain. No patched version was published at verification time.
+- [Esbuild / GHSA-67mh-4wv8-2f99](https://github.com/advisories/GHSA-67mh-4wv8-2f99): development server CORS in versions through 0.24.2, through stable Drizzle Kit's legacy `@esbuild-kit` chain. Esbuild has a fix from 0.25.0; the path installed by Kit still includes the affected version. Bootstrap uses generation/migration without starting esbuild's `serve` server.
 
-O audit sugeriu downgrades de `eslint-config-next` para 14.2.35 e Drizzle Kit para 0.18.1; não foram aplicados à stack atual. Não force downgrades ou overrides sem compatibilidade comprovada, nem oculte alertas. Reavalie atualizações upstream e registre a decisão no app. Build/lint aprovados não significam auditoria completa zerada.
+The audit suggested downgrading `eslint-config-next` to 14.2.35 and Drizzle Kit to 0.18.1; these were not applied to the current stack. Do not force downgrades or overrides without verified compatibility or hide warnings. Reassess upstream updates and record the decision in the app. Passing builds/lint does not mean a clean full audit.
 
-## Manutenção antes da entrega
+## Maintenance before delivery
 
-Confira também TOML, sintaxe dos executáveis, `git diff --check`, escopo dos arquivos incluídos e ausência de dados privados, caches ou saídas de validação. Mudanças nas regras precisam do self-check e de um caso real no app temporário. Testes extras entram quando a mudança ou um achado exigir nova evidência.
+Also check TOML, executable syntax, `git diff --check`, included file scope, and the absence of private data, caches, or validation outputs. Rule changes need the self-check and a real case in the temporary app. Additional tests are appropriate when a change or finding needs new evidence.
 
-## Três ciclos de revisão desta atualização
+## Three review cycles for this update
 
-As revisões abaixo se referem à padronização do bootstrap, com contexto separado e correções antes do commit.
+The reviews below concern bootstrap standardization, with separate context and fixes before commit.
 
-| Ciclo | Foco | Resultado |
+| Cycle | Focus | Result |
 |---|---|---|
-| 1 | Núcleo, segurança e testes | Isolado `LOG_LEVEL` no teste do logger; falha reproduzida e corrigida, com suíte aprovada também em `silent`/`warn` |
-| 2 | Organização, manifesto e callers | Sem novos achados materiais; perfis leve/completo e quatro documentos de raiz coerentes |
-| 3 | Funcionamento e portabilidade | Sem achados bloqueantes/importantes; logs finais, links e diff conferidos |
+| 1 | Core, security, and tests | Isolated `LOG_LEVEL` in the logger test; reproduced and fixed the failure, with the suite also passing under `silent`/`warn` |
+| 2 | Organization, manifest, and callers | No new material findings; lightweight/full profiles and four root documents consistent |
+| 3 | Operation and portability | No blocking/important findings; final logs, links, and diff checked |
 
-As execuções ampliadas de Ubuntu/Windows ficam no [workflow da main](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/workflows/validate.yml?query=branch%3Amain). PostgreSQL externo, produção e descoberta de todos os hosts continuam fora dos checks automáticos.
+Expanded Ubuntu/Windows runs appear in the [main workflow](https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/workflows/validate.yml?query=branch%3Amain). External PostgreSQL, production, and discovery on every host remain outside automated checks.

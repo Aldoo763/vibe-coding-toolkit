@@ -1,14 +1,14 @@
-# Instalação
+# Installation
 
-Referência rápida para instalar os agentes e as peças do toolkit. Para **preparar ou atualizar o computador inteiro**, use o [guia de setup](03-environment-setup.md) e o [prompt 10](prompts/10-development-environment-setup.md): ele inclui a base de sistema, Node.js, Docker, todas as integrações obrigatórias, backups e validação.
+Quick reference for installing agents and toolkit components. To **prepare or update the entire computer**, use the [setup guide](03-environment-setup.md) and [prompt 10](prompts/10-development-environment-setup.md): they include system prerequisites, Node.js, Docker, all required integrations, backups, and validation.
 
-Para **configurar ou atualizar um projeto existente**, use o [prompt 12](prompts/12-existing-project-setup.md): diagnóstico, brainstorming, harness e integração de todo o toolkit aplicável, preservando a stack e as personalizações.
+To **configure or update an existing project**, use [prompt 12](prompts/12-existing-project-setup.md): diagnosis, brainstorming, a harness, and integration of all applicable toolkit components, preserving the stack and customizations.
 
-Comandos conferidos em **14 de outubro de 2026**. Confirme a documentação da versão e do sistema usados. Escolha um método por ferramenta e preserve instalações existentes quando suportadas.
+Commands checked on **October 14, 2026**. Confirm the documentation for your version and operating system. Choose one method per tool and preserve existing installations where supported.
 
-## 1. Codex e Claude Code
+## 1. Codex and Claude Code
 
-Os dois agentes oferecem instaladores nativos que não exigem Node.js previamente. Em macOS, Linux ou WSL, escolha o comando do agente que deseja instalar:
+Both agents offer native installers that do not require Node.js beforehand. On macOS, Linux, or WSL, choose the command for the agent you want to install:
 
 ```bash
 # Codex
@@ -18,24 +18,24 @@ curl -fsSL https://chatgpt.com/codex/install.sh | sh
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-No Windows nativo, use as instruções de PowerShell das páginas oficiais. Para Homebrew ou uma instalação npm já existente, confira os métodos suportados antes de migrar. Fontes: [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) e [Claude Code](https://code.claude.com/docs/en/setup).
+On native Windows, follow the PowerShell instructions on the official pages. For Homebrew or an existing npm installation, check supported methods before migrating. Sources: [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) and [Claude Code](https://code.claude.com/docs/en/setup).
 
-Depois, em terminal novo:
+Then, in a new terminal:
 
 ```bash
 codex --version
 claude --version
 ```
 
-Abra `codex` ou `claude` e conclua a autenticação no fluxo oficial. No Codex, a preferência do prompt de setup é login com ChatGPT. Credenciais não entram no chat nem em arquivos do projeto.
+Open `codex` or `claude` and complete authentication through the official flow. The setup prompt prefers ChatGPT login for Codex. Credentials never belong in chat or project files.
 
-`claude doctor` ajuda a verificar instalação e atualização do Claude Code. Atualize cada CLI pelo método responsável; por exemplo, uma instalação Homebrew exige atualização pelo Homebrew, enquanto o instalador nativo do Claude gerencia atualizações próprias.
+`claude doctor` helps check Claude Code installation and updates. Update each CLI through its installation method; for example, a Homebrew installation requires Homebrew updates, while Claude's native installer manages its own updates.
 
-## 2. Plugins e CLIs independentes
+## 2. Plugins and standalone CLIs
 
-### Claude Code: comandos dentro da sessão
+### Claude Code: commands inside the session
 
-`/plugin` é comando do Claude Code, **não do shell**. Abra `claude` antes de usar:
+`/plugin` is a Claude Code command, **not a shell command**. Open `claude` before using it:
 
 ```text
 /plugin marketplace add anthropics/claude-plugins-official
@@ -48,60 +48,62 @@ Abra `codex` ou `claude` e conclua a autenticação no fluxo oficial. No Codex, 
 /plugin install caveman@caveman
 ```
 
-Fontes: [Superpowers](https://github.com/obra/superpowers#claude-code), [Ponytail](https://github.com/DietrichGebert/ponytail#install) e [Caveman](https://github.com/JuliusBrussee/caveman). Confira carregamento em uma nova conversa; diretório instalado não comprova ativação.
+Sources: [Superpowers](https://github.com/obra/superpowers#claude-code), [Ponytail](https://github.com/DietrichGebert/ponytail#install), and [Caveman](https://github.com/JuliusBrussee/caveman). Verify loading in a new conversation; an installed directory does not prove activation.
 
-### Codex: plugins próprios
+### Codex: its own plugins
 
-Para Superpowers, abra `/plugins` na sessão e instale a distribuição oficial. Para Ponytail, os comandos de terminal documentados são:
+For Superpowers, open `/plugins` in the session and install the official distribution. For Ponytail, the documented terminal commands are:
 
 ```bash
 codex plugin marketplace add DietrichGebert/ponytail
 codex plugin add ponytail@ponytail
 ```
 
-Confira os hooks pelo fluxo do cliente e abra uma nova conversa. Para Caveman, use a distribuição de skills documentada e a descoberta do Codex, mantendo a preferência por comunicação concisa sem ativar proxy ou roteamento de modelos. Veja o [guia do Codex](tools/15-codex-workflow.md) para os caminhos, comandos e precedência das instruções.
+Check hooks through the client's workflow and open a new conversation. For Caveman, use the documented skills distribution and Codex discovery, retaining concise communication without enabling a proxy or model routing. See the [Codex guide](tools/15-codex-workflow.md) for paths, commands, and instruction precedence.
 
-### RTK, Context7 e Graphify
+### RTK, Context7, and Graphify
 
-| Ferramenta | Instalação ou conexão | Integração |
+| Tool | Installation or connection | Integration |
 |---|---|---|
-| [RTK](tools/03-rtk-token-proxy.md) | Com Homebrew: `brew install rtk-ai/tap/rtk`; outros sistemas seguem as releases oficiais | Claude: `rtk init --global`; Codex: `rtk init --global --codex` |
-| [Context7](tools/12-context7.md) | Plugin do cliente ou MCP remoto em `https://mcp.context7.com/mcp` | Configure em cada cliente e faça uma consulta real; evite servidor duplicado |
-| [Graphify](tools/07-graphify.md) | `uv tool install graphifyy` **ou** `pipx install graphifyy` | `graphify install`, depois confira descoberta da skill no agente |
+| [RTK](tools/03-rtk-token-proxy.md) | With Homebrew: `brew install rtk-ai/tap/rtk`; other systems follow official releases | Claude: `rtk init --global`; Codex: `rtk init --global --codex` |
+| [Context7](tools/12-context7.md) | Client plugin or remote MCP at `https://mcp.context7.com/mcp` | Configure each client and run a real query; avoid duplicate servers |
+| [Graphify](tools/07-graphify.md) | `uv tool install graphifyy` **or** `pipx install graphifyy` | `graphify install`, then verify skill discovery in the agent |
 
-Graphify exige Python e um mecanismo de instalação compatível; configure essas dependências se ausentes. O pacote é `graphifyy`, com dois “y”; a CLI é `graphify`. Escolha um dos métodos isolados, sem instalar ambos. RTK e Graphify são CLIs; não são pacotes npm com o mesmo nome.
+Graphify requires Python and a compatible installation mechanism; configure these prerequisites if missing. The package is `graphifyy`, with two “y” characters; the CLI is `graphify`. Choose one isolated method, rather than installing both. RTK and Graphify are CLIs; they are not npm packages with the same names.
 
-Context7 remoto é um serviço, não um pacote local a atualizar. O plugin pode já incluir MCP e skill de consulta. Instalar também uma segunda conexão para a mesma finalidade cria sobreposição.
+Remote Context7 is a service, not a local package to update. The plugin may already include the MCP server and query skill. Installing a second connection for the same purpose creates overlap.
 
-### Extras do fluxo de projeto
+### Project workflow extras
 
-No toolkit modular, você pode escolher peças. No **prompt 10**, RTK, Ponytail, Caveman, Superpowers, Context7 e Graphify são obrigatórios. Os itens abaixo continuam sendo extras novos sujeitos à sua escolha:
+With the modular toolkit, you can choose components. In **prompt 10**, RTK, Ponytail, Caveman, Superpowers, Context7, and Graphify are required. The following remain new extras subject to your choice:
 
-| Ferramenta | Referência | Uso |
+| Tool | Reference | Use |
 |---|---|---|
-| agent-browser | [Guia](tools/11-agent-browser.md) | Automatizar fluxos de navegador |
-| Chrome DevTools MCP | [Guia](tools/14-chrome-devtools-mcp.md) | Investigar rede, console e performance |
-| Anthropic Skills | [Guia](tools/13-anthropics-skills.md) | Trabalhar com artefatos e criar skills |
-| aia-harness | [Marketplace](https://github.com/leandrosilvaferreira/claude-plugins-registry) | Onboarding de projeto; confirme opções e suporte no próprio marketplace |
-| Plugins oficiais do Claude | [Marketplace](https://github.com/anthropics/claude-plugins-official) | Escolha ferramentas de revisão, commits ou hooks conforme a necessidade |
+| agent-browser | [Guide](tools/11-agent-browser.md) | Automate browser flows |
+| Chrome DevTools MCP | [Guide](tools/14-chrome-devtools-mcp.md) | Investigate networking, console, and performance |
+| Anthropic Skills | [Guide](tools/13-anthropics-skills.md) | Work with artifacts and create skills |
+| aia-harness | [Marketplace](https://github.com/leandrosilvaferreira/claude-plugins-registry) | Project onboarding; confirm options and support in the marketplace itself |
+| Official Claude plugins | [Marketplace](https://github.com/anthropics/claude-plugins-official) | Choose review, commit, or hook tools as needed |
 
-## 3. Skills Vercel locais
+## 3. Local Vercel skills
 
-Para Next/React, siga o [catálogo completo](tools/16-vercel-skills.md): oito skills web de `vercel-labs/agent-skills` e `find-skills` de `vercel-labs/skills`. Use instalação local, nomes reais do frontmatter e somente os clientes necessários. React Native/Expo é uma extensão opcional.
+For Next.js/React, follow the [Vercel catalog](tools/16-vercel-skills.md) and discover current official sources. Use local installation, actual frontmatter names, and only the clients you need. React Native/Expo is an optional extension.
 
-Para gerar produto, base oficial e configurações em conjunto, use o [bootstrap Next](04-project-bootstrap.md) e o [prompt 11](prompts/11-next-project-bootstrap.md). Não reinstale plugins globais a cada projeto.
+Evaluate the [capability matrix](tools/README.md#select-by-scope) for both machine preparation and individual projects: [Next.js runtime/bundle skills](tools/17-nextjs-runtime-and-performance.md), [PostgreSQL](tools/18-postgresql-skills.md), [GitHub CI repair](tools/19-github-ci-repair.md), [security review](tools/20-security-review.md), [shadcn](tools/21-shadcn-ui.md), and [Sentry MCP](tools/22-sentry-mcp.md). Each guide covers prerequisites, installation, use, verification, and updates. Install applicable instructions locally; account-dependent workflows stay pending until authorized access exists.
 
-<a id="3-instruções-do-projeto"></a>
+To generate the product definition, official foundation, and configurations together, use the [Next.js bootstrap](04-project-bootstrap.md) and [prompt 11](prompts/11-next-project-bootstrap.md). Do not reinstall global plugins for every project.
 
-## 4. Instruções do projeto
+<a id="3-project-instructions"></a>
 
-Use [AGENTS.md.template](../templates/AGENTS.md.template) para instruções compartilhadas e [CLAUDE.md.template](../templates/CLAUDE.md.template) como ponte do cliente Claude para `AGENTS.md`. Preencha comandos e convenções no arquivo compartilhado; incorpore aos existentes sem sobrescrevê-los.
+## 4. Project instructions
 
-O [settings.json.example](../templates/settings.json.example) mostra o formato de hooks personalizados. Os scripts citados são exemplos: só registre hooks cujos arquivos existam e cujo comportamento tenha sido verificado. RTK e plugins devem usar sua instalação oficial, sem duplicar interceptadores.
+Use [AGENTS.md.template](../templates/AGENTS.md.template) for shared instructions and [CLAUDE.md.template](../templates/CLAUDE.md.template) as the Claude client's bridge to `AGENTS.md`. Fill in commands and conventions in the shared file; merge with existing files without overwriting them.
 
-## Quer o passo a passo completo?
+[settings.json.example](../templates/settings.json.example) shows the custom hook format. Referenced scripts are examples: register only hooks whose files exist and whose behavior has been verified. RTK and plugins should use their official installation without duplicate interceptors.
 
-- [Setup da máquina](03-environment-setup.md): execução, retomada, relatório e reprodução.
-- [Setup de projeto existente](prompts/12-existing-project-setup.md): adoção completa, atualização e validação.
-- [Playbook do Claude Code](02-playbook-onboarding.md): fluxo de projeto narrado.
-- [Fluxo do Codex](tools/15-codex-workflow.md): instruções, skills, MCP e permissões.
+## Need the complete walkthrough?
+
+- [Machine setup](03-environment-setup.md): execution, resumption, reporting, and reproduction.
+- [Existing-project setup](prompts/12-existing-project-setup.md): complete adoption, updates, and validation.
+- [Claude Code playbook](02-playbook-onboarding.md): a narrated project workflow.
+- [Codex workflow](tools/15-codex-workflow.md): instructions, skills, MCP, and permissions.

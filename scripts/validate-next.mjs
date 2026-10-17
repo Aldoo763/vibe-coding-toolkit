@@ -17,7 +17,8 @@ const env = { ...process.env, DISABLE_TELEMETRY: "1", NEXT_TELEMETRY_DISABLED: "
 // Prove that validation does not depend on the caller's database credentials.
 for (const key of ["DATABASE_URL", "DATABASE_URL_UNPOOLED", "LOG_LEVEL"]) delete env[key];
 const expectedSkills = [
-  "deploy-to-vercel", "find-skills", "vercel-cli-with-tokens",
+  "deploy-to-vercel", "differential-review", "find-skills", "gh-fix-ci",
+  "next-bundle-optimizer", "next-dev-loop", "shadcn", "supabase-postgres-best-practices", "vercel-cli-with-tokens",
   "vercel-composition-patterns", "vercel-optimize", "vercel-react-best-practices",
   "vercel-react-view-transitions", "web-design-guidelines", "writing-guidelines",
 ];
@@ -67,12 +68,19 @@ async function checkSkills() {
   const copy = process.platform === "win32" ? " --copy" : "";
   run("npx --yes skills@latest add vercel-labs/agent-skills --skill vercel-react-best-practices vercel-composition-patterns web-design-guidelines writing-guidelines vercel-react-view-transitions vercel-optimize deploy-to-vercel vercel-cli-with-tokens --agent codex claude-code --yes" + copy);
   run("npx --yes skills@latest add vercel-labs/skills --skill find-skills --agent codex claude-code --yes" + copy);
+  // This disposable fixture selects optional skills to verify packaging, not a product's defaults.
+  run("npx --yes skills@latest add https://github.com/vercel/next.js/tree/canary/skills/next-dev-loop --skill next-dev-loop --agent codex claude-code --yes" + copy);
+  run("npx --yes skills@latest add https://github.com/vercel/next.js/tree/canary/skills/next-bundle-optimizer --skill next-bundle-optimizer --agent codex claude-code --yes" + copy);
+  run("npx --yes skills@latest add supabase/agent-skills --skill supabase-postgres-best-practices --agent codex claude-code --yes" + copy);
+  run("npx --yes skills@latest add https://github.com/openai/skills/tree/main/skills/.curated/gh-fix-ci --skill gh-fix-ci --agent codex claude-code --yes" + copy);
+  run("npx --yes skills@latest add https://github.com/trailofbits/skills/tree/main/plugins/differential-review --skill differential-review --agent codex claude-code --yes" + copy);
+  run("npx --yes skills@latest add shadcn/ui --skill shadcn --agent codex claude-code --yes" + copy);
   assert.deepEqual((await readdir(path.join(app, ".agents/skills"))).sort(), expectedSkills);
   const lock = JSON.parse(await readFile(path.join(app, "skills-lock.json"), "utf8"));
   assert.deepEqual(Object.keys(lock.skills).sort(), expectedSkills);
   for (const name of expectedSkills) {
     const canonical = await readFile(path.join(app, ".agents/skills", name, "SKILL.md"), "utf8");
-    assert(canonical.includes(`name: ${name}`));
+    assert(canonical.includes(`name: ${name}`) || canonical.includes(`name: "${name}"`), `Missing skill name: ${name}`);
     assert.equal(await readFile(path.join(app, ".claude/skills", name, "SKILL.md"), "utf8"), canonical);
     if (process.platform !== "win32") assert(!path.isAbsolute(await readlink(path.join(app, ".claude/skills", name))));
   }
@@ -218,4 +226,4 @@ try {
   await rm(temporary, { recursive: true, force: true });
 }
 
-console.log(`PASS ${process.platform}: documentation contracts, Next/Drizzle templates, quality guards, tests, SQL, build, audit, HTTP and nine local skills`);
+console.log(`PASS ${process.platform}: documentation contracts, Next/Drizzle templates, quality guards, tests, SQL, build, audit, HTTP and ${expectedSkills.length} selected local skills`);

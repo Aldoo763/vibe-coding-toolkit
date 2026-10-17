@@ -1,152 +1,151 @@
 # Ponytail
 
-## O que é
+## What it is
 
-Ponytail é um plugin — um pacote que estende o comportamento do agente
-dentro do Claude Code, instalado com um comando de barra ("/") direto na
-conversa — que veste o agente com uma persona de disciplina de engenharia: o
-"desenvolvedor sênior preguiçoso". Preguiçoso aqui quer dizer eficiente,
-nunca descuidado: é a preguiça de quem já viu código complicado demais
-falhar de madrugada e aprendeu a nunca mais escrever complexidade que
-ninguém pediu.
+Ponytail is a plugin — a package that extends the agent's behavior
+inside Claude Code, installed with a slash command ("/") directly in the
+conversation — that gives the agent an engineering discipline persona: the
+"lazy senior developer." Lazy here means efficient,
+never careless: the laziness of someone who has seen overly complicated code
+fail in the middle of the night and learned never to write complexity that
+nobody asked for again.
 
-Na prática, o plugin injeta uma escada de decisão fixa que roda antes de
-qualquer linha de código ser escrita. O agente sobe a escada degrau por
-degrau e para no primeiro que resolve o problema — nunca continua subindo
-"só por garantia". Fonte: [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail).
+In practice, the plugin injects a fixed decision ladder that runs before
+any line of code is written. The agent climbs it one rung at a time
+and stops at the first one that solves the problem — never climbing further
+"just in case." Source: [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail).
 
-## Por que usar
+## Why use it
 
-Um agente de IA recebendo uma tarefa aberta tende a puxar para abstração,
-configurabilidade e código defensivo que ninguém pediu — sem um freio
-explícito, ele otimiza para "parecer completo", não para "resolver
-exatamente o que foi pedido". O resultado comum: uma classe de cache com
-estratégia plugável quando um decorator de uma linha resolveria; uma
-interface com uma única implementação; um arquivo de configuração para um
-valor que nunca muda.
+An AI agent given an open-ended task tends toward abstraction,
+configurability, and defensive code nobody requested — without an explicit
+brake, it optimizes for "looking complete" rather than "solving
+exactly what was asked." Common results: a cache class with a
+pluggable strategy when a one-line decorator would do; an
+interface with a single implementation; a configuration file for a
+value that never changes.
 
-Ponytail existe para forçar a opção mais barata a ser considerada primeiro,
-sempre, antes de qualquer código sair. Ele não deixa a "preguiça" virar
-desculpa para cortar canto em segurança, validação ou tratamento de erro —
-só no que sobra depois de garantir que essas partes estão cobertas.
+Ponytail forces the cheapest option to be considered first,
+always, before any code is written. It does not let "laziness" become
+an excuse to cut corners on security, validation, or error handling —
+only on what remains after ensuring those parts are covered.
 
-## Como instalar/ativar
+## How to install/activate
 
-Dentro de uma sessão do Claude Code:
+Inside a Claude Code session:
 
 ```bash
 /plugin marketplace add DietrichGebert/ponytail
 /plugin install ponytail@ponytail
 ```
 
-O primeiro comando registra o repositório do GitHub como uma fonte de
-plugins instalável (um "marketplace"); o segundo instala o plugin `ponytail`
-a partir dessa fonte.
+The first command registers the GitHub repository as an installable
+plugin source (a "marketplace"); the second installs the `ponytail` plugin
+from that source.
 
-Uma vez instalado, Ponytail fica ativo em toda resposta por padrão, no nível
-`full`. Ele continua ativo mesmo quando não está claro se a tarefa atual se
-aplica — a regra por trás disso é "presumir que sim". Para desligar durante
-a conversa, basta escrever "stop ponytail" ou "normal mode" — não precisa
-desinstalar o plugin. O nível escolhido vale só para a sessão atual; uma
-sessão nova volta para o padrão.
+Once installed, Ponytail is active in every response by default, at the
+`full` level. It stays active even when it is unclear whether the current task
+applies — the underlying rule is "assume yes." To turn it off during
+the conversation, simply write "stop ponytail" or "normal mode" — no need
+to uninstall the plugin. The selected level applies only to the current session;
+a new session returns to the default.
 
-### Codex e instruções persistentes
+### Codex and persistent instructions
 
-O [Ponytail oficial](https://github.com/DietrichGebert/ponytail#install) também fornece plugin para Codex. No terminal:
+[Official Ponytail](https://github.com/DietrichGebert/ponytail#install) also provides a Codex plugin. In the terminal:
 
 ```bash
 codex plugin marketplace add DietrichGebert/ponytail
 codex plugin add ponytail@ponytail
 ```
 
-Abra `/hooks` no Codex, confira os hooks do plugin e conclua o fluxo de confiança. Inicie uma nova conversa. Se usar apenas a skill, confira a descoberta nos caminhos documentados do cliente; uma distribuição já instalada não precisa de outra cópia.
+Open `/hooks` in Codex, inspect the plugin hooks, and complete the trust flow. Start a new conversation. If using only the skill, check discovery in the client's documented paths; an already installed distribution does not need another copy.
 
-Para registrar a preferência de intensidade, use o [template de `AGENTS.md`](../../templates/AGENTS.md.template) ou incorpore ao arquivo existente: “Ponytail ativo em `full` para programação, preservando requisitos, segurança e acessibilidade.” O [guia do Codex](15-codex-workflow.md) explica a instalação e a precedência das instruções.
+To record the intensity preference, use the [`AGENTS.md` template](../../templates/AGENTS.md.template) or incorporate this into the existing file: “Ponytail active at `full` for coding, preserving requirements, security, and accessibility.” The [Codex guide](15-codex-workflow.md) explains installation and instruction precedence.
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-### 1. Entenda o problema antes de subir a escada
+### 1. Understand the problem before climbing the ladder
 
-A escada encurta a *solução*, nunca a *leitura*. Antes de escolher um
-degrau, o agente precisa rastrear o fluxo real e ler por completo o código
-que a mudança vai afetar. Um diff (o conjunto de linhas alteradas por uma
-mudança) pequeno no lugar errado não é preguiça — é um segundo bug. Essa
-etapa acontece sempre, mesmo em pedidos que parecem triviais.
+The ladder shortens the *solution*, never the *reading*. Before choosing a
+rung, the agent needs to trace the actual flow and fully read the code
+the change will affect. A small diff (the set of lines altered by a
+change) in the wrong place is not laziness — it is a second bug. This
+step always happens, even for requests that seem trivial.
 
-### 2. Suba a escada, degrau por degrau, e pare no primeiro que resolve
+### 2. Climb the ladder one rung at a time and stop at the first solution
 
-| # | Pergunta | Se a resposta for sim |
+| # | Question | If the answer is yes |
 |---|---|---|
-| 1 | Isso precisa existir? | Trabalho especulativo — pule e diga isso em uma linha (YAGNI: sigla em inglês para "you aren't gonna need it", ou seja, não construa hoje o que ninguém pediu ainda) |
-| 2 | Já existe algo equivalente nesse código? | Reaproveite — reimplementar o que já está a alguns arquivos de distância é a forma mais comum de complexidade desnecessária |
-| 3 | A biblioteca padrão da linguagem ou do framework já faz isso? | Use a biblioteca padrão |
-| 4 | Um recurso nativo da plataforma cobre isso? | Prefira o nativo — `<input type="date">` em vez de uma lib de calendário, CSS em vez de JS, uma restrição do banco em vez de código na aplicação |
-| 5 | Uma dependência já instalada resolve isso? | Use-a — nunca adicione uma dependência nova para o que algumas linhas resolvem |
-| 6 | Dá para ser uma linha só? | Escreva a linha |
-| 7 | (só se nenhum dos anteriores resolveu) | O mínimo de código novo que funciona de verdade |
+| 1 | Does this need to exist? | Speculative work — skip it and say so in one line (YAGNI: "you aren't gonna need it," meaning do not build today what nobody has requested yet) |
+| 2 | Does something equivalent already exist in this codebase? | Reuse it — reimplementing something a few files away is the most common form of unnecessary complexity |
+| 3 | Does the language or framework's standard library already do this? | Use the standard library |
+| 4 | Does a native platform feature cover this? | Prefer native — `<input type="date">` over a calendar library, CSS over JS, a database constraint over application code |
+| 5 | Does an installed dependency solve this? | Use it — never add a new dependency for something a few lines can solve |
+| 6 | Can it be a single line? | Write that line |
+| 7 | (only if none of the above solved it) | The minimum new code that actually works |
 
-Dois degraus resolvem igualmente bem? Fica com o mais alto — o mais simples
-— e segue em frente. A primeira solução preguiçosa que funciona é a certa,
-uma vez que o problema já foi entendido de verdade.
+Do two rungs solve it equally well? Choose the higher one — the simpler one
+— and move on. The first lazy solution that works is the right one,
+once the problem has actually been understood.
 
-### 3. Corrija bugs na causa raiz, não no sintoma
+### 3. Fix bugs at the root cause, not the symptom
 
-Um relatório de bug descreve um sintoma. Antes de editar, o agente busca
-(`grep`) todo lugar que chama a função que está prestes a mexer. A versão
-preguiçosa É a correção na causa raiz: uma proteção dentro da função
-compartilhada é um diff menor do que a mesma proteção repetida em cada lugar
-que a chama — e corrigir só o caminho que o relato original descreve deixa
-toda função irmã ainda quebrada. Corrige uma vez, no lugar por onde todo
-mundo passa.
+A bug report describes a symptom. Before editing, the agent searches
+(`grep`) every caller of the function it is about to change. The lazy
+version IS the root-cause fix: a guard inside the shared
+function is a smaller diff than repeating the same guard at every
+call site — and fixing only the path described in the original report leaves
+all sibling functions broken. Fix it once, where every caller passes through.
 
-### 4. Marque simplificações deliberadas com um comentário `shortcut:`
+### 4. Mark deliberate simplifications with a `shortcut:` comment
 
-Quando um corte de canto é intencional e tem um teto conhecido (um lock —
-trava de concorrência — global em vez de um por registro, uma varredura que
-cresce mal com o tamanho da entrada, uma heurística simples), ele fica
-marcado com um comentário nomeando o teto e o caminho de upgrade:
+When cutting a corner is intentional and has a known ceiling (a global
+lock — a concurrency guard — instead of one per record, a scan that
+scales poorly with input size, a simple heuristic), mark it
+with a comment naming the limit and upgrade path:
 
 ```js
-// shortcut: lock global; trocar por lock por conta se a taxa de
-// processamento virar gargalo
+// shortcut: global lock; switch to a per-account lock if
+// throughput becomes a bottleneck
 ```
 
-Isso é diferente de deixar uma limitação escondida — o comentário existe
-para a próxima pessoa (ou o próprio agente, numa sessão futura) saber que
-aquilo foi uma escolha, não um esquecimento.
+This differs from leaving a hidden limitation — the comment exists
+so the next person (or the agent itself in a future session) knows
+it was a choice, not an oversight.
 
-O marcador atual é `shortcut:`. `/ponytail-debt` reúne esses comentários como dívida rastreável; instalações mais antigas também podem reconhecer `ponytail:`. Preserve limites e critérios de revisão ao atualizar comentários existentes.
+The current marker is `shortcut:`. `/ponytail-debt` gathers these comments as trackable debt; older installations may also recognize `ponytail:`. Preserve limits and review criteria when updating existing comments.
 
-### 5. Feche com uma verificação mínima, quando a lógica não é trivial
+### 5. Finish with a minimal check when the logic is nontrivial
 
-Código com ramificação, laço, parser, ou qualquer caminho envolvendo
-dinheiro ou segurança não sai sem uma checagem que falha se a lógica
-quebrar: o menor teste possível — um `assert` (uma linha que verifica uma
-condição e interrompe a execução se ela for falsa) dentro de um bloco
-`demo()`/`__main__`, ou um arquivo `test_*` pequeno — sem framework de
-teste, sem fixture, sem suíte por função a menos que peçam. Uma linha
-trivial não precisa de teste: YAGNI vale para teste também.
+Code with a branch, loop, parser, or any path involving
+money or security does not ship without a check that fails if the logic
+breaks: the smallest possible test — an `assert` (a line that checks a
+condition and stops execution if it is false) inside a
+`demo()`/`__main__` block, or a small `test_*` file — without a test
+framework, fixtures, or a suite per function unless requested. A trivial
+one-liner needs no test: YAGNI applies to tests too.
 
-### 6. Responda direto: código primeiro, explicação em no máximo três linhas
+### 6. Answer directly: code first, explanation in at most three lines
 
-Depois do código, no máximo três linhas curtas: o que foi deixado de fora, e
-quando adicionar. Sem redação longa, sem passeio por funcionalidades, sem
-notas de design — se a explicação for maior que o código, o instinto certo é
-apagar a explicação, porque todo parágrafo defendendo uma simplificação é
-complexidade voltando disfarçada de texto. Isso não vale para uma explicação
-que o usuário pediu explicitamente (um relatório, um passo a passo, notas
-por fase) — essa é dada por completo; a regra é só contra prosa não
-solicitada.
+After the code, at most three short lines: what was left out, and
+when to add it. No long essay, feature tour, or
+design notes — if the explanation is longer than the code, the right instinct is
+to delete the explanation, because every paragraph defending a simplification is
+complexity returning disguised as text. This does not apply to an explanation
+the user explicitly requested (a report, a walkthrough, notes
+per phase) — provide that in full; the rule only targets unsolicited
+prose.
 
-Padrão: `[código] → skipped: [o que ficou de fora], add when: [quando adicionar]`.
+Pattern: `[code] → skipped: [what was left out], add when: [when to add it]`.
 
-## Exemplos concretos
+## Concrete examples
 
-### Exemplo 1 — evitando abstração reflexa
+### Example 1 — avoiding reflexive abstraction
 
-**Pedido do usuário:** "Adiciona um cache para as respostas dessa API."
+**User request:** "Add a cache for this API's responses."
 
-**Sem Ponytail** — resposta plausível de um agente sem esse freio:
+**Without Ponytail** — a plausible response from an agent without this brake:
 
 ```python
 class ApiCache:
@@ -161,14 +160,14 @@ class ApiCache:
         return MemoryCacheBackend()
 
     def get_or_fetch(self, key, fetch_fn):
-        ...  # mais 40 linhas de política de expiração e descarte de itens
+        ...  # 40 more lines of expiration and eviction policy
 ```
 
-Uma classe nova, uma interface de backend plugável que ninguém pediu,
-suporte a Redis que nem está instalado no projeto — tudo para resolver um
-cache simples.
+A new class, a pluggable backend interface nobody requested,
+Redis support when it is not even installed in the project — all to solve a
+simple cache.
 
-**Com Ponytail ativo:**
+**With Ponytail active:**
 
 ```python
 from functools import lru_cache
@@ -178,32 +177,32 @@ def fetch_response(request_key):
     ...
 ```
 
-O `@` antes de `lru_cache` é um decorator do Python: uma forma de envolver
-uma função existente com comportamento extra sem reescrevê-la. `lru_cache` já
-é um cache pronto, guardado em memória, na biblioteca padrão da linguagem.
+The `@` before `lru_cache` is a Python decorator: a way to wrap
+an existing function with extra behavior without rewriting it. `lru_cache` is
+already a ready-made in-memory cache in the language's standard library.
 
-`→ skipped: classe de cache customizada. add when: lru_cache ficar mensuravelmente insuficiente.`
+`→ skipped: custom cache class. add when: lru_cache becomes measurably insufficient.`
 
-O degrau 3 da escada (a biblioteca padrão já faz isso) resolveu — nunca
-chegou no degrau 7.
+Rung 3 of the ladder (the standard library already does it) solved it —
+rung 7 was never reached.
 
-### Exemplo 2 — corrigindo a causa raiz, não o sintoma
+### Example 2 — fixing the root cause, not the symptom
 
-**Pedido do usuário:** "Corrige esse bug: `formatCurrency()` quebra quando o
-valor vem `undefined`."
+**User request:** "Fix this bug: `formatCurrency()` breaks when the
+value is `undefined`."
 
-**Sem Ponytail** — conserta só onde o bug foi visto:
+**Without Ponytail** — fix only where the bug was seen:
 
 ```js
-// no único lugar que reportou o erro
+// at the only site that reported the error
 const label = value !== undefined ? formatCurrency(value) : "—";
 ```
 
-Funciona ali. Mas `formatCurrency()` tem outras três chamadas no projeto —
-todas continuam quebradas para o mesmo caso.
+It works there. But `formatCurrency()` has three other callers in the project —
+all remain broken for the same case.
 
-**Com Ponytail ativo** — primeiro passo é buscar todo lugar que chama
-`formatCurrency`, depois a correção entra na função compartilhada:
+**With Ponytail active** — the first step is to find every caller of
+`formatCurrency`, then put the fix in the shared function:
 
 ```js
 function formatCurrency(value) {
@@ -212,72 +211,72 @@ function formatCurrency(value) {
 }
 ```
 
-`→ skipped: guarda repetida nos 4 pontos de chamada — resolvido de uma vez na função. add when: nunca, esse é o lugar certo para essa checagem.`
+`→ skipped: repeated guard at all 4 call sites — solved once in the function. add when: never, this is the right place for this check.`
 
-Diff menor, e sem sintoma remanescente nas outras três chamadas.
+Smaller diff, with no remaining symptom in the other three callers.
 
-### Exemplo 3 — quando a preguiça não se aplica
+### Example 3 — when laziness does not apply
 
-**Pedido do usuário:** "Adiciona validação de CPF nesse formulário de
-cadastro."
+**User request:** "Add CPF validation to this registration
+form."
 
-Validação de entrada numa fronteira de confiança — o ponto onde um dado
-chega de fora do controle direto do sistema, nesse caso o que o usuário
-digita — é um dos não-negociáveis. Mesmo com Ponytail em `full`, o agente
-não entrega uma checagem superficial para "economizar linhas": ele escreve a
-validação real, dígito verificador incluso, porque isso foi pedido
-explicitamente e é justamente o tipo de corte que a escada nunca autoriza.
+Input validation at a trust boundary — the point where data
+arrives from outside the system's direct control, in this case user
+input — is nonnegotiable. Even with Ponytail at `full`, the agent
+does not deliver a superficial check to "save lines": it writes the
+actual validation, including the check digits, because that was explicitly
+requested and is exactly the kind of shortcut the ladder never authorizes.
 
-`→ skipped: nada. Validação em fronteira de confiança está na lista do que a preguiça nunca simplifica.`
+`→ skipped: nothing. Trust-boundary validation is on the list of things laziness never simplifies.`
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-- **A escada só roda depois da leitura, nunca no lugar dela.** Se uma
-  resposta "resolveu rápido demais" sem citar o fluxo real que foi lido,
-  vale desconfiar — pular a compreensão para entregar um diff pequeno é o
-  tipo perigoso de preguiça, porque se disfarça de eficiência e entrega uma
-  correção confiante e errada.
-- **Ponytail não é sinônimo de resposta curta.** A brevidade dele é sobre
-  não escrever prosa não solicitada defendendo a simplificação — diferente
-  de [Caveman](05-caveman.md), que comprime a prosa palavra por palavra. As
-  duas camadas são independentes e se somam: uma decide o que é construído,
-  a outra decide como o agente fala sobre isso.
-- **Duas opções da biblioteca padrão do mesmo tamanho:** o critério de
-  desempate é correção nos casos de borda, não qual é mais curta de
-  escrever. Preguiça é escrever menos código, não escolher o algoritmo mais
-  frágil.
-- **Pedido complexo ou ambíguo não trava a resposta.** Ponytail entrega a
-  versão preguiçosa e questiona na mesma resposta — "fiz X; Y cobre o caso;
-  precisa do X completo? diga" — em vez de parar esperando uma confirmação
-  que já dava para assumir.
-- **O nível vale só para a sessão atual.** Trocar com `/ponytail
-  lite|full|ultra` não persiste entre sessões; cada sessão nova recomeça no
-  padrão (`full`).
+- **The ladder runs only after reading, never instead of it.** If a
+  response "solved it too quickly" without citing the actual flow it read,
+  be skeptical — skipping understanding to deliver a small diff is the
+  dangerous kind of laziness: it disguises itself as efficiency and delivers a
+  confident, incorrect fix.
+- **Ponytail is not synonymous with a short response.** Its brevity is about
+  avoiding unsolicited prose defending a simplification — unlike
+  [Caveman](05-caveman.md), which compresses prose word by word. The
+  two layers are independent and additive: one decides what gets built,
+  the other decides how the agent talks about it.
+- **Two standard-library options of equal size:** the tiebreaker is
+  correctness on edge cases, not which is shorter to
+  write. Laziness means writing less code, not choosing the more fragile
+  algorithm.
+- **A complex or ambiguous request does not block the response.** Ponytail delivers the
+  lazy version and asks in the same response — "did X; Y covers the case;
+  need full X? say so" — instead of stopping for confirmation
+  it could already reasonably infer.
+- **The level applies only to the current session.** Changing it with `/ponytail
+  lite|full|ultra` does not persist across sessions; every new session restarts at
+  the default (`full`).
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Ponytail vai simplificar validação, tratamento de erro ou segurança para
-economizar linhas?**
-Não. Esses itens — mais acessibilidade básica e qualquer coisa pedida
-explicitamente — ficam fora do alcance da preguiça, em qualquer nível de
-intensidade.
+**Will Ponytail simplify validation, error handling, or security to
+save lines?**
+No. Those items — plus basic accessibility and anything explicitly
+requested — are beyond laziness's reach at every intensity
+level.
 
-**Preciso reinstalar o plugin toda vez que quiser mudar o nível?**
-Não. `/ponytail lite|full|ultra` troca o nível a qualquer momento, dentro da
-conversa atual.
+**Do I need to reinstall the plugin whenever I want to change the level?**
+No. `/ponytail lite|full|ultra` changes the level at any time within the
+current conversation.
 
-**Ponytail escreve testes automaticamente?**
-Só quando a lógica não é trivial — ramificação, laço, parser, caminho de
-dinheiro ou segurança — e mesmo assim deixa só uma verificação mínima, não
-uma suíte completa. Uma linha trivial não gera teste.
+**Does Ponytail write tests automatically?**
+Only when the logic is nontrivial — a branch, loop, parser, money
+or security path — and even then it leaves only a minimal check, not
+an entire suite. A trivial one-liner generates no test.
 
-**Ponytail e Caveman são a mesma coisa?**
-Não. Ponytail decide o que é construído; [Caveman](05-caveman.md) decide
-como o agente fala sobre o que construiu. São plugins independentes, mas
-combináveis.
+**Are Ponytail and Caveman the same thing?**
+No. Ponytail decides what gets built; [Caveman](05-caveman.md) decides
+how the agent talks about what it built. They are independent but
+combinable plugins.
 
-**A escada muda de uma linguagem para outra?**
-O raciocínio não muda — biblioteca padrão, recurso nativo, dependência já
-instalada, uma linha, e só então código novo —, mas o que cada degrau
-resolve, sim: numa stack de frontend, o degrau 4 pode ser um elemento HTML
-nativo; num backend, pode ser uma constraint do banco de dados.
+**Does the ladder change between languages?**
+The reasoning does not change — standard library, native feature, already
+installed dependency, one line, and only then new code — but what each rung
+solves does: in a frontend stack, rung 4 might be a native HTML
+element; in a backend, it might be a database constraint.

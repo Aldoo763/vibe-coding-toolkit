@@ -1,52 +1,51 @@
-# Sanitização de projeto
+# Project sanitation
 
-## Quando usar
+## When to use
 
-Use este prompt para uma passada geral de "limpar esse código": código
-morto, comentários `TODO`/`FIXME` esquecidos, dependências que ninguém mais
-importa. O ponto central é ter um agente que **mede antes de agir**, em vez
-de chutar a gravidade de cada problema ou assumir riscos silenciosamente por
-conta própria. Em bases de código grandes, combine com o [despacho paralelo
-de subagentes especialistas](../tools/02-subagent-orchestration.md) em vez
-de rodar o prompt inteiro através de um agente só.
+Use this prompt for a general "clean up this code" pass: dead code,
+forgotten `TODO`/`FIXME` comments, dependencies nobody imports anymore.
+The central idea is an agent that **measures before acting**, instead of
+guessing each problem's severity or silently taking risks on its own.
+For large codebases, combine it with [parallel dispatch of specialist
+subagents](../tools/02-subagent-orchestration.md) instead of running the
+whole prompt through a single agent.
 
-## Por que funciona
+## Why it works
 
-A lógica é separar **medir** de **agir**. Toda alegação sobre o estado do
-código — quantos warnings existem, se o build passa, quantas dependências
-estão sem uso — precisa vir de um comando real, executado agora, nunca de
-uma estimativa ou de um número lembrado de uma execução anterior. Em cima
-dessa base factual, o prompt separa correções mecânicas e seguras (que
-podem acontecer sem perguntar nada) de decisões que exigem julgamento
-humano — por exemplo, "essa exportação realmente não é usada, ou só parece
-assim porque é consumida via reflection ou import dinâmico?" — com a opção
-conservadora como padrão se ninguém responder. Por fim, ele força execução
-em passos pequenos e verificáveis, cada um comprovado por uma checagem
-real, em vez de um diff (a comparação entre duas versões do código) gigante
-que mistura dez correções não relacionadas e fica impossível revisar com
-confiança.
+The logic separates **measuring** from **acting**. Every claim about the
+code's state — warning counts, whether the build passes, how many
+dependencies are unused — must come from a real command run now, never an
+estimate or a number remembered from an earlier run. On that factual
+foundation, the prompt separates safe mechanical fixes (which can proceed
+without asking) from decisions requiring human judgment — for example,
+"is this export really unused, or does it only look that way because it is
+consumed through reflection or dynamic imports?" — with the conservative
+option as the default if nobody responds. Finally, it requires small,
+verifiable execution steps, each proven by a real check, instead of one
+huge diff (the comparison between two versions of the code) mixing ten
+unrelated fixes that become impossible to review confidently.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[LINT_COMMAND]`** — o comando que roda o linter do projeto (ex.:
+- **`[LINT_COMMAND]`** — the command that runs the project's linter (e.g.
   `npm run lint`, `ruff check .`, `golangci-lint run`).
-- **`[TYPECHECK_COMMAND]`** — o comando que roda a checagem de tipos (ex.:
+- **`[TYPECHECK_COMMAND]`** — the command that runs type checking (e.g.
   `npm run typecheck`, `tsc --noEmit`, `mypy .`).
-- **`[TEST_COMMAND]`** — o comando que roda a suíte de testes (ex.:
+- **`[TEST_COMMAND]`** — the command that runs the test suite (e.g.
   `npm test`, `pytest`, `go test ./...`).
-- **`[BUILD_COMMAND]`** — o comando que compila/builda o projeto (ex.:
+- **`[BUILD_COMMAND]`** — the command that compiles/builds the project (e.g.
   `npm run build`, `make build`).
-- **`[DEPENDENCY_AUDIT_COMMAND]`** — o comando que audita dependências em
-  busca de pacotes sem uso ou com vulnerabilidades (ex.: `npm audit`,
+- **`[DEPENDENCY_AUDIT_COMMAND]`** — the command that audits dependencies
+  for unused packages or vulnerabilities (e.g. `npm audit`,
   `npx depcheck`, `pip-audit`).
-- **`[PACKAGE_MANIFEST]`** — o arquivo que declara as dependências do
-  projeto (ex.: `package.json`, `requirements.txt`, `go.mod`).
-- **`[STACK/FRAMEWORK]`** — descrição curta da stack (ex.: "Next.js +
+- **`[PACKAGE_MANIFEST]`** — the file declaring the project's dependencies
+  (e.g. `package.json`, `requirements.txt`, `go.mod`).
+- **`[STACK/FRAMEWORK]`** — a short stack description (e.g. "Next.js +
   TypeScript", "Django + Python 3.12").
-- **`[ROOT_PATH]`** — o caminho raiz onde o agente deve operar. Útil pra
-  restringir a passada a um pacote específico dentro de um monorepo.
+- **`[ROOT_PATH]`** — the root path where the agent should operate. Useful
+  for restricting the pass to a particular package in a monorepo.
 
-## O prompt
+## The prompt
 
 ```
 You are doing a codebase sanitation pass. Goal: leave the repo measurably
@@ -100,12 +99,11 @@ that proves it.
 Codebase: [STACK/FRAMEWORK], root at [ROOT_PATH].
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine que você herdou o backend de um app de gestão de tarefas — uma API
-em Node.js/Express com TypeScript que cresceu por dois anos sem nunca
-passar por uma limpeza sistemática. Você preencheria os placeholders
-assim:
+Imagine inheriting the backend of a task management app — a Node.js/Express
+API with TypeScript that grew for two years without a systematic cleanup.
+You would fill in the placeholders like this:
 
 - `[LINT_COMMAND]` → `npm run lint`
 - `[TYPECHECK_COMMAND]` → `npm run typecheck`
@@ -114,30 +112,28 @@ assim:
 - `[DEPENDENCY_AUDIT_COMMAND]` → `npx depcheck`
 - `[PACKAGE_MANIFEST]` → `package.json`
 - `[STACK/FRAMEWORK]` → "Node.js + Express + TypeScript"
-- `[ROOT_PATH]` → `/apps/api` (se for um monorepo com vários pacotes)
+- `[ROOT_PATH]` → `/apps/api` (for a monorepo with multiple packages)
 
-Ao rodar, o agente primeiro executa os cinco comandos do passo 0 e reporta
-os números reais — por exemplo, "14 warnings de lint, build passando, 3
-dependências sem uso, 0 vulnerabilidades". Em seguida lista o inventário:
-alguns exports nunca importados, um punhado de `TODO`s de dois anos atrás,
-e as 3 dependências sem uso. O plano priorizado separa isso em grupo 1
-(remover imports não usados, apagar um arquivo utilitário órfão) e grupo 2
-— por exemplo, uma dependência que parece sem uso mas na verdade é exigida
-como peer dependency (um pacote que a própria dependência espera que o
-projeto host já forneça) por outro pacote, ou um `TODO` que documenta uma
-limitação real e ainda vale a pena manter. Você aprova ou corrige o grupo
-2, o agente executa item por item confirmando cada checagem antes de
-seguir pro próximo, e o relatório final mostra o antes/depois lado a lado
-(ex.: "14 → 2 warnings", "3 → 0 dependências sem uso").
+When run, the agent first executes the five commands from step 0 and reports
+the real numbers — for example, "14 lint warnings, build passing, 3 unused
+dependencies, 0 vulnerabilities". It then lists the inventory: exports never
+imported, a handful of two-year-old `TODO`s, and the 3 unused dependencies.
+The prioritized plan splits these into group 1 (remove unused imports,
+delete an orphaned utility file) and group 2 — for example, an apparently
+unused dependency actually required as a peer dependency (a package the
+dependency itself expects the host project to provide) by another package,
+or a `TODO` documenting a real limitation worth keeping. You approve or
+correct group 2, the agent executes item by item, confirming each check
+before continuing, and the final report shows before/after side by side
+(e.g. "14 → 2 warnings", "3 → 0 unused dependencies").
 
-## Dicas
+## Tips
 
-- Em uma base grande, divida o inventário do passo 1 e a execução do passo
-  3 entre subagentes especialistas por diretório ou domínio, em vez de um
-  agente só passando por tudo em série.
-- Rode o passo 0 de novo, do zero, toda vez que for reportar um número —
-  um valor lembrado de mais cedo na sessão é a forma mais comum desse
-  número se afastar da realidade.
-- O grupo 2 é o ponto central do exercício; resista à tentação de encaixar
-  um item "provavelmente seguro" no grupo 1 só porque deletar parece
-  fácil.
+- In a large codebase, split the inventory in step 1 and execution in step
+  3 among specialist subagents by directory or domain, instead of having
+  one agent process everything in sequence.
+- Run step 0 again, from scratch, whenever reporting a number — a value
+  remembered from earlier in the session is the most common way that number
+  drifts away from reality.
+- Group 2 is the core of the exercise; resist putting a "probably safe"
+  item into group 1 just because deletion looks easy.

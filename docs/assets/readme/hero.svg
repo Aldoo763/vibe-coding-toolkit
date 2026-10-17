@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="680" viewBox="0 0 1600 680" role="img" aria-labelledby="title description">
   <!-- Keep the static companion hero-still.svg aligned with this composition. -->
   <title id="title">Vibe Coding Toolkit</title>
-  <desc id="description">Abertura cinematográfica em carvão e âmbar. Um portal orbital ilumina o nome do toolkit. A animação termina em menos de cinco segundos e respeita a preferência de redução de movimento.</desc>
+  <desc id="description">Machine setup and individual project setup in charcoal and amber. An orbital portal lights up the toolkit name. The animation ends in under five seconds and respects reduced-motion preferences.</desc>
   <defs>
     <linearGradient id="background" x2="1" y2="1">
       <stop stop-color="#080b10"/>
@@ -87,7 +87,7 @@
     <path class="light" d="M1015 340h440" stroke="url(#beam)" stroke-width="17" filter="url(#glow)"/>
     <path d="M946 340h593" stroke="url(#beam)" stroke-width="1"/>
     <g class="settle">
-      <text x="78" y="201" fill="#e7ba7d" font-family="monospace" font-size="19" letter-spacing="3.4">DA IDEIA AO PRIMEIRO COMMIT.</text>
+      <text x="78" y="201" fill="#e7ba7d" font-family="monospace" font-size="19" letter-spacing="3.4">MACHINE SETUP. PROJECT SETUP.</text>
       <g fill="#f5f2eb" font-family="Arial, Helvetica, sans-serif" font-weight="900">
         <text x="76" y="337" font-size="114" textLength="856" lengthAdjust="spacingAndGlyphs">VIBE CODING</text>
         <text x="69" y="485" font-size="180" textLength="864" lengthAdjust="spacingAndGlyphs">TOOLKIT</text>
@@ -95,8 +95,8 @@
     </g>
     <g clip-path="url(#type)"><rect class="sweep" x="0" y="210" width="320" height="310" fill="url(#sweep)"/></g>
     <g fill="#adb4bf" font-family="monospace" font-size="16" letter-spacing="1.8">
-      <text x="76" y="616">NEXT.JS</text>
-      <text x="226" y="616">SKILLS</text>
+      <text x="76" y="616">MACHINES</text>
+      <text x="226" y="616">PROJECTS</text>
       <text x="370" y="616">CONTEXT</text>
       <text x="530" y="616">QUALITY</text>
       <text x="1524" y="616" text-anchor="end" fill="#e3b982">BUILD WITH INTENT. SHIP WITH FLOW.</text>

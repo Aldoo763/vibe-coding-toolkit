@@ -1,140 +1,157 @@
-# Iniciar um projeto Next.js
+# Start a Next.js project
 
-Transforme uma descrição de produto numa base configurada. Para usar só uma peça, consulte [ferramentas](tools/README.md), [prompts](prompts/README.md) ou [templates](../templates/README.md). Este toolkit distribui a receita; a aplicação fica em outro diretório.
+Turn a product description into a configured foundation. To use a single component, consult [tools](tools/README.md), [prompts](prompts/README.md), or [templates](../templates/README.md). This toolkit distributes the recipe; the application belongs in another directory.
 
-Se a aplicação já existe, use o [prompt 12 — configurar ou atualizar projeto existente](prompts/12-existing-project-setup.md), que preserva sua stack e concilia o toolkit com a base atual.
+If the application already exists, use [prompt 12 — configure or update an existing project](prompts/12-existing-project-setup.md), which preserves its stack and reconciles the toolkit with the current codebase.
 
-Funciona com um agente capaz de ler arquivos, editar e executar comandos. Claude Code e Codex usam os mesmos acordos em formatos próprios; outras LLMs seguem os requisitos com capacidades equivalentes. Um chat sem acesso ao ambiente não comprova execução.
+This works with an agent that can read files, edit, and execute commands. Claude Code and Codex use the same agreements in their own formats; other LLMs follow the requirements with equivalent capabilities. A chat without environment access does not prove execution.
 
-## Prompt curto
+## Short prompt
 
-Abra o agente no diretório de destino e cole:
+Open the agent in the destination directory and paste:
 
 ```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/11-next-project-bootstrap.md e execute o setup neste diretório.
-Projeto: [nome, problema, público, fluxos principais e restrições].
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/11-next-project-bootstrap.md and execute setup in this directory.
+Project: [name, problem, audience, main flows, and constraints].
 ```
 
-Troque só a descrição. Exemplo: “CRM para pequenas imobiliárias; corretores registram contatos, negócios e tarefas, gestores acompanham o funil. Interface em português, acesso por equipe; MVP focado no cadastro e no funil.”
+Replace only the description. Example: “CRM for small real estate agencies; agents record contacts, deals, and tasks, while managers track the pipeline. English interface, team-based access; MVP focused on registration and the pipeline.”
 
-O setup gera `PRODUCT.md`, documentos úteis e o núcleo técnico. As funcionalidades seguem como próximas tarefas do MVP. O bootstrap não publica, contrata serviços nem implementa todo o produto.
+Setup generates `PRODUCT.md`, useful documents, and the technical core. Features remain the next MVP tasks. The bootstrap does not publish, purchase services, or implement the entire product.
 
-## Resultado esperado
+## Expected result
 
 ```text
-meu-projeto/
-├── README.md, PRODUCT.md         # entrada e escopo
-├── AGENTS.md, CLAUDE.md          # acordos e ponte de uma linha
+my-project/
+├── README.md, PRODUCT.md         # entry point and scope
+├── AGENTS.md, CLAUDE.md          # agreements and one-line bridge
 ├── docs/
-│   ├── architecture.md          # estrutura e decisões efetivas
-│   ├── design.md                # direção visual e acessibilidade
-│   ├── onboarding.md            # preparação local
-│   ├── quality.md               # checks e limites
-│   └── setup.md                 # fontes, versões e evidências
+│   ├── architecture.md          # actual structure and decisions
+│   ├── design.md                # visual direction and accessibility
+│   ├── onboarding.md            # local preparation
+│   ├── quality.md               # checks and limits
+│   └── setup.md                 # sources, versions, and evidence
 ├── src/
 │   ├── app/                     # App Router
-│   ├── db/                      # conexão, schema e testes de ciclo de vida
-│   └── lib/                     # ambiente, logger, cn e testes de fronteiras
-├── drizzle/                     # SQL versionado quando houver schema
+│   ├── db/                      # connection, schema, and lifecycle tests
+│   └── lib/                     # environment, logger, cn, and boundary tests
+├── drizzle/                     # versioned SQL when a schema exists
 ├── drizzle.config.ts
 ├── vitest.config.mts
 ├── eslint.config.mjs
-├── eslint-rules/                # regras e baseline compartilhada
+├── eslint-rules/                # rules and shared baseline
 ├── scripts/verify-quality-rules.mjs
-├── .env.example                 # nomes, sem credenciais reais
-├── .agents/skills/              # fontes oficiais locais
+├── .env.example                 # names, without real credentials
+├── .agents/skills/              # local official sources
 ├── skills-lock.json
-├── .claude/skills/              # links relativos/cópias, se esse cliente for usado
+├── .claude/skills/              # relative links/copies, if this client is used
 ├── .graphifyignore
 ├── package.json
-└── [lockfile do gerenciador]
+└── [package manager lockfile]
 ```
 
-Configurações MCP/cliente só entram quando necessárias. Não crie camadas, pastas opcionais ou arquivos vazios. Preserve e concilie instruções geradas pelo Next. Nunca copie o toolkit inteiro para a aplicação.
+MCP/client settings are added only when needed. Do not create layers, optional directories, or empty files. Preserve and reconcile instructions generated by Next.js. Never copy the entire toolkit into the application.
 
-## Global e local
+## Global and local
 
-| Componente | Escopo e ação |
+| Component | Scope and action |
 |---|---|
-| Runtime, gerenciador, Git e agente | Máquina: conferir compatibilidade e reutilizar autenticação |
-| RTK | Reutilizar binário/hook funcional; sem hook, usar comandos suportados explicitamente |
-| Ponytail `full`, Caveman e Superpowers | Plugin/skill do cliente: conferir descoberta e guardar acordos no projeto |
-| Context7 | Reutilizar conexão; configurar MCP local só se faltar integração ativa |
-| Graphify | Reutilizar CLI/skill; exclusões e grafo determinístico pertencem ao projeto |
-| Skills oficiais Vercel e `find-skills` | Projeto: fontes, links relativos/cópias e lockfile versionados |
-| Next e núcleo servidor/testes | Projeto: dependências compatíveis, scripts e um lockfile |
-| Produto, instruções e documentação | Projeto: conteúdo específico e atualizado junto do código |
+| Runtime, package manager, Git, and agent | Machine: check compatibility and reuse authentication |
+| RTK | Reuse a working binary/hook; without a hook, explicitly use supported commands |
+| Ponytail `full`, Caveman, and Superpowers | Client plugin/skill: verify discovery and save working agreements in the project |
+| Context7 | Reuse the connection; configure local MCP only if no active integration exists |
+| Graphify | Reuse CLI/skill; exclusions and the deterministic graph belong to the project |
+| Official Vercel skills and `find-skills` | Project: versioned sources, relative links/copies, and lockfile |
+| Next.js runtime/bundle and PostgreSQL skills | Project: select compatible workflows and actual persistence |
+| CI repair, security review, shadcn, and Sentry MCP | Select by client, task, adopted UI, and authorized service; record inactive/pending cases |
+| Next.js and server/testing core | Project: compatible dependencies, scripts, and one lockfile |
+| Product, instructions, and documentation | Project: specific content updated together with code |
 
-O [setup da máquina](03-environment-setup.md) é separado. Não atualize todas as ferramentas globais nem altere permissões por efeito do bootstrap. Uma preferência escrita não instala plugin nem comprova descoberta. Registre ausências e continue etapas independentes.
+[Machine setup](03-environment-setup.md) is separate. Do not update all global tools or change permissions as a side effect of bootstrap. A written preference does not install a plugin or prove discovery. Record absences and continue independent steps.
 
-## Sequência de execução
+## Execution sequence
 
-### 1. Inspecionar e definir o produto
+### 1. Inspect and define the product
 
-Identifique diretório, instruções, cliente, runtime, gerenciador, arquivos e alterações locais. Obtenha uma revisão única do toolkit e use todos os arquivos dessa revisão. Se o destino for o toolkit, crie uma pasta irmã para o produto.
+Identify the directory, instructions, client, runtime, package manager, files, and local changes. Obtain a single toolkit revision and use all files from that revision. If the destination is the toolkit itself, create a sibling directory for the product.
 
-Leia os [padrões](06-project-defaults.md). Gere `PRODUCT.md` pelo [template histórico](../templates/product.md.template): problema, público, objetivo, fluxos, MVP, requisitos, restrições e aceite. Hipóteses reversíveis ficam explícitas; informação externa indispensável fica pendente, sem inventar resultado. Preserve/consolide documentos existentes, inclusive `product.md`, conforme a regra de nomes dos padrões.
+Read the [defaults](06-project-defaults.md). Generate `PRODUCT.md` using the [historical template](../templates/product.md.template): problem, audience, objective, flows, MVP, requirements, constraints, and acceptance. Make reversible assumptions explicit; leave essential external information pending without inventing results. Preserve/consolidate existing documents, including `product.md`, following the naming rule in the defaults.
 
-### 2. Gerar a base oficial e conferir compatibilidade
+### 2. Generate the official foundation and check compatibility
 
-Consulte Context7 para APIs/setup e fontes oficiais quando necessário. Confira `create-next-app --help`, versões estáveis, runtime e peer dependencies. Uma página oficial pode exemplificar `@rc`: o canal estável do registry e os checks decidem o conjunto utilizado. Registre adaptações, fontes e data.
+Consult Context7 for APIs/setup and official sources when needed. Check `create-next-app --help`, stable versions, runtime, and peer dependencies. An official page may show `@rc`: the registry's stable channel and checks determine the combination used. Record adaptations, sources, and date.
 
-Padrão: App Router, TypeScript strict, Tailwind, ESLint, `src/` e alias `@/*`. Preserve o gerenciador existente; prefira pnpm em projeto novo quando disponível. Registre runtime e `packageManager`.
+Default: App Router, strict TypeScript, Tailwind, ESLint, `src/`, and the `@/*` alias. Preserve the existing package manager; prefer pnpm in a new project when available. Record the runtime and `packageManager`.
 
-Exemplo para pasta nova:
+Example for a new directory:
 
 ```bash
-npx --yes create-next-app@latest meu-projeto --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --use-pnpm --disable-git --no-react-compiler --no-cache-components --no-agent-feedback --yes
+npx --yes create-next-app@latest my-project --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --use-pnpm --disable-git --no-react-compiler --no-cache-components --no-agent-feedback --yes
 ```
 
-As flags negativas evitam preferências salvas. Confira suporte atual; React Compiler/cache entram conforme requisitos e documentação, sem exigir canary. Se houver arquivos no destino, gere em pasta temporária e incorpore sem sobrescrever. Não regenere uma aplicação existente. Inicialize Git se necessário, sem criar remoto ou publicar.
+Negative flags avoid saved preferences. Check current support; React Compiler/caching depend on requirements and documentation, without requiring canary. If the destination contains files, scaffold in a temporary directory and merge without overwriting. Do not regenerate an existing application. Initialize Git if needed, without creating a remote or publishing.
 
-Fontes: [instalação Next](https://nextjs.org/docs/app/getting-started/installation), [CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app) e [ESLint](https://nextjs.org/docs/app/api-reference/config/eslint).
+Sources: [Next.js installation](https://nextjs.org/docs/app/getting-started/installation), [CLI](https://nextjs.org/docs/app/api-reference/cli/create-next-app), and [ESLint](https://nextjs.org/docs/app/api-reference/config/eslint).
 
-### 3. Instalar o núcleo do projeto
+### 3. Install the project core
 
-Drizzle + PostgreSQL é o default de persistência nova; os [padrões](06-project-defaults.md) explicam exceções e critérios de adaptação. Não migre a stack existente automaticamente.
+Drizzle + PostgreSQL is the default for new persistence; the [defaults](06-project-defaults.md) explain exceptions and adaptation criteria. Do not automatically migrate an existing stack.
 
-Exemplo npm, após conferir canais e compatibilidade:
+npm example, after checking channels and compatibility:
 
 ```bash
 npm install drizzle-orm pg server-only zod pino clsx tailwind-merge
 npm install -D drizzle-kit @types/pg @next/env vitest eslint-plugin-drizzle @types/node@24
 ```
 
-Adapte ao gerenciador e runtime. `@types/node@24` corresponde à base Node 24 validada; selecione tipos compatíveis com o runtime real e os peers do Vitest. Não use `--force`/`--legacy-peer-deps` para ocultar conflitos. Alinhe `@next/env` à versão do Next.
+Adapt to the package manager and runtime. `@types/node@24` matches the validated Node 24 baseline; select types compatible with the actual runtime and Vitest peers. Do not hide conflicts with `--force`/`--legacy-peer-deps`. Align `@next/env` with the Next.js version.
 
-Copie a árvore [templates/next/](../templates/next/) no app, removendo só o sufixo `.example`; **mantenha `.env.example`**. Incorpore arquivos existentes. `vitest.config.mts` usa ESM explicitamente, inclusive num package sem `type: module`. Os testes incluídos cobrem validação sem vazamento, redação de logs e ciclo de vida do pool; não dependem de credenciais.
+Copy the [templates/next/](../templates/next/) tree into the app, removing only the `.example` suffix; **keep `.env.example`**. Merge existing files. `vitest.config.mts` uses ESM explicitly, including in a package without `type: module`. Included tests cover validation without leaks, log redaction, and pool lifecycle; they do not require credentials.
 
-O schema começa sem tabelas fictícias. Derive entidades do produto quando forem implementadas. `getDb()` valida a URL e cria um pool sob demanda: o build inicial não precisa de banco. Ajuste pooling ao host; o driver `pg` exige Node. Sem persistência, omita os módulos/dependências de banco e use o perfil leve de lint, documentando a razão.
+The schema starts without fictitious tables. Derive entities from the product as they are implemented. `getDb()` validates the URL and creates a pool lazily: the initial build does not need a database. Adapt pooling to the host; the `pg` driver requires Node.js. Without persistence, omit database modules/dependencies and use the lightweight lint profile, documenting the reason.
 
-Crie `.env.local` ignorado somente quando houver valores autorizados. Garanta que `.env.example` possa ser versionado (`!.env.example`), sem expor credenciais. Gere SQL sem conectar; revise e só aplique migrations no destino correto. Não migre no build, import ou request; não adicione `db:push` ao padrão.
+Create ignored `.env.local` only when authorized values exist. Ensure `.env.example` can be versioned (`!.env.example`), without exposing credentials. Generate SQL without connecting; review and apply migrations only to the correct destination. Do not migrate during builds, imports, or requests; do not add `db:push` to the default workflow.
 
-### 4. Instalar e rotear as skills
+### 4. Install and route skills
 
-Confira o [catálogo Vercel](tools/16-vercel-skills.md) e o upstream atual. Esta revisão verifica oito skills web e `find-skills`; incorpore mudanças oficiais pertinentes, sem congelar nomes/quantidade. Use o `name` do frontmatter e selecione clientes em uso, sem `--all` indiscriminado.
+Check the [Vercel catalog](tools/16-vercel-skills.md) and current upstream. Incorporate relevant official changes without freezing names/counts. Use the frontmatter `name` and select clients in use, without indiscriminate `--all`.
 
-Versione `.agents/skills/`, links relativos de cliente e `skills-lock.json`. No Windows ou host sem links portáveis, use `--copy`. Confira sobreposição local/global sem remover preferências de outros projetos. Instalar skills de deploy não publica; React Native/Expo entra apenas para essa plataforma.
+Evaluate the [scope matrix](tools/README.md#select-by-scope) as part of setup:
 
-### 5. Documentar e integrar os clientes
+| Capability | Bootstrap decision |
+|---|---|
+| [next-dev-loop / next-bundle-optimizer](tools/17-nextjs-runtime-and-performance.md) | Install compatible Next.js instructions; validate runtime prerequisites and analyzer support separately. Missing agent-browser becomes a machine-preparation item, not a silent global install |
+| [supabase-postgres-best-practices](tools/18-postgresql-skills.md) | Install when using PostgreSQL, including the default Drizzle core; preserve the chosen provider |
+| [gh-fix-ci](tools/19-github-ci-repair.md) | Select for a supported Codex/GitHub Actions workflow; live investigation requires an authorized PR/run |
+| [differential-review](tools/20-security-review.md) | Select for security-sensitive development/review; configure the intended report location and range |
+| [shadcn](tools/21-shadcn-ui.md) | Install only when shadcn/ui is adopted or explicitly chosen; preserve other UI systems |
+| [Sentry MCP](tools/22-sentry-mcp.md) | Configure only for a chosen service and intended organization/project; OAuth and live checks remain explicit |
 
-Preencha os nove destinos do [manifesto](../templates/project-docs/manifest.json) com fatos do produto e do código. Quatro arquivos ficam na raiz; os cinco de apoio ficam em `docs/`. Remova campos sem utilidade e placeholders. `CLAUDE.md` importa `AGENTS.md`, sem repetir políticas; é uma ponte pequena já pronta para adoção Claude. Outros clientes usam seus formatos oficiais.
+Record applicability and evidence for every row. Availability does not authorize upgrading an older Next.js project, changing its bundler, adopting a UI kit, or purchasing a service. A missing dependency blocks only its capability.
 
-Reutilize Ponytail `full`, Caveman, Superpowers e RTK funcionais. Se faltar plugin e o host suportar escopo de projeto, prefira-o. No Claude, confira `claude plugin install --help`/`--scope project`; no Codex, confira suporte vigente em vez de inventar flags. Nunca copie caches para simular instalação. Veja [instalação](01-installation.md).
+Version `.agents/skills/`, relative client links, and `skills-lock.json`. On Windows or a host without portable links, use `--copy`. Check local/global overlap without removing preferences from other projects. Installing deployment skills does not publish; React Native/Expo applies only to that platform.
 
-Para Context7 ausente, incorpore o [TOML Codex](../templates/project/codex.config.toml.example) ou [MCP Claude](../templates/project/mcp.json.example), sem transportar tokens. Respeite confiança/configuração do host. Copie [exclusões Graphify](../templates/project/.graphifyignore.example) e ignore grafo, `.vercel/`, configuração pessoal e credenciais; skills e lockfiles permanecem versionáveis.
+### 5. Document and integrate clients
 
-Preserve cliente nativo, modelo e autenticação da sessão, inclusive em Graphify/Caveman e delegação suportada. Não ative backend de API, proxy ou billing externo. Não registre hooks Git, bloqueios de `main` ou exigências de branch/worktree. Hooks próprios do cliente seguem sua integração suportada.
+Fill the nine [manifest](../templates/project-docs/manifest.json) destinations with product and code facts. Four files belong at the root; the five supporting documents belong in `docs/`. Remove unused fields and placeholders. `CLAUDE.md` imports `AGENTS.md` without repeating policies; it is a small bridge ready for Claude adoption. Other clients use their official formats.
 
-### 6. Aplicar ESLint e comandos
+Reuse working Ponytail `full`, Caveman, Superpowers, and RTK integrations. If a plugin is missing and the host supports project scope, prefer it. In Claude, check `claude plugin install --help`/`--scope project`; in Codex, check current support rather than inventing flags. Never copy caches to simulate installation. See [installation](01-installation.md).
 
-Para o núcleo completo, use [next-app.config.mjs.example](../templates/eslint/next-app.config.mjs.example) como `eslint.config.mjs`. Copie **toda** a pasta `templates/eslint/eslint-rules/` para `eslint-rules/` (inclui a baseline Next compartilhada) e o [self-check](../templates/eslint/verify.mjs) para `scripts/verify-quality-rules.mjs`.
+For missing Context7, merge the [Codex TOML](../templates/project/codex.config.toml.example) or [Claude MCP](../templates/project/mcp.json.example), without transporting tokens. Respect host trust/configuration. Copy [Graphify exclusions](../templates/project/.graphifyignore.example) and ignore the graph, `.vercel/`, personal configuration, and credentials; skills and lockfiles remain versionable.
 
-O perfil reúne presets oficiais Next/TypeScript, teto de 350 linhas, logger, fronteira de dados e guardas de `update/delete` Drizzle. O logger é exclusivo do servidor; remova logs de debug do cliente sem importar Pino em Client Components. Os métodos de escrita devem usar a variável `db`, como configurado pelo plugin; aliases, SQL cru e exceções exigem revisão. A guarda de imports também depende dos caminhos configurados: ajuste-os ao layout efetivo. Não substitui autorização ou validação.
+If Sentry is selected, merge its separate [Codex](../templates/project/sentry.codex.config.toml.example) or [Claude](../templates/project/sentry.mcp.json.example) example, replace the scope identifiers, and complete OAuth in the client. Reuse an existing connection; do not add account-dependent MCP entries to every application.
 
-Para adoção parcial ou produto sem banco, o [perfil leve](../templates/eslint/next.config.mjs.example) continua sem exigir dependências do ORM/logger. [Perfil avançado](../templates/eslint/eslint.config.mjs.example) e [lint com tipos](../templates/eslint/eslint.typed.config.mjs.example) são opções separadas.
+Preserve the native client, session model, and authentication, including Graphify/Caveman and supported delegation. Do not enable an API backend, proxy, or external billing. Do not register Git hooks, `main` blockers, or branch/worktree requirements. Client hooks use their supported integration.
 
-Scripts de referência para npm:
+### 6. Apply ESLint and commands
+
+For the full core, use [next-app.config.mjs.example](../templates/eslint/next-app.config.mjs.example) as `eslint.config.mjs`. Copy the **entire** `templates/eslint/eslint-rules/` directory to `eslint-rules/` (including the shared Next.js baseline) and the [self-check](../templates/eslint/verify.mjs) to `scripts/verify-quality-rules.mjs`.
+
+The profile combines official Next.js/TypeScript presets, a 350-line limit, logging, a data boundary, and Drizzle `update/delete` guards. The logger is server-only; remove client debug logs without importing Pino into Client Components. Write methods must use the `db` variable, as configured in the plugin; aliases, raw SQL, and exceptions need review. The import guard also depends on configured paths: adapt them to the actual layout. It does not replace authorization or validation.
+
+For partial adoption or a product without a database, the [lightweight profile](../templates/eslint/next.config.mjs.example) still requires no ORM/logger dependencies. The [advanced profile](../templates/eslint/eslint.config.mjs.example) and [typed lint](../templates/eslint/eslint.typed.config.mjs.example) are separate options.
+
+Reference npm scripts:
 
 ```json
 {
@@ -154,13 +171,17 @@ Scripts de referência para npm:
 }
 ```
 
-Adapte o comando composto ao gerenciador; omita scripts de banco quando não houver persistência. `check` não conecta nem aplica migrations. ESLint roda pela própria CLI; não use `next lint` nem suponha que o build executa lint. Testes DOM/E2E entram junto dos fluxos que precisem deles.
+Adapt the combined command to the package manager; omit database scripts without persistence. `check` does not connect or apply migrations. ESLint runs through its own CLI; do not use `next lint` or assume the build runs lint. Add DOM/E2E tests with flows that require them.
 
-### 7. Verificar e entregar
+### 7. Verify and deliver
 
-Execute lint, tipos, self-check, testes e build sem credenciais reais. Rode `db:generate` com schema presente e confira SQL. Quando houver conexão autorizada, teste migrations e fluxo de dados no banco, distinguindo isso de mock ou engine embarcado. Audite produção e desenvolvimento separadamente; investigue advisories, sem forçar downgrade incompatível ou declarar segurança absoluta.
+Run lint, types, self-check, tests, and build without real credentials. Run `db:generate` with a schema present and inspect SQL. With an authorized connection, test migrations and data flows against the database, distinguishing these from mocks or an embedded engine. Audit production and development separately; investigate advisories without forcing incompatible downgrades or claiming absolute security.
 
-Inicie a aplicação numa porta livre, confirme HTTP/página e encerre apenas processos/recursos criados pelo setup. Confira descoberta de skills em sessão nova quando possível; presença em disco é uma evidência diferente. Valide consulta Context7 real. Para grafo inicial sem LLM externo:
+Start the application on a free port, verify HTTP/page content, and stop only processes/resources created by setup. Check skill discovery in a new session when possible; disk presence is different evidence. Validate a real Context7 query.
+
+For selected capabilities, also record the Next.js runtime preflight and affected browser flow, analyzer support/audit evidence, PostgreSQL checks, read-only CI/Sentry queries, and the security report or component checks that actually ran. Keep unavailable account-dependent checks pending. A successful build does not prove any remote integration works.
+
+Generate the initial deterministic graph with:
 
 ```bash
 GRAPHIFY_NO_AUTO_REFRESH=1 graphify extract . --code-only --no-cluster
@@ -173,8 +194,8 @@ $env:GRAPHIFY_NO_AUTO_REFRESH = '1'
 graphify extract . --code-only --no-cluster
 ```
 
-Confira arquivos esperados em `graphify-out/graph.json`; esse modo não cobre requisitos de `PRODUCT.md` nem semântica dos documentos. Registre limitações da CLI/host. Não instale automações de refresh ou envie o grafo a serviços.
+Check expected files at `graphify-out/graph.json`; this mode does not cover `PRODUCT.md` requirements or document semantics. Record CLI/host limitations. Do not install refresh automations or send the graph to services.
 
-Finalize `docs/setup.md` com revisão, fontes/data, versões, escopos, skills, comandos/resultados e diferenças dos defaults. Use **validado**, **configurado sem execução** ou **pendente**, sem credenciais, caminhos pessoais ou evidências inventadas. Atualize os outros documentos com o estado efetivo.
+Finish `docs/setup.md` with the revision, sources/date, versions, scopes, skills, commands/results, and differences from defaults. Use **validated**, **configured without execution**, or **pending**, without credentials, personal paths, or invented evidence. Update other documents with the actual state.
 
-O bootstrap termina com a base rodando, checks aprovados, pendências explícitas, comando de desenvolvimento e próxima tarefa do MVP. Melhorias compatíveis e atuais fazem parte do setup; migrações amplas, serviços pagos e publicação dependem da autorização pertinente.
+Bootstrap ends with a running foundation, passing checks, explicit pending work, a development command, and the next MVP task. Compatible, current improvements belong in setup; broad migrations, paid services, and publishing require relevant authorization.

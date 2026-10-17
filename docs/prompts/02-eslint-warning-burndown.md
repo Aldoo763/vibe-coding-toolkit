@@ -1,87 +1,81 @@
 # ESLint warning burndown
 
-## Atalho: só o link
+## Shortcut: just the link
 
-Se você chegou aqui pela sequência do
+If you followed the sequence
 [`08`](08-eslint-quality-gates-install.md) →
-[`09`](09-file-size-refactor.md) e agora quer zerar o que sobrou (console
-direto, acesso a dados fora de lugar, orçamento de complexidade), cole
-esta linha no seu agente:
+[`09`](09-file-size-refactor.md) and now want to clear the remaining warnings
+(direct console use, misplaced data access, complexity budgets), paste this
+line into your agent:
 
 ```
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/02-eslint-warning-burndown.md
-e execute o prompt que está nesse arquivo neste projeto, para o conjunto
-inteiro de avisos restantes. Descubra sozinho os comandos de lint, teste,
-typecheck e build lendo o package.json.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/02-eslint-warning-burndown.md
+and execute the prompt in that file in this project, for the entire set
+of remaining warnings. Discover the lint, test, typecheck and build commands
+by reading package.json yourself.
 ```
 
-O resto deste documento é o mesmo prompt, aberto, pra quem prefere colar o
-texto inteiro ou escolher uma regra específica em vez do conjunto todo.
+The rest of this document contains the same prompt in full, for those who
+prefer to paste the entire text or choose one specific rule instead of the
+whole set.
 
-## Quando usar
+## When to use
 
-Se o projeto ainda não tem uma configuração de ESLint decente pra começar,
-use antes um dos dois que montam a configuração: o
+If the project does not yet have a decent ESLint configuration, first use
+one of the two configuration prompts:
 [`08-eslint-quality-gates-install.md`](08-eslint-quality-gates-install.md)
-(o atalho — copia três regras prontas e mede) ou o
-[`07-eslint-complete-setup.md`](07-eslint-complete-setup.md) (o completo — o
-agente monta a config raciocinando sobre a sua stack). Este prompt aqui serve
-pra depois, quando os avisos de uma configuração já existente acumularam e é
-hora de zerá-los.
+(the shortcut — copy three ready-made rules and measure) or
+[`07-eslint-complete-setup.md`](07-eslint-complete-setup.md) (the complete
+version — the agent builds the config by reasoning about your stack). This
+prompt comes afterward, when warnings from an existing configuration have
+accumulated and it is time to clear them.
 
-Se os avisos que você quer zerar são especificamente de **tamanho de
-arquivo**, vá direto pro
-[`09-file-size-refactor.md`](09-file-size-refactor.md): quebrar um arquivo de
-800 linhas é um tipo de trabalho diferente de corrigir 240 avisos de
-`complexity`, e aquele prompt é feito só pra isso.
+If the warnings you want to clear specifically concern **file size**, go
+straight to [`09-file-size-refactor.md`](09-file-size-refactor.md): splitting
+an 800-line file is different work from fixing 240 `complexity` warnings,
+and that prompt is designed specifically for it.
 
-Use este prompt quando você tem uma pilha grande de warnings de lint pra
-zerar — ou quer revisar e reapertar deliberadamente uma regra específica —
-sem que "só corrigir os warnings" vire, silenciosamente, um refactor
-grande. Ele foi generalizado a partir de uma queima de warnings real, na
-qual a decisão mais cara (até onde vale a pena perseguir uma regra em
-arquivos que não foram escritos pensando nela) precisava de uma resposta
-humana explícita antes de qualquer código mudar — não de uma suposição
-enterrada no meio de um plano de implementação.
+Use this prompt when you have a large pile of lint warnings to clear — or
+want to deliberately review and tighten a particular rule — without "just
+fixing the warnings" silently becoming a major refactor. It was generalized
+from a real warning burndown in which the costliest decision (how far to
+pursue a rule in files not written with it in mind) needed an explicit human
+answer before any code changed, rather than an assumption buried in an
+implementation plan.
 
-## Por que funciona
+## Why it works
 
-A lógica é transformar decisão implícita em decisão explícita, e alegação
-em comando. Primeiro, o prompt exige a contagem real de warnings agora —
-nunca um número antigo, porque contagens lembradas divergem da realidade
-rápido demais pra confiar nelas. Depois, ele isola a decisão mais
-arriscada (até onde vale perseguir a regra, ou se faz mais sentido só
-afrouxar o escopo dela) num **portão de decisão** numerado, com opções e
-trade-offs explícitos — deixando claro que "afrouxar a regra" é uma
-mudança de configuração, não uma limpeza de código, pra nunca ser
-apresentada como se fosse a mesma coisa. Os critérios de sucesso viram
-comandos literais em vez de frases vagas do tipo "deveria funcionar". O
-trabalho é dividido em **ondas** — grupos de tarefas com arquivos
-disjuntos, despachadas em paralelo — porque um subagente só enxerga o
-próprio briefing, nunca a conversa de planejamento inteira; por isso a
-lista de pegadinhas precisa ser copiada literalmente em cada uma. E o
-checklist final só é riscado rodando o comando de novo, nunca por
-suposição.
+The logic turns implicit decisions into explicit ones, and claims into
+commands. First, the prompt requires the real warning count now — never an
+old number, because remembered counts drift from reality too quickly to
+trust. Then it isolates the riskiest decision (how far to pursue the rule,
+or whether simply loosening its scope makes more sense) in a numbered
+**decision gate**, with explicit options and trade-offs — making clear that
+"loosening the rule" is a configuration change, not code cleanup, so they
+are never presented as the same thing. Success criteria become literal
+commands instead of vague "should work" statements. Work is divided into
+**waves** — groups of tasks with disjoint files, dispatched in parallel —
+because a subagent only sees its own brief, never the entire planning
+conversation; that is why the pitfalls list must be copied verbatim into
+each one. And the final checklist is checked off only by running the
+command again, never by assumption.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[RULE_NAME]`** — a regra específica do ESLint (ou de outro linter)
-  que está sendo zerada ou reavaliada — ex.: `no-unused-vars`,
-  `complexity`, `max-lines`. Se a queima cobre o conjunto inteiro de
-  warnings em vez de uma regra só, diga isso explicitamente — o próprio
-  prompt já prevê essa opção ("or the full warning set").
-- **`[LINT_COMMAND]`** — o comando que roda o linter mostrando a saída
-  completa por arquivo e por regra. Atenção: alguns wrappers/proxies de CI
-  resumem a saída em vez de mostrar cada linha — o prompt já orienta a
-  rodar com a flag ou invocação direta que devolve a saída completa
-  quando isso acontecer.
-- **`[TYPECHECK_COMMAND]`** — o comando de checagem de tipos.
-- **`[TEST_COMMAND]`** — o comando que roda a suíte de testes.
-- **`[BUILD_COMMAND]`** — o comando de build.
-- **`[STACK/FRAMEWORK]`** — descrição curta da stack, pra dar contexto ao
-  agente.
+- **`[RULE_NAME]`** — the specific ESLint (or other linter) rule being cleared
+  or reassessed — e.g. `no-unused-vars`, `complexity`, `max-lines`. If the
+  burndown covers the entire warning set rather than one rule, say so
+  explicitly — the prompt already supports this ("or the full warning set").
+- **`[LINT_COMMAND]`** — the command that runs the linter with full output
+  per file and rule. Note: some CI wrappers/proxies summarize output rather
+  than displaying every line — the prompt already instructs the agent to
+  use the flag or direct invocation that returns full output when needed.
+- **`[TYPECHECK_COMMAND]`** — the type-checking command.
+- **`[TEST_COMMAND]`** — the command that runs the test suite.
+- **`[BUILD_COMMAND]`** — the build command.
+- **`[STACK/FRAMEWORK]`** — a short stack description to give the agent context.
 
-## O prompt
+## The prompt
 
 ```
 You are planning and executing a lint warning burn-down for [RULE_NAME] (or
@@ -165,12 +159,11 @@ assertion:
 Codebase: [STACK/FRAMEWORK]. Rule(s) in scope: [RULE_NAME].
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine um monorepo em TypeScript onde subir o limite da regra
-`complexity` do ESLint pra um valor mais rígido revelou 240 warnings no
-projeto inteiro — 180 deles concentrados em seis arquivos legados com
-condicionais muito aninhadas. Você preencheria assim:
+Imagine a TypeScript monorepo where tightening ESLint's `complexity` rule
+revealed 240 warnings across the project — 180 concentrated in six legacy
+files with deeply nested conditionals. Fill it in as follows:
 
 - `[RULE_NAME]` → `complexity`
 - `[LINT_COMMAND]` → `npm run lint`
@@ -179,29 +172,27 @@ condicionais muito aninhadas. Você preencheria assim:
 - `[BUILD_COMMAND]` → `npm run build`
 - `[STACK/FRAMEWORK]` → "Next.js + TypeScript monorepo"
 
-O agente roda o lint agora e reporta o número real (240, nunca um número de
-memória). No portão de decisão, ele aponta os seis arquivos legados como o
-ponto caro e arriscado, com contagem real de linhas e arquivos, e
-apresenta as três opções — corrigir tudo, corrigir a maioria e rastrear o
-resto como dívida técnica, ou afrouxar o limite da regra só pra esses seis
-arquivos (deixando explícito que isso é mudança de config, não limpeza de
-código). Sem resposta sua, ele assume a opção A como padrão e segue
-corrigindo o resto do projeto normalmente enquanto espera. Depois, quebra
-o trabalho em ondas de arquivos disjuntos, cada uma com uma pegadinha
-conhecida copiada no briefing (ex.: "essa extração não pode mudar o tipo
-de retorno inferido da função exportada"), roda revisores especialistas
-por onda, e só risca o checklist final depois de rodar `[LINT_COMMAND]`,
-`[TYPECHECK_COMMAND]`, `[TEST_COMMAND]` e `[BUILD_COMMAND]` de novo, de
-verdade.
+The agent runs lint now and reports the real number (240, never from memory).
+At the decision gate, it identifies the six legacy files as the expensive,
+risky area, with real line and file counts, and presents the three options:
+fix everything, fix most and track the rest as technical debt, or loosen
+the rule's limit just for those six files (explicitly stating that this is
+a config change, not code cleanup). Without your response, it assumes
+option A by default and continues fixing the rest of the project while it
+waits. Then it splits work into waves of disjoint files, with each known
+pitfall copied into the brief (e.g. "this extraction must not change the
+exported function's inferred return type"), runs specialist reviewers for
+each wave, and only checks off the final checklist after actually rerunning
+`[LINT_COMMAND]`, `[TYPECHECK_COMMAND]`, `[TEST_COMMAND]` and `[BUILD_COMMAND]`.
 
-## Dicas
+## Tips
 
-- O portão de decisão do passo 1 é a parte mais tentadora de pular,
-  porque parece formalidade — na prática, é onde costuma estar a maior
-  parte do trabalho ou do risco real.
-- Combine o passo 3 com
-  [`05-parallel-wave-dispatch.md`](05-parallel-wave-dispatch.md) pra ter
-  paralelismo de verdade; sem isso, isso degrada pra uma tarefa por vez.
-- Mantenha a lista de pegadinhas do passo 4 crescendo à medida que você
-  encontra novas no meio da queima — uma pegadinha descoberta na onda 2
-  pertence a toda onda 3 em diante também.
+- The decision gate in step 1 is the most tempting part to skip because it
+  seems like a formality — in practice, it usually holds most of the work
+  or real risk.
+- Combine step 3 with
+  [`05-parallel-wave-dispatch.md`](05-parallel-wave-dispatch.md) for real
+  parallelism; without it, this degrades into one task at a time.
+- Keep growing the pitfalls list from step 4 as you discover new ones
+  during the burndown — a pitfall found in wave 2 also belongs in every
+  wave from wave 3 onward.

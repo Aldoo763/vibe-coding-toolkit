@@ -1,390 +1,404 @@
-<a id="topo"></a>
-<a id="sobre-o-projeto"></a>
+**English** · [Português (Brasil)](README.pt-BR.md) · [Español](README.es.md)
+
+<a id="top"></a>
+<a id="about-the-project"></a>
 
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/hero-still.svg" />
-    <img src="docs/assets/readme/hero.svg" alt="Vibe Coding Toolkit — da ideia ao primeiro commit. Abertura cinematográfica em carvão e âmbar." width="1600" />
+    <img src="docs/assets/readme/hero.svg" alt="Vibe Coding Toolkit — machine setup and individual project setup, in charcoal and amber." width="1600" />
   </picture>
 </p>
 
 # Vibe Coding Toolkit
 
-**Da ideia ao projeto preparado. Do código existente a uma base que evolui.**
+**Set up your machine. Bootstrap or upgrade your projects.**
 
-Um toolkit de **documentação, prompts e templates** para desenvolver com agentes de IA: preparar a máquina, iniciar uma aplicação, melhorar um projeto existente e manter contexto e qualidade durante o trabalho.
+A toolkit of **documentation, prompts, and templates** with **two functions: configure machines and configure individual projects**. Build with AI agents: prepare your machine, start an application, improve an existing project, and maintain context and quality throughout the work.
 
-Você descreve o objetivo. O agente inspeciona o ambiente, organiza as decisões, configura as peças aplicáveis e verifica o resultado. **O código fica no seu projeto; este repositório guarda a receita.**
+You describe the goal. The agent inspects the environment, organizes decisions, configures applicable components, and verifies the result. **The code stays in your project; this repository holds the recipe.**
 
 <p align="center">
-  <a href="#comece-por-aqui"><strong>INICIAR UM PROJETO →</strong></a>
+  <a href="#start-here"><strong>START A PROJECT →</strong></a>
   &nbsp; · &nbsp;
-  <a href="docs/03-environment-setup.md">PREPARAR A MÁQUINA</a>
+  <a href="docs/03-environment-setup.md">PREPARE YOUR MACHINE</a>
   &nbsp; · &nbsp;
-  <a href="docs/prompts/12-existing-project-setup.md">CONFIGURAR PROJETO EXISTENTE</a>
+  <a href="docs/prompts/12-existing-project-setup.md">SET UP AN EXISTING PROJECT</a>
   &nbsp; · &nbsp;
-  <a href="#documentacao-completa">EXPLORAR O TOOLKIT</a>
+  <a href="#full-documentation">EXPLORE THE TOOLKIT</a>
 </p>
 
 <p align="center">
-  <a href=".github/workflows/validate.yml"><img src="https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/workflows/validate.yml/badge.svg" alt="Estado da validação do toolkit no GitHub Actions" /></a>
+  <a href=".github/workflows/validate.yml"><img src="https://github.com/soumatheusgomes/vibe-coding-toolkit/actions/workflows/validate.yml/badge.svg" alt="Toolkit validation status on GitHub Actions" /></a>
   &nbsp;
   <a href="LICENSE"><strong>MIT</strong></a>
   &nbsp; · &nbsp;
-  <a href="#comunidade">Star History</a>
+  <a href="#community">Star History</a>
   &nbsp; · &nbsp;
-  <a href="docs/05-toolkit-validation.md">Evidências e limites</a>
+  <a href="docs/05-toolkit-validation.md">Evidence and limits</a>
 </p>
 
 <p align="center">
-  <strong>Claude Code + Codex</strong> / instruções portáveis / skills locais
+  <strong>Claude Code + Codex</strong> / portable instructions / local skills
   <br />
-  <strong>Next.js</strong> para projetos novos / sua stack preservada em projetos existentes
+  <strong>Next.js</strong> for new projects / your stack preserved in existing projects
 </p>
 
 ---
 
-<a id="como-usar-este-repositorio"></a>
-<a id="como-usar-este-repositório"></a>
-<a id="setup-completo-com-o-projeto-aberto-no-agente"></a>
-<a id="escolha-seu-ponto-de-entrada"></a>
+<a id="how-to-use-this-repository"></a>
+<a id="how-to-use-this-repo"></a>
+<a id="complete-setup-with-the-project-open-in-the-agent"></a>
+<a id="choose-your-entry-point"></a>
 
-## 00 / Escolha onde começar
+## 00 / Choose where to start
 
-| Seu momento | Caminho | O que você recebe |
+| Your situation | Path | What you get |
 |---|---|---|
-| **Tenho uma ideia** | [Iniciar um projeto Next.js](docs/04-project-bootstrap.md) · [Prompt 11](docs/prompts/11-next-project-bootstrap.md) | Produto definido, base oficial, documentação, skills e checks |
-| **Já tenho um projeto** | [Configurar ou atualizar a base](docs/prompts/12-existing-project-setup.md) | Diagnóstico, brainstorming, harness, ferramentas e melhorias verificadas |
-| **Preciso preparar a máquina** | [Setup do ambiente](docs/03-environment-setup.md) · [Prompt 10](docs/prompts/10-development-environment-setup.md) | Runtime, agentes, integrações globais, backups e manifesto |
-| **Quero resolver uma necessidade** | [Instalação modular](docs/01-installation.md) · [Prompts](docs/prompts/README.md) | Lint, refatoração, revisão, contexto ou uma ferramenta específica |
+| **I have an idea** | [Start a Next.js project](docs/04-project-bootstrap.md) · [Prompt 11](docs/prompts/11-next-project-bootstrap.md) | Defined product, official foundation, documentation, skills, and checks |
+| **I already have a project** | [Configure or update the foundation](docs/prompts/12-existing-project-setup.md) | Diagnosis, brainstorming, harness, tools, and verified improvements |
+| **I need to prepare my machine** | [Environment setup](docs/03-environment-setup.md) · [Prompt 10](docs/prompts/10-development-environment-setup.md) | Runtime, agents, global integrations, backups, and manifest |
+| **I need to solve a specific problem** | [Modular installation](docs/01-installation.md) · [Prompts](docs/prompts/README.md) | Lint, refactoring, review, context, or a specific tool |
 
-**Durante a leitura:** [Preparação](#preparacao) · [Agentes](#agentes) · [Conhecimento](#conhecimento) · [Qualidade](#qualidade) · [Prompts](#prompts-prontos) · [Documentação](#documentacao-completa) · [Comunidade](#comunidade).
+**On this page:** [Foundation](#foundation) · [Agents](#agents) · [Knowledge](#knowledge) · [Quality](#quality) · [Prompts](#ready-to-use-prompts) · [Documentation](#full-documentation) · [Community](#community).
 
-O agente precisa conseguir ler arquivos, editar e executar comandos. Os guias tratam **Claude Code e Codex separadamente**; outros clientes podem seguir os acordos com capacidades equivalentes. Conversa sem acesso ao ambiente explica o processo, mas não comprova instalações ou testes.
+The agent must be able to read files, edit, and execute commands. The guides cover **Claude Code and Codex separately**; other clients can follow the agreements with equivalent capabilities. A conversation without environment access explains the process but does not prove installations or tests.
 
-<a id="preparacao"></a>
+<a id="foundation"></a>
 
-## 01 / Prepare uma base que combina com o projeto
+## 01 / Prepare a foundation that fits your project
 
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/foundation-still.svg" />
-    <img src="docs/assets/readme/foundation.svg" alt="Fluxo de preparação: entender a intenção, configurar a base, integrar as ferramentas e comprovar o resultado." width="1600" loading="lazy" />
+    <img src="docs/assets/readme/foundation.svg" alt="Preparation flow: understand intent, configure the foundation, integrate tools, and verify the result." width="1600" loading="lazy" />
   </picture>
 </p>
 
-O setup começa pelo que existe: produto, arquivos, runtime, gerenciador, instruções e ferramentas disponíveis. Projetos novos recebem uma base coerente; projetos existentes recebem uma adoção compatível com seus contratos.
+Setup starts with what exists: product, files, runtime, package manager, instructions, and available tools. New projects receive a coherent foundation; existing projects receive adoption compatible with their contracts.
 
-<a id="comece-por-aqui"></a>
+<a id="start-here"></a>
 
-### Comece um projeto com duas linhas
+### Start a project with two lines
 
-Abra o agente no diretório de destino e cole. Troque a segunda linha pela descrição do seu produto:
+Open the agent in the destination directory and paste. Replace the second line with your product description:
 
 ```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/11-next-project-bootstrap.md e execute o setup neste diretório.
-Projeto: [nome, problema, público, fluxos principais e restrições].
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/11-next-project-bootstrap.md and execute setup in this directory.
+Project: [name, problem, audience, main flows, and constraints].
 ```
 
-Exemplo: “CRM para pequenas imobiliárias. Corretores registram contatos, negócios e tarefas; gestores acompanham o funil por equipe. Interface em português, MVP focado em cadastro e acompanhamento de oportunidades.”
+Example: “CRM for small real estate agencies. Agents record contacts, deals, and tasks; managers track the pipeline by team. English interface, MVP focused on registration and tracking opportunities.”
 
-| Parte da entrega | Conteúdo |
+| Delivery area | Contents |
 |---|---|
-| **Produto** | `PRODUCT.md`: problema, público, MVP, restrições, hipóteses e critérios de aceitação |
-| **Aplicação** | Base oficial Next.js, App Router, TypeScript, Tailwind e ESLint |
-| **Servidor e dados** | Drizzle/PostgreSQL para persistência nova, Zod, Pino e fronteiras de servidor |
-| **Testes e qualidade** | Vitest, regras locais, scripts canônicos e validação da base |
-| **Agentes** | Instruções compartilhadas, integração por cliente e skills Vercel locais |
-| **Documentação** | Quatro arquivos na raiz e cinco documentos em `docs/`, com fontes e evidências |
+| **Product** | `PRODUCT.md`: problem, audience, MVP, constraints, assumptions, and acceptance criteria |
+| **Application** | Official Next.js foundation, App Router, TypeScript, Tailwind, and ESLint |
+| **Server and data** | Drizzle/PostgreSQL for new persistence, Zod, Pino, and server boundaries |
+| **Tests and quality** | Vitest, local rules, canonical scripts, and foundation validation |
+| **Agents** | Shared instructions, client-specific integration, and local Vercel skills |
+| **Documentation** | Four root files and five documents in `docs/`, with sources and evidence |
 
-O [bootstrap](docs/04-project-bootstrap.md) termina com a base configurada e a próxima tarefa do MVP identificada. Autenticação, serviços e funcionalidades entram conforme o produto. Uma aplicação sem persistência pode omitir banco com justificativa. Os [defaults](docs/06-project-defaults.md) são revistos com fontes atuais na execução.
+The [bootstrap](docs/04-project-bootstrap.md) ends with a configured foundation and the next MVP task identified. Authentication, services, and features depend on the product. An application without persistence may omit the database with a reason. The [defaults](docs/06-project-defaults.md) are reviewed against current sources during execution.
 
-### Configure ou atualize um projeto existente
+### Configure or update an existing project
 
-Abra o agente na raiz da aplicação e cole:
-
-```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/12-existing-project-setup.md e execute integralmente o bloco da seção “Prompt” neste projeto, começando pelo brainstorming.
-```
-
-O prompt atende uma base sem toolkit, uma adoção parcial ou uma configuração antiga. O trabalho segue este percurso:
-
-1. **Conhecer:** inspecionar produto, stack, instruções, dependências, integrações e checks atuais.
-2. **Decidir:** fazer brainstorming e apresentar melhorias, riscos, dependências e critérios de conclusão.
-3. **Configurar:** instalar, atualizar, integrar ou reaproveitar cada peça aplicável do catálogo.
-4. **Melhorar:** conciliar documentação e regras; organizar código com mudanças incrementais verificáveis.
-5. **Comprovar:** comparar antes/depois, testar integrações disponíveis e registrar limites e pendências.
-
-**Repetir o prompt é parte da manutenção.** Ele confere a revisão do toolkit e a documentação atual, preserva personalizações e evita duplicar instruções, skills, hooks ou servidores MCP. Stack, banco e contratos existentes são preservados; migrações incompatíveis recebem uma decisão própria.
-
-### Prepare a máquina
+Open the agent at the application root and paste:
 
 ```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/10-development-environment-setup.md e execute integralmente o bloco da seção “Prompt” neste computador.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/12-existing-project-setup.md and execute the entire “Prompt” section block in this project, starting with brainstorming.
 ```
 
-O [setup global](docs/03-environment-setup.md) cuida de ferramentas de sistema, Node.js, Docker, agentes, plugins e integrações. Registra versões, escopos, backups, validações e intervenções necessárias. O setup de projeto reutiliza esse ambiente.
+The prompt supports a codebase without the toolkit, partial adoption, or an older configuration. Work follows this path:
 
-> Cole os textos na conversa de um agente com terminal. Os atalhos remotos usam a versão publicada em `main`; em uma cópia ainda não publicada, use o arquivo local. Nenhum setup publica automaticamente sua aplicação.
+1. **Understand:** inspect product, stack, instructions, dependencies, integrations, and current checks.
+2. **Decide:** brainstorm and present improvements, risks, dependencies, and completion criteria.
+3. **Configure:** install, update, integrate, or reuse each applicable catalog component.
+4. **Improve:** reconcile documentation and rules; organize code through incremental, verifiable changes.
+5. **Verify:** compare before/after, test available integrations, and record limits and pending work.
 
-<a id="agentes"></a>
-<a id="o-fluxo-completo"></a>
-<a id="fluxo"></a>
-<a id="superpowers-primeiro"></a>
+**Rerunning the prompt is part of maintenance.** It checks the toolkit revision and current documentation, preserves customizations, and avoids duplicate instructions, skills, hooks, or MCP servers. Existing stack, database, and contracts are preserved; incompatible migrations require their own decision.
 
-## 02 / Dê direção ao trabalho dos agentes
+### Prepare your machine
+
+```text
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/10-development-environment-setup.md and execute the entire “Prompt” section block on this computer.
+```
+
+[Global setup](docs/03-environment-setup.md) handles system tools, Node.js, Docker, agents, plugins, and integrations. It records versions, scopes, backups, validations, and required interventions. Project setup reuses this environment.
+
+> Paste these texts into a conversation with an agent that has terminal access. Remote shortcuts use the version published on `main`; in an unpublished checkout, use the local file. No setup automatically publishes your application.
+
+<a id="agents"></a>
+<a id="complete-workflow"></a>
+<a id="workflow"></a>
+<a id="superpowers-first"></a>
+
+## 02 / Give agent work direction
 
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/orchestration-still.svg" />
-    <img src="docs/assets/readme/orchestration.svg" alt="Um coordenador distribui tarefas entre capacidades leve, focada e crítica, conforme complexidade e risco, e verifica a integração." width="1600" loading="lazy" />
+    <img src="docs/assets/readme/orchestration.svg" alt="A coordinator assigns tasks to light, focused, and critical capabilities according to complexity and risk, then verifies integration." width="1600" loading="lazy" />
   </picture>
 </p>
 
-**Entender → desenhar → planejar quando necessário → implementar → verificar → revisar.** Cada etapa existe para tornar o resultado mais previsível. O processo acompanha o tamanho do pedido e a autorização vigente.
+**Understand → design → plan when needed → implement → verify → review.** Each stage makes the result more predictable. The process follows the request's size and current authorization.
 
-| Função | Ferramentas e acordos | Quando entram |
+| Role | Tools and agreements | When to use |
 |---|---|---|
-| **Entender e decidir** | [Superpowers](docs/tools/01-superpowers.md) | Brainstorming, desenho proporcional, planejamento, diagnóstico e verificação |
-| **Construir com escopo** | [Ponytail full](docs/tools/04-ponytail.md) | Reutilizar o que existe e entregar a menor mudança completa |
-| **Conversar com clareza** | [Caveman](docs/tools/05-caveman.md) | Respostas concisas; código, documentação e commits com redação normal |
-| **Delegar com responsabilidade** | [Subagentes e ondas](docs/tools/02-subagent-orchestration.md) | Contexto isolável, especialização útil e tarefas independentes |
-| **Reduzir saída repetitiva** | [RTK](docs/tools/03-rtk-token-proxy.md) | Comandos suportados, preservando acesso à saída original |
-| **Configurar cada cliente** | [Codex](docs/tools/15-codex-workflow.md) · [Playbook Claude](docs/02-playbook-onboarding.md) | Instruções, descoberta de skills, MCPs e hooks no formato correto |
+| **Understand and decide** | [Superpowers](docs/tools/01-superpowers.md) | Brainstorming, proportional design, planning, diagnosis, and verification |
+| **Build within scope** | [Ponytail full](docs/tools/04-ponytail.md) | Reuse what exists and deliver the smallest complete change |
+| **Communicate clearly** | [Caveman](docs/tools/05-caveman.md) | Concise responses; normal wording for code, documentation, and commits |
+| **Delegate responsibly** | [Subagents and waves](docs/tools/02-subagent-orchestration.md) | Isolatable context, useful specialization, and independent tasks |
+| **Reduce repetitive output** | [RTK](docs/tools/03-rtk-token-proxy.md) | Supported commands, preserving access to original output |
+| **Configure each client** | [Codex](docs/tools/15-codex-workflow.md) · [Claude playbook](docs/02-playbook-onboarding.md) | Instructions, skill discovery, MCP servers, and hooks in the correct format |
 
-### Capacidade escolhida por tarefa
+### Capability chosen per task
 
-Com seleção de modelos autorizada, a LLM escolhe entre os modelos e esforços realmente disponíveis. Busca, inventário e mudanças mecânicas favorecem capacidade leve; decisões ambíguas, segurança, dados e revisão crítica recebem capacidade suficiente para o risco.
+With authorized model selection, the LLM chooses among models and effort levels actually available. Search, inventory, and mechanical changes favor lightweight capability; ambiguous decisions, security, data, and critical review receive enough capability for the risk.
 
-O [prompt de projeto existente](docs/prompts/12-existing-project-setup.md) autoriza essa seleção dentro do cliente e autenticação vigentes, respeitando restrições explícitas. Sem essa política, preserve o modelo da sessão. Disponibilidade de ferramenta não autoriza trocar provedor, ativar proxy ou criar cobrança por API.
+The [existing-project prompt](docs/prompts/12-existing-project-setup.md) authorizes this selection within the current client and authentication, respecting explicit restrictions. Without that policy, preserve the session model. Tool availability does not authorize changing providers, enabling a proxy, or creating API charges.
 
-### Paralelo quando o trabalho permite
+### Parallel work when tasks allow it
 
-- Cada tarefa tem objetivo, contexto mínimo, arquivos permitidos, dependências, aceite e checks.
-- Um escritor por arquivo; lockfiles e configurações compartilhadas têm responsável único.
-- Revisores paralelos trabalham em leitura. O coordenador confere o diff e a integração.
-- Falhas pedem diagnóstico e possível escalonamento, com limites de tempo e tentativas.
-- A retomada verifica arquivos, checkout e processos reais. Um resumo anterior não prova o estado atual.
+- Each task has an objective, minimal context, permitted files, dependencies, acceptance criteria, and checks.
+- One writer per file; lockfiles and shared configurations have a single owner.
+- Parallel reviewers are read-only. The coordinator checks the diff and integration.
+- Failures require diagnosis and possible escalation, with time and retry limits.
+- Resumption checks actual files, checkout, and processes. An earlier summary does not prove current state.
 
-Mudanças pequenas podem ficar no agente principal. O [protocolo de orquestração](docs/tools/02-subagent-orchestration.md) detalha critérios, recuperação e concorrência.
+Small changes can stay with the main agent. The [orchestration protocol](docs/tools/02-subagent-orchestration.md) details criteria, recovery, and concurrency.
 
-<a id="conhecimento"></a>
+<a id="knowledge"></a>
 
-## 03 / Faça o conhecimento sobreviver à sessão
+## 03 / Make knowledge survive the session
 
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/context-still.svg" />
-    <img src="docs/assets/readme/context.svg" alt="Um índice curto de instruções conecta produto, documentação, código, fontes e evidências, carregando detalhes conforme a tarefa." width="1600" loading="lazy" />
+    <img src="docs/assets/readme/context.svg" alt="A short instruction index connects product, documentation, code, sources, and evidence, loading details according to the task." width="1600" loading="lazy" />
   </picture>
 </p>
 
-**Harness engineering** organiza o ambiente no qual o agente trabalha: instruções localizáveis, contexto confiável, ferramentas acessíveis, comandos reproduzíveis e feedback verificável. O projeto guarda o que o próximo agente precisa para continuar.
+**Harness engineering** organizes the environment where the agent works: discoverable instructions, reliable context, accessible tools, reproducible commands, and verifiable feedback. The project keeps what the next agent needs to continue.
 
-| Necessidade | Peça do toolkit | Resultado esperado |
+| Need | Toolkit component | Expected result |
 |---|---|---|
-| **Saber por onde começar** | [AGENTS compartilhado](templates/AGENTS.md.template) e [ponte Claude](templates/CLAUDE.md.template) | Comandos e restrições curtos, apontando para os detalhes |
-| **Consultar APIs atuais** | [Context7](docs/tools/12-context7.md) | Documentação da biblioteca e versão relevantes, sem enviar segredos |
-| **Entender relações no código** | [Graphify](docs/tools/07-graphify.md) | Grafo consultável com cobertura, atualidade e limites registrados |
-| **Guardar decisões úteis** | [Memória do cliente](docs/tools/09-claude-memory-system.md) · [Obsidian opcional](docs/tools/08-obsidian-memory.md) | Índice enxuto e conhecimento detalhado sob demanda |
-| **Usar especialização existente** | [Skills Vercel](docs/tools/16-vercel-skills.md) · [Skills de artefatos](docs/tools/13-anthropics-skills.md) | Instruções pertinentes à tarefa e ao cliente, descobertas e verificadas |
+| **Know where to start** | [Shared AGENTS](templates/AGENTS.md.template) and [Claude bridge](templates/CLAUDE.md.template) | Short commands and constraints pointing to details |
+| **Consult current APIs** | [Context7](docs/tools/12-context7.md) | Documentation for the relevant library and version, without sending secrets |
+| **Understand code relationships** | [Graphify](docs/tools/07-graphify.md) | Queryable graph with recorded coverage, freshness, and limits |
+| **Keep useful decisions** | [Client memory](docs/tools/09-claude-memory-system.md) · [Optional Obsidian](docs/tools/08-obsidian-memory.md) | Lean index and detailed knowledge on demand |
+| **Use existing specialization** | [Vercel skills](docs/tools/16-vercel-skills.md) · [Artifact skills](docs/tools/13-anthropics-skills.md) | Relevant instructions for the task and client, discovered and verified |
 
-### Cada documento tem uma função
+### Each document has a purpose
 
-O [manifesto de documentos](templates/project-docs/manifest.json) liga os templates aos nove destinos do bootstrap:
+The [document manifest](templates/project-docs/manifest.json) connects templates to the nine bootstrap destinations:
 
 ```text
-seu-projeto/
-├── README.md                 Como entrar e executar
-├── PRODUCT.md                Problema, escopo e aceite
-├── AGENTS.md                 Comandos e acordos compartilhados
-├── CLAUDE.md                 Ponte para as instruções compartilhadas
+your-project/
+├── README.md                 How to enter and run
+├── PRODUCT.md                Problem, scope, and acceptance
+├── AGENTS.md                 Shared commands and agreements
+├── CLAUDE.md                 Bridge to shared instructions
 └── docs/
-    ├── architecture.md       Estrutura, fronteiras e decisões
-    ├── design.md             Direção visual e acessibilidade
-    ├── onboarding.md         Preparação local e primeiro fluxo
-    ├── quality.md            Checks, revisão e limites
-    └── setup.md              Fontes, versões, evidências e pendências
+    ├── architecture.md       Structure, boundaries, and decisions
+    ├── design.md             Visual direction and accessibility
+    ├── onboarding.md         Local preparation and first flow
+    ├── quality.md            Checks, review, and limits
+    └── setup.md              Sources, versions, evidence, and pending work
 ```
 
-Em projeto existente, preserve documentos equivalentes já canônicos e registre o mapeamento. Mudar comportamento, comando, schema ou configuração também atualiza o documento responsável. Detalhes ficam na fonte correta, sem transformar `AGENTS.md` em uma enciclopédia.
+In an existing project, preserve equivalent canonical documents and record the mapping. A behavior, command, schema, or configuration change also updates its responsible document. Details stay in the correct source without turning `AGENTS.md` into an encyclopedia.
 
-### Skills disponíveis, ações sob demanda
+### Available skills, actions on demand
 
-Para Next/React, o [catálogo Vercel](docs/tools/16-vercel-skills.md) cobre boas práticas, composição, UI, escrita, transições, otimização e operações Vercel, além de `find-skills`. React Native/Expo entra conforme a plataforma. Os nomes vêm do `SKILL.md` e são conferidos no upstream durante o setup.
+For Next.js/React, the [Vercel catalog](docs/tools/16-vercel-skills.md) covers best practices, composition, UI, writing, transitions, optimization, and Vercel operations, plus `find-skills`. React Native/Expo depends on the platform. Names come from `SKILL.md` and are checked upstream during setup.
 
-Instalar uma skill de deploy não publica. Instalar uma skill de transições não exige animações. Skills, MCPs e memória externa entram no fluxo quando existe tarefa pertinente e autorização.
+Installing a deployment skill does not publish. Installing a transition skill does not require animations. Skills, MCP servers, and external memory enter the workflow when there is a relevant task and authorization.
 
-<a id="qualidade"></a>
+<a id="quality"></a>
 
-## 04 / Troque “parece pronto” por evidência
+## 04 / Replace “looks ready” with evidence
 
 <p align="center">
   <picture>
     <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/readme/quality-still.svg" />
-    <img src="docs/assets/readme/quality.svg" alt="Lint, tipos, testes e build formam uma esteira de verificação com revisão, correção e nova evidência. A imagem ilustra etapas, não resultados medidos." width="1600" loading="lazy" />
+    <img src="docs/assets/readme/quality.svg" alt="Lint, types, tests, and build form a verification pipeline with review, fixes, and fresh evidence. The image illustrates stages, not measured results." width="1600" loading="lazy" />
   </picture>
 </p>
 
-O toolkit separa **arquivo presente**, **configuração concluída** e **integração testada**. Cada check prova uma parte do resultado; pendências e falhas preexistentes continuam visíveis.
+The toolkit distinguishes **file present**, **configuration complete**, and **integration tested**. Each check proves part of the result; pending work and pre-existing failures remain visible.
 
-| Frente | Como verificar | Referência |
+| Area | How to verify | Reference |
 |---|---|---|
-| **Estrutura e fronteiras** | Presets do framework, regras locais, teto de 350 linhas e imports ajustados à base | [ESLint e quality gates](docs/tools/06-eslint-biome-quality-gates.md) |
-| **Comportamento** | Tipos, testes relevantes, regressões, tratamento de erros e build | [Padrões do projeto](docs/06-project-defaults.md) |
-| **Interface em uso** | Navegação local, teclado, foco, estados, console, rede e desempenho quando pertinente | [agent-browser](docs/tools/11-agent-browser.md) · [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) |
-| **Integrações do agente** | Descoberta real de skills, consulta ao Context7, RTK sem duplicação e grafo pertinente | [Setup de projeto existente](docs/prompts/12-existing-project-setup.md) |
-| **O próprio toolkit** | Links, âncoras, manifesto, JSON e base Next em projeto temporário | [Validação reproduzível](docs/05-toolkit-validation.md) |
+| **Structure and boundaries** | Framework presets, local rules, a 350-line limit, and imports adapted to the codebase | [ESLint and quality gates](docs/tools/06-eslint-biome-quality-gates.md) |
+| **Behavior** | Types, relevant tests, regressions, error handling, and build | [Project defaults](docs/06-project-defaults.md) |
+| **Interface in use** | Local navigation, keyboard, focus, states, console, networking, and performance where relevant | [agent-browser](docs/tools/11-agent-browser.md) · [Chrome DevTools MCP](docs/tools/14-chrome-devtools-mcp.md) |
+| **Agent integrations** | Actual skill discovery, Context7 queries, RTK without duplication, and a relevant graph | [Existing-project setup](docs/prompts/12-existing-project-setup.md) |
+| **The toolkit itself** | Links, anchors, manifest, JSON, and a Next.js foundation in a temporary project | [Reproducible validation](docs/05-toolkit-validation.md) |
 
-Regras novas em código legado recebem medição e adoção progressiva. Proteções existentes não são enfraquecidas para obter um relatório verde. O perfil de lint acompanha a stack; instalar regras não justifica trocar ORM ou introduzir dependências sem uso.
+New rules in legacy code receive measurement and gradual adoption. Existing protections are not weakened to obtain a green report. The lint profile follows the stack; installing rules does not justify switching ORM or adding unused dependencies.
 
-### Revisão depois de implementar ou corrigir
+### Review after implementation or fixes
 
-As instruções compartilhadas recomendam **3 a 8 ciclos posteriores de code review**. A LLM escolhe quantidade e focos pelo tamanho, risco e incerteza da mudança e entrega um prompt de continuação.
+Shared instructions recommend **3 to 8 subsequent code review cycles**. The LLM chooses the count and focuses according to the change's size, risk, and uncertainty, and provides a continuation prompt.
 
-Os ciclos podem cobrir comportamento, regressões, segurança, dados, acessibilidade e integração. Cada um inspeciona o estado atual, registra achados e verifica correções autorizadas. A contagem não reinicia a cada correção interna. Essa faixa é uma convenção do toolkit; não garante ausência de bugs nem inicia novas rodadas automaticamente.
+Cycles may cover behavior, regressions, security, data, accessibility, and integration. Each inspects the current state, records findings, and verifies authorized fixes. The count does not reset with each internal fix. This range is a toolkit convention; it neither guarantees the absence of bugs nor automatically starts new rounds.
 
-### Evidências e limites
+### Evidence and limits
 
-A base possui [validação documentada em macOS, Linux e Windows](docs/05-toolkit-validation.md), com checks automatizados também em [Ubuntu e Windows](.github/workflows/validate.yml). O relatório distingue testes de fronteiras, SQL, build, HTTP e integrações reais, além de registrar advisories e limites conhecidos. Instalação em outro ambiente precisa de verificação própria.
+The foundation has [documented validation on macOS, Linux, and Windows](docs/05-toolkit-validation.md), with automated checks also on [Ubuntu and Windows](.github/workflows/validate.yml). The report distinguishes boundary tests, SQL, build, HTTP, and real integrations, and records advisories and known limits. Installation in another environment requires its own verification.
 
-Checks são explícitos. O toolkit não instala bloqueios de push em `main`, não exige branch/worktree e não acrescenta hooks de commit/push. [Hooks do cliente](docs/tools/10-hooks-best-practices.md) usam integrações suportadas e verificadas, sem duplicação.
+Checks are explicit. The toolkit does not install push blockers on `main`, require a branch/worktree, or add commit/push hooks. [Client hooks](docs/tools/10-hooks-best-practices.md) use supported, verified integrations without duplication.
 
-<a id="prompts-prontos"></a>
+<a id="ready-to-use-prompts"></a>
 <a id="prompts"></a>
 
-## 05 / Uma biblioteca de prompts por objetivo
+## 05 / A prompt library organized by goal
 
-Escolha a tarefa, abra o prompt e copie o bloco indicado. O [catálogo completo](docs/prompts/README.md) reúne instruções de uso e adaptação.
+Choose a task, open the prompt, and copy the indicated block. The [complete catalog](docs/prompts/README.md) includes usage and adaptation instructions.
 
-| Objetivo | Prompts | Quando usar |
+| Goal | Prompts | When to use |
 |---|---|---|
-| **Preparar tudo** | [10 · Máquina](docs/prompts/10-development-environment-setup.md) · [11 · Projeto novo](docs/prompts/11-next-project-bootstrap.md) · [12 · Projeto existente](docs/prompts/12-existing-project-setup.md) | Instalação inicial, adoção completa ou atualização |
-| **Entender e planejar** | [04 · Brainstorm até plano](docs/prompts/04-brainstorm-to-plan.md) | Transformar pedido ambíguo em trabalho com aceite |
-| **Organizar a base** | [01 · Sanitização](docs/prompts/01-project-sanitation.md) · [09 · Arquivos grandes](docs/prompts/09-file-size-refactor.md) | Medir problemas e refatorar por responsabilidade |
-| **Evoluir o lint** | [07 · ESLint completo](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Instalar regras, medir legado e reduzir violações |
-| **Revisar e coordenar** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Ondas paralelas](docs/prompts/05-parallel-wave-dispatch.md) | Revisão especializada e execução independente |
-| **Manter contexto** | [06 · Memória](docs/prompts/06-memory-bootstrap.md) | Guardar conhecimento útil sem inflar a sessão |
+| **Prepare everything** | [10 · Machine](docs/prompts/10-development-environment-setup.md) · [11 · New project](docs/prompts/11-next-project-bootstrap.md) · [12 · Existing project](docs/prompts/12-existing-project-setup.md) | Initial installation, complete adoption, or updates |
+| **Understand and plan** | [04 · Brainstorm to plan](docs/prompts/04-brainstorm-to-plan.md) | Turn an ambiguous request into work with acceptance criteria |
+| **Organize the codebase** | [01 · Sanitation](docs/prompts/01-project-sanitation.md) · [09 · Large files](docs/prompts/09-file-size-refactor.md) | Measure problems and refactor by responsibility |
+| **Evolve lint** | [07 · Complete ESLint](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Install rules, measure legacy code, and reduce violations |
+| **Review and coordinate** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Parallel waves](docs/prompts/05-parallel-wave-dispatch.md) | Specialist review and independent execution |
+| **Maintain context** | [06 · Memory](docs/prompts/06-memory-bootstrap.md) | Keep useful knowledge without bloating the session |
 
-<a id="ou-só-o-eslint-numa-linha"></a>
+<a id="eslint-in-one-line"></a>
 
-### Adote uma peça por vez
+### Adopt one component at a time
 
-Para instalar somente os quality gates:
+To install only the quality gates:
 
 ```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md e execute o prompt neste projeto. Use MAX_LINES=350.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md and execute the prompt in this project. Use MAX_LINES=350.
 ```
 
-Depois da medição, o [prompt 09](docs/prompts/09-file-size-refactor.md) orienta refatoração de arquivos grandes. Para apenas skills Vercel, use o [catálogo e a instalação local](docs/tools/16-vercel-skills.md). A adoção modular continua disponível sem executar o setup inteiro.
+After measurement, [prompt 09](docs/prompts/09-file-size-refactor.md) guides large-file refactoring. For Vercel skills alone, use the [catalog and local installation](docs/tools/16-vercel-skills.md). Modular adoption remains available without running the entire setup.
 
-## 06 / Entenda o que pertence a cada lugar
+## 06 / Understand what belongs where
 
-### Global e local
+### Global and local
 
-| Máquina e cliente | Projeto |
+| Machine and client | Project |
 |---|---|
-| Runtime, Git e gerenciador de pacotes | Dependências da aplicação e lockfile |
-| Agente, autenticação e plugins existentes | Produto, instruções e documentação específica |
-| RTK e integração funcional | Skills locais e `skills-lock.json` |
-| Ponytail, Caveman e Superpowers já disponíveis | Regras de qualidade e comandos canônicos |
-| CLI Graphify e conexão Context7 existente | Exclusões do grafo e configuração local quando necessária |
+| Runtime, Git, and package manager | Application dependencies and lockfile |
+| Agent, authentication, and existing plugins | Product, instructions, and specific documentation |
+| RTK and working integration | Local skills and `skills-lock.json` |
+| Ponytail, Caveman, and Superpowers already available | Quality rules and canonical commands |
+| Graphify CLI and existing Context7 connection | Graph exclusions and local configuration when needed |
 
-Claude Code e Codex têm descoberta e configurações próprias. Uma integração global funcional é reutilizada; conteúdo pessoal e credenciais não são copiados para templates. Instalação e atualização usam o menor escopo suportado, com limites de autorização explícitos.
+Claude Code and Codex have their own discovery and configuration mechanisms. Reuse a working global integration; personal content and credentials are not copied into templates. Installation and updates use the smallest supported scope, with explicit authorization limits.
 
-### Stack de partida e compatibilidade
+### Starting stack and compatibility
 
-| Contexto | Como o toolkit se adapta |
+| Context | How the toolkit adapts |
 |---|---|
-| **Projeto web novo** | Next.js estável, App Router, TypeScript, Tailwind, ESLint, Vitest e núcleo servidor conforme o produto |
-| **Projeto existente** | Preserva framework, gerenciador, banco, ORM, testes e equivalentes funcionais; mede antes de mudar |
-| **Monorepo** | Identifica workspaces, fronteiras e configurações compartilhadas antes de escolher alvos |
-| **Outro cliente ou stack** | Usa capacidades e formatos compatíveis; registra componentes inaplicáveis e bloqueios |
-| **Sem credenciais ou serviços** | Executa checks seguros e independentes; distingue configuração de integração real |
+| **New web project** | Stable Next.js, App Router, TypeScript, Tailwind, ESLint, Vitest, and server core according to the product |
+| **Existing project** | Preserves framework, package manager, database, ORM, tests, and working equivalents; measures before changing |
+| **Monorepo** | Identifies workspaces, boundaries, and shared configurations before selecting targets |
+| **Another client or stack** | Uses compatible capabilities and formats; records inapplicable components and blockers |
+| **No credentials or services** | Runs safe, independent checks; distinguishes configuration from real integration |
 
-O toolkit não é um gerador próprio nem uma aplicação pronta. O scaffold novo vem de `create-next-app`; os templates complementam a base. Versões e APIs são conferidas durante o setup. Publicação, serviços pagos e migrações incompatíveis dependem da autorização pertinente.
+The toolkit is neither a custom generator nor a ready-made application. New scaffolds come from `create-next-app`; templates complement the foundation. Versions and APIs are checked during setup. Publishing, paid services, and incompatible migrations require relevant authorization.
 
-<a id="documentacao-completa"></a>
-<a id="documentação-completa"></a>
-<a id="índice"></a>
-<a id="referências"></a>
+<a id="full-documentation"></a>
+<a id="complete-documentation"></a>
+<a id="index"></a>
+<a id="references"></a>
 
-## 07 / Explore a documentação
+## 07 / Explore the documentation
 
 ```text
 vibe-coding-toolkit/
-├── README.md                 Você está aqui
-├── docs/                     Guias, padrões e evidências
-│   ├── tools/                Ferramentas por função
-│   └── prompts/              Receitas copiáveis
-├── templates/                Arquivos para adaptar no destino
-└── scripts/                  Validação do próprio toolkit
+├── README.md                 You are here
+├── docs/                     Guides, defaults, and evidence
+│   ├── tools/                Tools by purpose
+│   └── prompts/              Copyable recipes
+├── templates/                Files to adapt at the destination
+└── scripts/                  Toolkit validation
 ```
 
-<a id="fundamentos"></a>
+<a id="fundamentals"></a>
 
-### Guias
+### Guides
 
-| Documento | Para quê |
+| Document | Purpose |
 |---|---|
-| [Visão geral](docs/00-overview.md) | Princípios e caminhos de adoção |
-| [Instalação](docs/01-installation.md) | Comandos, distribuição e escopos |
-| [Playbook Claude](docs/02-playbook-onboarding.md) | Fluxo narrado de trabalho dentro do projeto |
-| [Setup da máquina](docs/03-environment-setup.md) | Preparação, retomada e reprodução do ambiente |
-| [Bootstrap Next](docs/04-project-bootstrap.md) | Produto até base configurada |
-| [Projeto existente](docs/prompts/12-existing-project-setup.md) | Adoção completa, atualização e harness |
-| [Validação do toolkit](docs/05-toolkit-validation.md) | O que foi comprovado e quais limites permanecem |
-| [Padrões do projeto](docs/06-project-defaults.md) | Stack, documentação e critérios de adaptação |
+| [Overview](docs/00-overview.md) | Principles and adoption paths |
+| [Installation](docs/01-installation.md) | Commands, distribution, and scopes |
+| [Claude playbook](docs/02-playbook-onboarding.md) | A narrated project workflow |
+| [Machine setup](docs/03-environment-setup.md) | Environment preparation, resumption, and reproduction |
+| [Next.js bootstrap](docs/04-project-bootstrap.md) | Product description to configured foundation |
+| [Existing project](docs/prompts/12-existing-project-setup.md) | Complete adoption, updates, and harness |
+| [Toolkit validation](docs/05-toolkit-validation.md) | What was verified and what limits remain |
+| [Project defaults](docs/06-project-defaults.md) | Stack, documentation, and adaptation criteria |
 
-### Ferramentas
+### Tools
 
-As 16 referências estão distribuídas pelos blocos funcionais desta página. O [catálogo de ferramentas](docs/tools/README.md) mantém o índice completo e os links de instalação.
+The [tool catalog](docs/tools/README.md) maintains the complete index, installation links, and [machine/project scope matrix](docs/tools/README.md#select-by-scope).
+
+| Capability | Use when |
+|---|---|
+| [next-dev-loop / next-bundle-optimizer](docs/tools/17-nextjs-runtime-and-performance.md) | A compatible Next.js project needs runtime feedback or bundle evidence |
+| [PostgreSQL guidance](docs/tools/18-postgresql-skills.md) | Working on SQL, schema, migrations, pooling, or database security |
+| [GitHub CI repair](docs/tools/19-github-ci-repair.md) | Investigating failing GitHub Actions PR checks |
+| [Differential security review](docs/tools/20-security-review.md) | A change affects sensitive data or trust boundaries |
+| [shadcn](docs/tools/21-shadcn-ui.md) | The project uses or selects shadcn/ui |
+| [Sentry MCP](docs/tools/22-sentry-mcp.md) | Investigating a chosen service's errors/performance with authorized access |
+
+Evaluate every option during setup; activate those that fit the project. Each guide covers requirements, installation, use, verification, and maintenance.
 
 ### Templates
 
-O [catálogo de templates](templates/README.md) reúne documentação, núcleo Next, perfis ESLint, configurações Context7 por cliente, exclusões Graphify e exemplos de hooks. Copie e adapte apenas os arquivos usados; valide no destino. O [manifesto](templates/project-docs/manifest.json) é a referência para os documentos gerados.
+The [template catalog](templates/README.md) includes documentation, Next.js core, ESLint profiles, Context7 configuration per client, Graphify exclusions, and hook examples. Copy and adapt only files you use; validate at the destination. The [manifest](templates/project-docs/manifest.json) is the reference for generated documents.
 
-### Verifique esta cópia
+### Verify this checkout
 
 ```bash
+node --test scripts/validate-docs.test.mjs
 node scripts/validate-docs.mjs
 node scripts/validate-next.mjs
 ```
 
-O primeiro comando confere links, âncoras, destinos e JSON. O segundo exige **Node.js 24, npm e rede**; cria um projeto temporário, executa os checks da base e remove os recursos criados. Dependências do produto não entram na raiz deste repositório. Veja [escopo e evidências](docs/05-toolkit-validation.md) antes de interpretar os resultados.
+The first commands test the validator and check links, anchors, destinations, and JSON. The final command requires **Node.js 24, npm, and network access**; it creates a temporary project, runs foundation checks, and removes created resources. Product dependencies stay outside this repository's root. See [scope and evidence](docs/05-toolkit-validation.md) before interpreting results.
 
-<a id="comunidade"></a>
+<a id="community"></a>
 
-## 08 / Acompanhe a evolução
+## 08 / Follow the project's progress
 
-Se o toolkit ajudou a preparar um projeto ou melhorar seu fluxo, uma estrela facilita encontrá-lo novamente e dá visibilidade ao trabalho.
+If the toolkit helped you prepare a project or improve your workflow, a star makes it easier to find again and helps others discover the work.
 
 <a href="https://www.star-history.com/?repos=soumatheusgomes%2Fvibe-coding-toolkit&amp;type=date">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=soumatheusgomes/vibe-coding-toolkit&amp;type=date&amp;theme=dark" />
     <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=soumatheusgomes/vibe-coding-toolkit&amp;type=date" />
-    <img src="https://api.star-history.com/chart?repos=soumatheusgomes/vibe-coding-toolkit&amp;type=date" alt="Histórico de estrelas do repositório soumatheusgomes/vibe-coding-toolkit, fornecido pelo Star History." width="1000" loading="lazy" />
+    <img src="https://api.star-history.com/chart?repos=soumatheusgomes/vibe-coding-toolkit&amp;type=date" alt="Star history for soumatheusgomes/vibe-coding-toolkit, provided by Star History." width="1000" loading="lazy" />
   </picture>
 </a>
 
-[Abrir o histórico de estrelas](https://www.star-history.com/?repos=soumatheusgomes%2Fvibe-coding-toolkit&type=date) · [Reportar um problema](https://github.com/soumatheusgomes/vibe-coding-toolkit/issues) · [Propor uma melhoria](https://github.com/soumatheusgomes/vibe-coding-toolkit/pulls)
+[Open star history](https://www.star-history.com/?repos=soumatheusgomes%2Fvibe-coding-toolkit&type=date) · [Report an issue](https://github.com/soumatheusgomes/vibe-coding-toolkit/issues) · [Suggest an improvement](https://github.com/soumatheusgomes/vibe-coding-toolkit/pulls)
 
-O gráfico é fornecido pelo [Star History](https://www.star-history.com/blog/how-to-use-github-star-history/) e depende da disponibilidade desse serviço. Para contribuir, descreva o problema, preserve caminhos públicos e inclua validação pertinente. Prompts e templates precisam continuar portáveis, sem segredos ou configurações pessoais.
+The chart is provided by [Star History](https://www.star-history.com/blog/how-to-use-github-star-history/) and depends on that service's availability. To contribute, describe the problem, keep public paths in English, and include relevant validation. Prompts and templates must remain portable, without secrets or personal settings.
 
-<a id="creditos"></a>
-<a id="licenca"></a>
-<a id="vamos-juntos"></a>
-<a id="créditos"></a>
-<a id="licença"></a>
+<a id="credits"></a>
+<a id="license"></a>
+<a id="build-together"></a>
+<a id="acknowledgments"></a>
+<a id="licensing"></a>
 
-## Créditos e licença
+## Credits and license
 
-Construído a partir de [Superpowers](https://github.com/obra/superpowers), [RTK](https://github.com/rtk-ai/rtk), [Ponytail](https://github.com/DietrichGebert/ponytail), [Caveman](https://github.com/JuliusBrussee/caveman), [Graphify](https://github.com/Graphify-Labs/graphify), [Context7](https://github.com/upstash/context7), [agent-browser](https://github.com/vercel-labs/agent-browser), [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills) e [Skills CLI](https://github.com/vercel-labs/skills). Cada projeto mantém sua licença e distribuição.
+Built on [Superpowers](https://github.com/obra/superpowers), [RTK](https://github.com/rtk-ai/rtk), [Ponytail](https://github.com/DietrichGebert/ponytail), [Caveman](https://github.com/JuliusBrussee/caveman), [Graphify](https://github.com/Graphify-Labs/graphify), [Context7](https://github.com/upstash/context7), [agent-browser](https://github.com/vercel-labs/agent-browser), [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills), and [Skills CLI](https://github.com/vercel-labs/skills). Each project maintains its own license and distribution.
 
-Toolkit sob [MIT](LICENSE). Por [Matheus Gomes](https://instagram.com/matheusgomes).
+Toolkit licensed under [MIT](LICENSE). By [Matheus Gomes](https://instagram.com/matheusgomes).
 
 <p align="center">
   <strong>BUILD WITH INTENT. SHIP WITH FLOW.</strong>
   <br />
-  <a href="#topo">Voltar ao topo ↑</a>
+  <a href="#top">Back to top ↑</a>
 </p>

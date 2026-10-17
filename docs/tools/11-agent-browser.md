@@ -1,94 +1,94 @@
 # agent-browser
 
-## O que é
+## What it is
 
-agent-browser é uma CLI (interface de linha de comando) standalone, instalada via npm (o gerenciador de pacotes padrão do Node.js/JavaScript) — não é um plugin do Claude Code, é uma ferramenta separada que funciona com qualquer agente de IA capaz de rodar comandos de terminal. É um agente de automação de navegador no estilo dos projetos da Vercel, e controla um navegador Chrome/Chromium de verdade através do DevTools Protocol (o protocolo de depuração remota que o próprio Chrome expõe — o mesmo que as ferramentas de desenvolvedor do navegador usam por trás dos panos).
+agent-browser is a standalone CLI (command-line interface), installed through npm (the default Node.js/JavaScript package manager). It is a separate tool, rather than a Claude Code plugin, and works with any AI agent capable of running terminal commands. It is a browser automation agent in the style of Vercel projects, controlling a real Chrome/Chromium browser through the DevTools Protocol (the remote debugging protocol exposed by Chrome itself, also used behind the scenes by the browser's developer tools).
 
-Importante: **não é um wrapper** (uma camada fina por cima) de bibliotecas como Playwright ou Puppeteer. Foi escrita do zero como CLI nativa, pensada especificamente pra ser controlada por um agente de IA — não adaptada de uma ferramenta feita originalmente pra humanos escreverem testes automatizados.
+Important: it is **not a wrapper** (a thin layer on top) around libraries such as Playwright or Puppeteer. It was written from scratch as a native CLI specifically designed for control by an AI agent, rather than adapted from a tool originally built for humans writing automated tests.
 
-A diferença prática que isso traz: em vez de seletores CSS (os "endereços" que identificam um elemento numa página, tipo `#botao-login`) ou interação só por captura de tela (a IA "olhando" pixels e adivinhando onde clicar), o agent-browser trabalha com fotografias — *snapshots* — da árvore de acessibilidade (*accessibility tree*: a estrutura que leitores de tela usam pra navegar uma página sem enxergar — títulos, botões, campos, links, e como eles se relacionam) e devolve referências compactas de elemento, tipo `@e1`, `@e2`, `@e3`.
+The practical difference: instead of CSS selectors (the “addresses” identifying an element on a page, such as `#login-button`) or screenshot-only interaction (the AI looking at pixels and guessing where to click), agent-browser takes *snapshots* of the *accessibility tree*: the structure screen readers use to navigate a page without seeing it, including headings, buttons, fields, links, and their relationships. It returns compact element references such as `@e1`, `@e2`, and `@e3`.
 
-## Por que usar
+## Why use it
 
-Um seletor CSS quebra assim que o layout de uma página muda. Uma abordagem só de captura de tela obriga o agente a raciocinar em cima de pixels, o que é caro e impreciso. Uma referência de acessibilidade curta e estável (`@e1`, `@e2`, ...) dá pro agente algo que ele consegue acionar diretamente e pedir de novo, barato, depois que a página muda — mais parecido com a forma como um leitor de tela "vê" uma página do que com a forma como um raspador (*scraper*) tradicional faz.
+A CSS selector breaks when a page layout changes. A screenshot-only approach forces the agent to reason about pixels, which is expensive and imprecise. A short, stable accessibility reference (`@e1`, `@e2`, ...) gives the agent something it can act on directly and request again cheaply after the page changes. This is closer to how a screen reader “sees” a page than how a traditional scraper works.
 
-## Como instalar
+## How to install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o agent-browser pra mim: rode `npm i -g agent-browser` e depois `agent-browser install`.
+> Install agent-browser for me: run `npm i -g agent-browser`, then `agent-browser install`.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda os comandos e confirma que funcionou. Você não precisa abrir um terminal separado nem saber a diferença entre `pip`/`uv`/`npm`. Prefere fazer você mesmo? Os comandos são exatamente os mesmos, é só rodar direto no seu terminal.
+> Claude Code has terminal (Bash) access: it runs the commands and confirms they worked. You do not need to open a separate terminal or know the difference between `pip`/`uv`/`npm`. Prefer doing it yourself? Run the exact same commands directly in your terminal.
 
-O primeiro comando instala a CLI globalmente; o segundo baixa e prepara o navegador Chrome/Chromium que ela vai controlar (parecido com o que `playwright install` faz, pra quem já usou Playwright).
+The first command installs the CLI globally; the second downloads and prepares the Chrome/Chromium browser it will control (similar to `playwright install`, for anyone familiar with Playwright).
 
-Confirme:
+Confirm:
 
 ```bash
 agent-browser --version
 ```
 
-## Fluxo básico
+## Basic workflow
 
-| Comando | O que faz |
+| Command | What it does |
 |---|---|
-| `agent-browser open <url>` | Abre uma página. |
-| `agent-browser snapshot` | Tira uma fotografia da árvore de acessibilidade da página atual, com referências (`@e1`, `@e2`, ...). |
-| `agent-browser click @eN` | Clica no elemento referenciado por `@eN` no último snapshot. |
-| `agent-browser fill @eN "texto"` | Preenche um campo referenciado por `@eN` com o texto dado. |
-| `agent-browser screenshot arquivo.png` | Salva uma captura de tela em PNG. |
+| `agent-browser open <url>` | Opens a page. |
+| `agent-browser snapshot` | Takes a snapshot of the current page's accessibility tree, with references (`@e1`, `@e2`, ...). |
+| `agent-browser click @eN` | Clicks the element referenced by `@eN` in the latest snapshot. |
+| `agent-browser fill @eN "text"` | Fills the field referenced by `@eN` with the given text. |
+| `agent-browser screenshot file.png` | Saves a PNG screenshot. |
 
-Regra de ouro: **tire um snapshot novo depois de qualquer ação que muda a página de forma relevante.** As referências só são válidas contra o snapshot de onde vieram — usar uma referência de um snapshot antigo, depois que a página mudou, aponta pro elemento errado ou pra nada.
+Golden rule: **take a fresh snapshot after any action that substantially changes the page.** References are only valid against the snapshot they came from. Reusing a reference from an old snapshot after the page changes points to the wrong element or nothing at all.
 
-## O padrão de esboço de descoberta
+## The discovery stub pattern
 
-O arquivo que um agente de codificação carrega pra saber usar essa ferramenta (o "skill" — no vocabulário do próprio agent-browser, um pacote de instruções carregado sob demanda pra uma capacidade específica) é propositalmente minúsculo. Em vez de duplicar um guia de uso completo em Markdown — que ficaria desatualizado a cada nova versão da CLI — esse arquivo só manda o agente puxar as instruções de verdade, atualizadas, direto da própria CLI:
+The file a coding agent loads to learn this tool (the “skill”: in agent-browser's vocabulary, an instruction package loaded on demand for a specific capability) is deliberately tiny. Instead of duplicating a complete Markdown guide that would become outdated with every CLI release, it simply tells the agent to fetch the actual, current instructions directly from the CLI:
 
 ```bash
-agent-browser skills get core          # fluxos de trabalho, padrões, troubleshooting
-agent-browser skills get core --full   # referência completa de comandos e templates
-agent-browser skills list              # todas as skills disponíveis nesta instalação
+agent-browser skills get core          # workflows, patterns, troubleshooting
+agent-browser skills get core --full   # complete command and template reference
+agent-browser skills list              # all skills available in this installation
 ```
 
-O esboço nunca fica desatualizado, porque não tem nada nele que possa ficar — o conteúdo de verdade sempre bate com a versão instalada no momento em que é buscado. É um padrão que vale a pena copiar nas suas próprias ferramentas: mantenha o arquivo sempre carregado minúsculo, e busque as instruções de verdade ao vivo, na hora.
+The stub never becomes outdated because there is nothing in it to go stale: the actual content always matches the version installed when it is fetched. This pattern is worth copying in your own tools: keep the always-loaded file tiny, and fetch the actual instructions live when needed.
 
-Esse mesmo motivo é por que este documento também evita duplicar uma referência exaustiva de comandos: pra qualquer coisa além do fluxo básico acima, `agent-browser skills get core --full`, rodado na sua instalação, é a fonte da verdade — não este texto.
+For the same reason, this document avoids duplicating an exhaustive command reference. For anything beyond the basic workflow above, `agent-browser skills get core --full`, run in your installation, is the source of truth, rather than this text.
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-### 1. Instale
+### 1. Install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o agent-browser pra mim: rode `npm i -g agent-browser` e depois `agent-browser install`.
+> Install agent-browser for me: run `npm i -g agent-browser`, then `agent-browser install`.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda os comandos e confirma que funcionou. Você não precisa abrir um terminal separado nem saber a diferença entre `pip`/`uv`/`npm`. Prefere fazer você mesmo? Os comandos são exatamente os mesmos, é só rodar direto no seu terminal.
+> Claude Code has terminal (Bash) access: it runs the commands and confirms they worked. You do not need to open a separate terminal or know the difference between `pip`/`uv`/`npm`. Prefer doing it yourself? Run the exact same commands directly in your terminal.
 
-### 2. Primeiro comando: puxe as instruções reais
+### 2. First command: fetch the actual instructions
 
 ```bash
 agent-browser skills get core
 ```
 
-Isso devolve um guia em Markdown cobrindo fluxo de trabalho, padrões comuns e troubleshooting pra versão instalada — o conteúdo exato varia de versão pra versão, por isso vale rodar isso você mesmo em vez de confiar só neste documento.
+This returns a Markdown guide covering workflows, common patterns, and troubleshooting for the installed version. The exact content varies by version, so run it yourself rather than relying solely on this document.
 
-### 3. Abra uma página
+### 3. Open a page
 
 ```bash
 agent-browser open example.com
 ```
 
-### 4. Tire um snapshot — e leia o texto direto dele
+### 4. Take a snapshot and read its text directly
 
 ```bash
 agent-browser snapshot
 ```
 
-Formato típico de saída, pra essa página específica (`example.com` é um domínio reservado pra exemplos de documentação — o conteúdo dela é sempre o mesmo):
+Typical output for this particular page (`example.com` is a domain reserved for documentation examples, with consistent content):
 
 ```
 Page: Example Domain
@@ -99,107 +99,107 @@ URL: https://example.com/
 @e3 [link] "More information..."
 ```
 
-Repare que "extrair um texto" não precisa de um comando separado — o texto visível já vem dentro do próprio snapshot, junto de cada referência. Ler `@e2` no resultado acima **é** a extração.
+Notice that “extracting text” does not require a separate command: visible text is already included in the snapshot alongside each reference. Reading `@e2` in the result above **is** the extraction.
 
-## Exemplos
+## Examples
 
-### Exemplo 1 — preencher e enviar um formulário
+### Example 1 — fill out and submit a form
 
-Um formulário de cadastro genérico, rodando localmente:
+A generic registration form running locally:
 
 ```bash
-agent-browser open localhost:3000/cadastro
+agent-browser open localhost:3000/signup
 agent-browser snapshot
 ```
 
-Formato típico de saída:
+Typical output:
 
 ```
-Page: Novo cadastro
-URL: http://localhost:3000/cadastro
+Page: New registration
+URL: http://localhost:3000/signup
 
-@e1 [heading] "Criar conta"
+@e1 [heading] "Create account"
 @e2 [form]
-  @e3 [input type="text"] placeholder="Nome completo"
-  @e4 [input type="email"] placeholder="E-mail"
-  @e5 [input type="password"] placeholder="Senha"
-  @e6 [button type="submit"] "Criar conta"
+  @e3 [input type="text"] placeholder="Full name"
+  @e4 [input type="email"] placeholder="Email"
+  @e5 [input type="password"] placeholder="Password"
+  @e6 [button type="submit"] "Create account"
 ```
 
-Preencha os campos e envie:
+Fill out the fields and submit:
 
 ```bash
 agent-browser fill @e3 "Maria Oliveira"
 agent-browser fill @e4 "maria@example.com"
-agent-browser fill @e5 "senha-forte-123"
+agent-browser fill @e5 "strong-password-123"
 agent-browser click @e6
 ```
 
-O clique em `@e6` envia o formulário e muda a página — pela regra de ouro lá de cima, o próximo passo é tirar um snapshot novo, não reusar `@e3`-`@e6`:
+Clicking `@e6` submits the form and changes the page. Following the golden rule above, the next step is a fresh snapshot, rather than reusing `@e3`–`@e6`:
 
 ```bash
 agent-browser snapshot
 ```
 
 ```
-Page: Cadastro confirmado
-URL: http://localhost:3000/bem-vindo
+Page: Registration confirmed
+URL: http://localhost:3000/welcome
 
-@e1 [heading] "Conta criada com sucesso"
-@e2 [text] "Enviamos um e-mail de confirmação pra maria@example.com."
+@e1 [heading] "Account created successfully"
+@e2 [text] "We sent a confirmation email to maria@example.com."
 ```
 
-### Exemplo 2 — tirar um print da página
+### Example 2 — take a page screenshot
 
 ```bash
 agent-browser open example.com
-agent-browser screenshot pagina.png
+agent-browser screenshot page.png
 ```
 
-Saída esperada: um arquivo `pagina.png` na pasta atual, e uma confirmação parecida com:
+Expected output: a `page.png` file in the current directory and a confirmation similar to:
 
 ```
-Screenshot salvo em pagina.png (1280x800)
+Screenshot saved to page.png (1280x800)
 ```
 
-## Além de páginas web comuns
+## Beyond ordinary web pages
 
-Capacidades estendidas carregam do mesmo jeito que o `core` acima — sob demanda, cada uma como sua própria skill, em vez de vir tudo empacotado de saída na documentação principal:
+Extended capabilities load just like `core` above: on demand, each as its own skill, instead of all being bundled into the main documentation from the start:
 
-| Skill | Cobre |
+| Skill | Covers |
 |---|---|
-| `electron` | Apps desktop feitos em Electron (framework que cria aplicativos desktop usando tecnologias web) — editores de código, apps de chat, ferramentas de design. |
-| `slack` | Automação de apps de chat corporativo (workspace). |
-| `dogfood` | Passadas exploratórias de QA/*dogfooding* (usar a própria aplicação internamente pra achar problemas antes que um usuário real os encontre) sobre uma aplicação web. |
-| `derive-client` | Derivar um cliente de API standalone a partir de uma captura de tráfego de rede — um arquivo HAR (*HTTP Archive*, o formato padrão que registra cada requisição e resposta que um navegador fez). |
-| `vercel-sandbox` | Rodar dentro de VMs (máquinas virtuais) de sandbox — um ambiente isolado e descartável, pra rodar algo sem risco pro resto do sistema — hospedadas na nuvem. |
-| `agentcore` | Sessões de navegador hospedadas na nuvem. |
+| `electron` | Desktop apps built with Electron (a framework for building desktop applications using web technologies): code editors, chat apps, and design tools. |
+| `slack` | Corporate chat app (workspace) automation. |
+| `dogfood` | Exploratory QA/*dogfooding* passes (using your own application internally to find problems before real users do) on a web application. |
+| `derive-client` | Deriving a standalone API client from captured network traffic: a HAR file (*HTTP Archive*, the standard format recording every browser request and response). |
+| `vercel-sandbox` | Running inside cloud-hosted sandbox VMs (virtual machines): isolated, disposable environments for running something without risking the rest of the system. |
+| `agentcore` | Cloud-hosted browser sessions. |
 
-Puxe qualquer uma delas do mesmo jeito: `agent-browser skills get <nome>`.
+Fetch any of them the same way: `agent-browser skills get <name>`.
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-**As referências `@eN` são geradas a cada snapshot e ficam obsoletas assim que a página muda.** Sempre tire um snapshot novo depois de uma ação que altera a página de forma relevante — clique, navegação, envio de formulário. Usar uma referência velha não dá erro sempre; às vezes só aponta pro elemento errado, silenciosamente.
+**`@eN` references are generated for each snapshot and become stale as soon as the page changes.** Always take a fresh snapshot after an action that substantially changes the page: a click, navigation, or form submission. An old reference does not always cause an error; sometimes it silently points to the wrong element.
 
-**Esse documento pode ficar desatualizado; a CLI, não.** Pelo próprio padrão de esboço de descoberta descrito acima, a referência de comandos completa e sempre atual é `agent-browser skills get core --full`, rodado na sua instalação — não este texto nem nenhum outro guia estático.
+**This document can become outdated; the CLI cannot.** Following the discovery stub pattern above, the complete, current command reference is `agent-browser skills get core --full`, run in your installation, rather than this text or another static guide.
 
-**Um print anotado ajuda a conferir o trabalho do agente.** `agent-browser screenshot --annotate arquivo.png` numera os elementos visíveis batendo com as referências `@eN` do snapshot — útil quando uma pessoa quer checar visualmente o que o agente "viu" antes de agir. `--full` captura a página inteira, com rolagem, em vez de só o que cabe na tela.
+**An annotated screenshot helps verify the agent's work.** `agent-browser screenshot --annotate file.png` numbers visible elements to match the snapshot's `@eN` references, useful when someone wants to visually check what the agent “saw” before acting. `--full` captures the entire scrollable page, rather than only the visible screen.
 
-**Falha mais por espera ruim do que por seletor ruim.** Se uma ação parece não fazer nada, o mais provável é que a página ainda estava carregando ou fazendo uma transição no momento da interação — não que a referência estivesse errada. Vale tirar um snapshot de checagem antes de repetir a ação.
+**Poor timing causes more failures than poor selectors.** If an action seems to do nothing, the page was most likely still loading or transitioning during the interaction, rather than the reference being wrong. Take a verification snapshot before repeating the action.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Preciso saber Playwright ou Puppeteer pra usar isso?**
-Não. agent-browser não é um wrapper de nenhum dos dois — os comandos são os dele mesmo, e a lógica de referência por acessibilidade não existe do mesmo jeito nessas outras ferramentas.
+**Do I need to know Playwright or Puppeteer to use this?**
+No. agent-browser is not a wrapper around either: it has its own commands, and those tools do not use accessibility references in the same way.
 
-**Funciona só com o Claude Code?**
-Não, é standalone — funciona com qualquer agente de IA que consiga rodar comandos de terminal.
+**Does it only work with Claude Code?**
+No, it is standalone and works with any AI agent that can run terminal commands.
 
-**Dá pra automatizar um aplicativo desktop, tipo um editor de código?**
-Sim, através da skill `electron`, carregada sob demanda com `agent-browser skills get electron`.
+**Can it automate a desktop application, such as a code editor?**
+Yes, through the `electron` skill, loaded on demand with `agent-browser skills get electron`.
 
-**As referências `@eN` mudam entre execuções?**
-Sim — são geradas a cada snapshot, do zero, a cada vez. Nunca reuse uma referência de um snapshot anterior.
+**Do `@eN` references change between runs?**
+Yes: they are generated from scratch for every snapshot. Never reuse a reference from an earlier snapshot.
 
-**Preciso manter algum guia próprio atualizado a cada nova versão da CLI?**
-Não pros comandos em si. A fonte de verdade é sempre `agent-browser skills get core`; este documento é só a porta de entrada conceitual — o "porquê" por trás da ferramenta, não o "como" exato de cada comando.
+**Do I need to maintain my own guide for every new CLI version?**
+Not for the commands themselves. The source of truth is always `agent-browser skills get core`; this document is the conceptual entry point, explaining the “why” behind the tool rather than the exact “how” of each command.

@@ -1,21 +1,21 @@
-# [Nome do projeto]
+# [Project name]
 
-[O que o produto resolve e para quem, conforme PRODUCT.md.]
+[What the product solves and for whom, as defined in PRODUCT.md.]
 
-## Executar
+## Run
 
-[Runtime, gerenciador e comandos reais de instalação, desenvolvimento e verificação. Indique ambiente e banco necessários; não exponha credenciais.]
+[Runtime, package manager, and actual installation, development, and verification commands. State required environment and database setup; do not expose credentials.]
 
-## Documentação
+## Documentation
 
-- [Produto e escopo](PRODUCT.md).
-- [Preparação local](docs/onboarding.md).
-- [Estrutura e decisões técnicas](docs/architecture.md).
-- [Design e acessibilidade](docs/design.md).
-- [Checks de qualidade](docs/quality.md).
-- [Instruções para agentes](AGENTS.md).
-- [Setup e evidências](docs/setup.md).
+- [Product and scope](PRODUCT.md).
+- [Local preparation](docs/onboarding.md).
+- [Structure and technical decisions](docs/architecture.md).
+- [Design and accessibility](docs/design.md).
+- [Quality checks](docs/quality.md).
+- [Agent instructions](AGENTS.md).
+- [Setup and evidence](docs/setup.md).
 
-## Próxima entrega
+## Next delivery
 
-[A menor tarefa que avança o MVP e seu critério observável. Pendências externas ficam explícitas.]
+[The smallest task that advances the MVP and its observable criterion. Make external dependencies explicit.]

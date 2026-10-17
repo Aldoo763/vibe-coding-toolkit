@@ -1,276 +1,259 @@
-# Playbook de Onboarding
+# Onboarding Playbook
 
-> Se o [README](../README.md) é o cardápio e a [Visão geral](00-overview.md)
-> é o porquê, este é o passo a passo: pegue qualquer projeto, do zero, e
-> monte esse fluxo de trabalho inteiro — na ordem certa, ficando fluente em
-> cada ferramenta pelo caminho.
+> If the [README](../README.md) is the menu and the [Overview](00-overview.md)
+> explains why, this is the walkthrough: take any project from scratch and
+> assemble the entire workflow in the right order, becoming fluent with
+> each tool along the way.
 
-## Para quem é este playbook
+## Who this playbook is for
 
-Serve tanto pra quem já desenvolve há anos e quer um jeito estruturado de
-usar IA em produção sem perder controle da qualidade, quanto pra quem está
-começando agora e só quer copiar um caminho que já funciona. Este playbook
-não assume que você já usou o Claude Code antes — a Parte 1 começa na
-instalação — mas também não obriga ninguém a andar pra trás: se parte
-disso já está rodando no seu ambiente, pule direto pra parte que falta.
+For experienced developers who want a structured way to use AI in
+production while retaining quality control, and beginners who simply want
+to follow a proven path. This playbook assumes no prior Claude Code
+experience: Part 1 starts with installation. It does not force anyone to
+backtrack, either: if something already works in your environment, skip to
+the missing part.
 
-## Como usar este playbook
+## How to use this playbook
 
-Para configurar ou atualizar o conjunto aplicável em um projeto existente, use o [prompt 12](prompts/12-existing-project-setup.md). Ele conduz diagnóstico, brainstorming, harness, implementação e validação; este playbook permanece como referência narrada do fluxo Claude.
+To configure or update the applicable toolkit in an existing project, use [prompt 12](prompts/12-existing-project-setup.md). It guides diagnosis, brainstorming, harness setup, implementation, and validation; this playbook remains the narrated Claude workflow reference.
 
-Para criar uma nova aplicação Next com uma descrição de produto, prefira o [bootstrap](04-project-bootstrap.md). Este playbook serve como referência de adoção e configuração manual no Claude. Plugins e hooks opcionais não são parte obrigatória do starter.
+To create a new Next application from a product description, prefer the [bootstrap](04-project-bootstrap.md). This playbook is an adoption and manual configuration reference for Claude. Optional plugins and hooks are not mandatory starter components.
 
-Este guia cobre o **fluxo dentro do projeto**, principalmente no Claude Code. Para preparar ou atualizar a máquina, comece pelo [setup do ambiente](03-environment-setup.md). Para usar Codex, veja o [guia do cliente](tools/15-codex-workflow.md) e o [template compartilhado de `AGENTS.md`](../templates/AGENTS.md.template).
+This guide covers the **in-project workflow**, primarily in Claude Code. To prepare or update the machine, start with [environment setup](03-environment-setup.md). For Codex, see the [client guide](tools/15-codex-workflow.md) and [shared `AGENTS.md` template](../templates/AGENTS.md.template).
 
-Duas formas, as duas válidas:
+Two equally valid approaches:
 
-- **Do início ao fim, na primeira vez.** Cada parte assume que a anterior
-  já rodou — a Parte 4 (o fluxo de trabalho completo) só faz sentido de
-  verdade depois que os pilares da Parte 2 estão instalados e o `CLAUDE.md`
-  da Parte 3 está preenchido.
-- **Como referência, depois.** Uma vez que o setup já está de pé, volte
-  direto pra parte que precisar — "como era o prompt de revisão
-  multi-agente mesmo?" é uma pergunta da Parte 4, não do playbook inteiro
-  de novo.
+- **Start to finish the first time.** Each part assumes the previous one
+  is complete. Part 4, the complete workflow, only makes full sense after
+  the Part 2 pillars are installed and Part 3's `CLAUDE.md` is filled in.
+- **As a reference afterward.** Once setup is running, return directly to
+  the part you need. “What was the multi-agent review prompt?” calls for
+  Part 4 rather than rereading the whole playbook.
 
-## Continuidade de execução
+## Execution continuity
 
-Estes acordos ajudam a conduzir um escopo já autorizado em Claude, Codex ou outro host com ferramentas. São instruções de trabalho; não garantem persistência do runtime nem criam um hook de continuação automática.
+These agreements help carry out already-authorized work in Claude, Codex, or another tool-enabled host. They are work instructions; they do not guarantee runtime persistence or create an automatic continuation hook.
 
-- **Status durante o trabalho:** responda brevemente e continue as ações restantes. Uma pergunta como “como está?” não cancela a tarefa. Pausa, cancelamento ou mudança de objetivo explícitos alteram a execução; sem execução em andamento, um pedido exclusivamente informativo termina com a resposta.
-- **Bloqueio parcial:** identifique quais tarefas dependem da ação bloqueada e conclua as independentes ainda seguras e autorizadas. Não contorne negativas ou gates. Antes de encerrar, confira se ainda existe ação executável dentro do escopo.
-- **Trabalhador falho ou incerto:** confirme pelo mecanismo do host que parou antes de assumir ou redistribuir seus arquivos. Pedido de interrupção sem confirmação não libera a escrita. Inspecione o diff e os checks das mudanças parciais, retome do ponto verificado e mantenha um escritor por arquivo.
-- **Tentativas e limites:** só repita com evidência nova, como causa identificada ou dependência corrigida. Respeite limites de tentativas, tempo e custo. Sem alternativa segura, encerre com o bloqueio, o que foi concluído e o que falta para retomar; não invente progresso para manter o turno ativo.
-- **Retomada:** handoff é contexto disponível, não prova do checkout. Confira arquivos, Git, resultados e processos reais antes de editar, preservando mudanças locais.
-- **Execução em segundo plano:** só afirme que continua quando houver processo, agente ou automação ativo e verificável. Uma promessa em conversa não inicia trabalho após o turno.
+- **Status during work:** answer briefly and continue remaining actions. A question such as “how is it going?” does not cancel the task. Explicit pauses, cancellations, or objective changes alter execution; without active work, a purely informational request ends with its answer.
+- **Partial blockage:** identify tasks depending on the blocked action and complete independent work that remains safe and authorized. Do not bypass denials or gates. Before ending, check whether any action within scope remains executable.
+- **Failed or uncertain worker:** use the host's mechanism to confirm it stopped before taking over or redistributing its files. An unconfirmed interruption request does not release write ownership. Inspect the partial diff and checks, resume from the verified point, and keep one writer per file.
+- **Retries and limits:** retry only with new evidence, such as an identified cause or fixed dependency. Respect attempt, time, and cost limits. Without a safe alternative, end with the blocker, completed work, and requirements for resuming; do not invent progress to keep the turn active.
+- **Resuming:** a handoff provides context, not proof of checkout state. Check actual files, Git state, results, and processes before editing, preserving local changes.
+- **Background execution:** claim work continues only when an active process, agent, or automation can be verified. A conversational promise does not start work after the turn ends.
 
-O [template compartilhado de AGENTS](../templates/AGENTS.md.template) contém o bloco pronto para adaptar. Em projeto existente, incorpore-o às instruções carregadas; `CLAUDE.md` pode importar `AGENTS.md`, sem duplicar políticas. Continue respeitando permissões e decisões vigentes: consultar autorização anterior evita repetir aprovações, mas não cria autorização nova.
+The [shared AGENTS template](../templates/AGENTS.md.template) contains a ready-to-adapt block. In existing projects, incorporate it into loaded instructions; `CLAUDE.md` can import `AGENTS.md` without duplicating policies. Continue respecting current permissions and decisions: consulting prior authorization avoids repeated approvals but does not create new authorization.
 
-### Roteiro de avaliação
+### Evaluation outline
 
-Em um projeto descartável, sem serviços externos, confira os seguintes cenários. Esta é uma proposta de avaliação, não um experimento já executado em todos os hosts.
+In a disposable project without external services, check these scenarios. This is a proposed evaluation, not an experiment already run across all hosts.
 
-| Cenário | Resultado esperado |
+| Scenario | Expected result |
 |---|---|
-| Pergunta de status entre duas alterações autorizadas | Resposta breve; segunda alteração concluída e verificada antes de encerrar |
-| Trabalhador falha ou seu estado é incerto | Sem assumir seus arquivos antes de confirmar a parada; diff parcial inspecionado |
-| Uma ação bloqueada, outra independente | Concluir a independente sem contornar o bloqueio |
-| Falha repetida sem evidência nova ou alternativa segura | Encerrar com diagnóstico e condição para retomada, sem retry idêntico |
-| Pausa, cancelamento ou limite de orçamento | Respeitar o limite e informar o estado real |
-| Pergunta exclusivamente informativa, sem execução ativa | Responder e encerrar, sem iniciar trabalho adicional |
-| Handoff diverge dos arquivos | Conferir estado real antes de editar |
+| Status question between two authorized changes | Brief answer; second change completed and verified before ending |
+| Worker fails or its state is uncertain | No takeover before confirmed stop; partial diff inspected |
+| One blocked action and one independent action | Complete the independent action without bypassing the blocker |
+| Repeated failure without new evidence or a safe alternative | End with diagnosis and resumption conditions, without identical retries |
+| Pause, cancellation, or budget limit | Respect the limit and report actual state |
+| Purely informational question without active execution | Answer and end without starting additional work |
+| Handoff differs from actual files | Check real state before editing |
 
-## Pré-requisitos
+## Prerequisites
 
-Antes de abrir o terminal, confira se você tem:
+Before opening the terminal, check that you have:
 
-- **Runtime exigido pelo projeto.** Para projetos Node.js, confira `node --version` e respeite `.node-version`, `.nvmrc` e `engines`. O instalador nativo do Claude Code não exige Node.js previamente.
-- **Um terminal.** macOS, Linux ou Windows (nativo ou WSL) — tudo neste
-  playbook roda em linha de comando.
-- **`gh` CLI (opcional).** Só necessário se você for usar os fluxos de
-  GitHub (pull requests, issues) mencionados ao longo do caminho. Instale
-  pelo [site oficial](https://cli.github.com) se ainda não tiver.
-- **Uma conta que autentique o Claude Code** — plano Pro, Max, ou acesso
-  via API/console da Anthropic. Sem isso o `claude` CLI instala, mas não
-  loga.
+- **The runtime required by the project.** For Node.js projects, check `node --version` and respect `.node-version`, `.nvmrc`, and `engines`. Claude Code's native installer does not require Node.js beforehand.
+- **A terminal.** macOS, Linux, or Windows (native or WSL): everything in
+  this playbook runs from the command line.
+- **`gh` CLI (optional).** Needed only for the GitHub workflows (pull
+  requests, issues) mentioned along the way. Install from the [official
+  website](https://cli.github.com) if needed.
+- **An account that authenticates Claude Code**: a Pro or Max plan, or
+  Anthropic API/console access. Without one, the `claude` CLI installs but
+  cannot log in.
 
-## Parte 1 — Fundação: instale o Claude Code e entenda a filosofia
+## Part 1 — Foundation: install Claude Code and understand the philosophy
 
-### Instale o Claude Code
+### Install Claude Code
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-Esse é o instalador nativo para macOS, Linux e WSL. Para Windows nativo e alternativas de instalação, use a [documentação oficial](https://code.claude.com/docs/en/setup). Se já houver instalação funcional, preserve seu método quando suportado em vez de adicionar outra cópia.
+This is the native installer for macOS, Linux, and WSL. For native Windows and alternative methods, use the [official documentation](https://code.claude.com/docs/en/setup). If a working installation exists, preserve its method when supported instead of adding another copy.
 
-Confirme que a instalação funcionou e está no seu `PATH`:
+Confirm installation succeeded and the executable is in your `PATH`:
 
 ```bash
 claude --version
 ```
 
-Se o comando não for encontrado, abra um terminal novo e confira o PATH indicado pelo instalador. Use `claude doctor` e a [documentação de instalação](https://code.claude.com/docs/en/setup) para diagnosticar a integração.
+If the command is not found, open a new terminal and check the PATH shown by the installer. Use `claude doctor` and the [installation documentation](https://code.claude.com/docs/en/setup) to diagnose integration.
 
-### A filosofia em um parágrafo
+### The philosophy in one paragraph
 
-Isso não é uma lista de ferramentas soltas — é um fluxo de trabalho. A
-sessão principal do Claude Code não implementa nada sozinha: ela planeja,
-decide e delega pra **subagentes** especialistas (sessões separadas do
-Claude Code, cada uma disparada pra executar uma tarefa específica com seu
-próprio contexto — um agente de backend, um de banco de dados, um revisor
-de segurança, e por aí vai), acionados em paralelo quando não há conflito
-entre eles. Código é o último passo de um processo — brainstorm pra
-explorar a intenção, plano pra resolver ambiguidade antes de escrever
-qualquer linha, implementação, revisão — nunca o primeiro. Em cima disso,
-uma camada de economia de tokens mantém sessões longas baratas, dois
-"modos de comportamento" compostos controlam o que é construído e como o
-agente fala sobre isso, portões de qualidade sobem de aviso pra erro como
-uma migração rastreada em vez de uma trava súbita, e um sistema de memória
-em duas camadas garante que uma lição cara não se perca entre sessões.
-Nenhuma peça é impressionante sozinha — a força está em rodar todas
-juntas. Pra a versão completa e sem pressa desse raciocínio antes de
-seguir, leia [Visão geral](00-overview.md) — o resto deste playbook
-assume que você já entendeu o porquê.
+This is a workflow, rather than a collection of unrelated tools. The main
+Claude Code session plans, decides, and implements. It delegates to specialist
+**subagents** when context isolation, expertise, or independent tasks justify
+the coordination. Each subagent receives a specific task and its own context;
+parallel execution requires independent tasks and distinct writable files.
+Scale the process to the request: brainstorm to explore intent, plan when
+needed, implement, verify, then review.
+A token-saving layer keeps long sessions affordable; two combined behavior
+modes control what gets built and how the agent describes it; quality
+gates progress from warnings to errors through tracked migration instead
+of sudden blocking; and a two-layer memory system preserves expensive
+lessons across sessions. No individual piece is impressive on its own:
+the strength comes from using them together. For a fuller explanation
+before continuing, read the [Overview](00-overview.md). The rest of this
+playbook assumes you understand the reasoning.
 
-## Parte 2 — Os pilares essenciais, em ordem de importância
+## Part 2 — Essential pillars in order of importance
 
-Três plugins formam a espinha dorsal deste fluxo. A ordem abaixo não é
-alfabética — é de importância real: **Superpowers vem primeiro porque tudo
-mais neste playbook gira em torno dele.** Sem ele, os outros dois ainda
-funcionam sozinhos, mas você perde a disciplina de processo (brainstorm →
-plano → implementação → revisão) que faz o resto do fluxo — inclusive a
-Parte 4 inteira — fazer sentido.
+Three plugins form this workflow's backbone. The order is based on actual
+importance, rather than alphabetical: **Superpowers comes first because
+everything else here revolves around it.** The other two work independently,
+but without Superpowers you lose the process discipline (brainstorm →
+plan → implementation → review) that makes the rest of the workflow,
+including all of Part 4, meaningful.
 
-### Superpowers — o pilar mais importante
+### Superpowers — the most important pillar
 
-Superpowers é um plugin do Claude Code que empacota uma biblioteca de
-**skills de processo** — fluxos nomeados e reutilizáveis pras etapas de
-construir software: explorar a intenção, planejar, implementar, debugar,
-revisar, finalizar um branch. É diferente de uma skill de *implementação*
-(que ensina uma tecnologia específica) — skills de processo ficam **acima**
-delas: decidem quando e como você aborda uma tarefa, antes de qualquer
-skill de domínio decidir o que escrever.
+Superpowers is a Claude Code plugin bundling **process skills**: named,
+reusable workflows for software development stages, including exploring
+intent, planning, implementing, debugging, reviewing, and finishing a
+branch. Unlike implementation skills teaching a specific technology,
+process skills operate **above** them: they determine when and how to
+approach a task before domain skills determine what to write.
 
-**Instale:**
+**Install:**
 
 ```bash
 /plugin marketplace add anthropics/claude-plugins-official
 /plugin install superpowers@claude-plugins-official
 ```
 
-Repare: isso não é um comando de terminal — é texto que você cola direto
-no prompt do Claude Code, dentro da sessão já aberta. Digitar
-`/plugin install ...` ali já é, por definição, pedir pro agente instalar
-o plugin: é o próprio Claude Code que interpreta e executa os dois
-comandos, não um terminal separado.
+These are not terminal commands: paste them directly into the Claude Code
+prompt in an open session. Typing `/plugin install ...` there already asks
+the agent to install the plugin. Claude Code itself interprets and runs
+the commands, without a separate terminal.
 
-**Veja funcionando:** peça algo propositalmente aberto — não um "conserte
-esse typo", mas algo com mais de uma interpretação razoável. Por exemplo:
+**See it work:** request something deliberately open-ended, with multiple
+reasonable interpretations, rather than a typo correction. For example:
 
 ```
-Adiciona um jeito de exportar relatórios na nossa API.
+Add a way to export reports from our API.
 ```
 
-Sem Superpowers, um agente decidiria sozinho o formato, o filtro e a
-autenticação — e provavelmente escolheria errado pelo menos um desses. Com
-Superpowers ativo, a regra central do plugin entra em ação:
+Without Superpowers, an agent would choose format, filters, and
+authentication independently and probably get at least one wrong. With
+Superpowers active, its central rule applies:
 
-> Se uma skill pode se aplicar, mesmo que um pouco, invoque-a **antes de
-> responder qualquer coisa** — inclusive antes de fazer uma pergunta de
-> esclarecimento.
+> If a skill could apply, even slightly, invoke it **before responding
+> with anything**, including a clarifying question.
 
-Na prática: em vez de já sair escrevendo código (ou até de só perguntar
-"qual formato?"), o Claude Code aciona a skill `brainstorming` primeiro, e
-as perguntas de esclarecimento acontecem *dentro* dela — coisas como quais
-campos entram no relatório, quem pode exportar, se existe limite de
-período. Se isso não acontecer — se o agente for direto pro código num
-pedido claramente ambíguo — o plugin não está ativo; rode `/plugin list`
-pra confirmar a instalação.
+In practice, instead of immediately writing code or merely asking “which
+format?”, Claude Code first invokes `brainstorming`. Clarifying questions
+happen within that skill: which fields belong in the report, who can
+export, whether a date-range limit exists. If a clearly ambiguous request
+goes straight to code, the plugin is inactive; run `/plugin list` to
+confirm installation.
 
-Saiba mais: [Superpowers](tools/01-superpowers.md).
+Learn more: [Superpowers](tools/01-superpowers.md).
 
-### Ponytail — o que é construído
+### Ponytail — what gets built
 
-Ponytail é uma persona de disciplina de engenharia: um "engenheiro sênior
-preguiçoso" — preguiçoso no sentido de eficiente, não de relapso.
-Instalado como plugin, ele roda uma escada de decisão fixa antes de
-qualquer código ser escrito e para no primeiro degrau que já resolve o
-problema. A raiz do problema que ele contém: o modo padrão de um agente de
-código é construir mais do que a tarefa pede.
+Ponytail is an engineering discipline persona: a “lazy senior engineer,”
+lazy in the efficient sense rather than careless. Installed as a plugin,
+it follows a fixed decision ladder before writing code and stops at the
+first step that solves the problem. It addresses a coding agent's default
+tendency to build more than the task requires.
 
-A escada, do topo pro fim: isso precisa existir? já existe algo parecido
-no código do projeto? a biblioteca padrão da linguagem (stdlib) já
-resolve? uma feature nativa da plataforma resolve? uma dependência já
-instalada resolve? cabe numa linha? só então — o mínimo de código novo que
-funciona.
+The ladder, from top to bottom: does this need to exist? Is something
+similar already in the project? Does the language's standard library
+solve it? Does a native platform feature solve it? An installed dependency?
+Can it fit in one line? Only then, write the minimum new code that works.
 
-**Instale:**
+**Install:**
 
 ```bash
 /plugin marketplace add DietrichGebert/ponytail
 /plugin install ponytail@ponytail
 ```
 
-Mesmo lembrete da Superpowers: isso roda dentro da sessão do Claude Code,
-não num terminal separado — digitar `/plugin install` ali já é o pedido
-de instalação em si.
+The same reminder as for Superpowers: run this inside the Claude Code
+session, not a separate terminal. Typing `/plugin install` is itself the
+installation request.
 
-**Veja funcionando:** peça algo que convida a over-engineering. Por
-exemplo:
+**See it work:** request something inviting overengineering. For example:
 
 ```
-Adiciona um cache pras respostas dessa API externa.
+Add caching for responses from this external API.
 ```
 
-Sem Ponytail, é fácil o agente propor uma classe de cache com TTL
-configurável, invalidação manual e uma interface pra trocar de storage no
-futuro — nada disso pedido, tudo especulativo. Com Ponytail ativo, a
-resposta tende a vir como o cache em memória já embutido na
-linguagem/framework (`@lru_cache`, ou equivalente) e uma linha só, nomeando
-explicitamente o que ficou de fora: *"cache com `@lru_cache(maxsize=1000)`
-na função — pulei uma classe de cache customizada, adiciono quando
-`lru_cache` não bastar de verdade."* Código primeiro, no máximo três
-linhas dizendo o que foi pulado e quando adicionar — esse formato é a
-marca registrada do plugin ativo.
+Without Ponytail, an agent might propose a cache class with configurable
+TTL, manual invalidation, and an interface for swapping storage later:
+unrequested and speculative. With Ponytail, the answer tends toward the
+language/framework's existing in-memory cache (`@lru_cache` or equivalent)
+and a single line naming what was skipped: *“Added
+`@lru_cache(maxsize=1000)` to the function; skipped a custom cache class,
+add one when `lru_cache` actually becomes insufficient.”* Code first,
+followed by at most three lines explaining what was skipped and when to
+add it: the signature of the active plugin.
 
-Saiba mais: [Ponytail](tools/04-ponytail.md).
+Learn more: [Ponytail](tools/04-ponytail.md).
 
-### Caveman — como o agente fala sobre isso
+### Caveman — how the agent talks about it
 
-Independente do Ponytail (que governa o que é construído), Caveman é uma
-camada de compressão de comunicação: remove o enchimento de linguiça da
-prosa do agente — "vou seguir em frente e...", "ótima pergunta!", "isso
-pode potencialmente..." — sem remover informação. Números, unidades,
-código e texto exato de erro passam intactos; palavras de negação (não,
-nunca, exceto) nunca são cortadas, porque cortar uma delas muda o sentido
-da frase.
+Independent of Ponytail's control over what gets built, Caveman compresses
+communication: it removes filler such as “I'll go ahead and...”, “great
+question!”, and “this could potentially...” without removing information.
+Numbers, units, code, and exact error messages remain intact. Negations
+such as “not,” “never,” and “except” are never cut because their removal
+changes meaning.
 
-**Instale:**
+**Install:**
 
 ```bash
 /plugin marketplace add JuliusBrussee/caveman
 /plugin install caveman@caveman
 ```
 
-De novo: cole dentro da sessão do Claude Code, não num terminal à parte —
-o comando `/plugin install` já é, sozinho, o pedido pro agente instalar.
+Again, paste inside the Claude Code session rather than a separate
+terminal: `/plugin install` alone is the installation request.
 
-**Veja funcionando:** faça uma pergunta comum de desenvolvimento e compare
-o tom da resposta antes/depois de instalar — ou simplesmente rode:
+**See it work:** ask a normal development question and compare the answer's
+tone before and after installation, or simply run:
 
 ```
 /caveman-stats
 ```
 
-para ver os contadores observados da sessão, quando disponíveis. Uso de tokens não comprova economia causada pelo Caveman; consulte as [limitações da medição](tools/05-caveman.md#6-meça-uso-sem-inventar-economia). Se as respostas do
-agente continuam cheias de "Vou verificar isso pra você!" e parágrafos de
-introdução antes de qualquer fato, o plugin não pegou — confira a
-instalação com `/plugin list`.
+to view observed session counters when available. Token usage does not prove savings caused by Caveman; see the [measurement limitations](tools/05-caveman.md#6-measure-usage-without-inventing-savings). If answers still start with “I'll check that for you!” and introductory paragraphs before any facts, the plugin has not taken effect; check with `/plugin list`.
 
-Saiba mais: [Caveman](tools/05-caveman.md).
+Learn more: [Caveman](tools/05-caveman.md).
 
 ---
 
-O [Guia de instalação](01-installation.md) completo lista outros plugins
-opcionais que valem a pena — `aia-harness`, `ui-ux-pro-max`, `hookify`,
+The complete [Installation guide](01-installation.md) lists other useful
+optional plugins: `aia-harness`, `ui-ux-pro-max`, `hookify`,
 `pr-review-toolkit`, `commit-commands`, `claude-code-setup`, `feature-dev`,
-`code-review`, `claude-md-management` — mas os três acima são a base. Não
-siga adiante sem eles.
+`code-review`, and `claude-md-management`. The three above are the
+foundation. Do not continue without them.
 
-## Parte 3 — Configurando seu projeto do zero
+## Part 3 — Configuring your project from scratch
 
-Com os três pilares instalados, é hora de sair do "Claude Code genérico"
-pro "Claude Code que conhece o seu projeto". Isso significa dois arquivos:
-`CLAUDE.md` na raiz do projeto, e `.claude/settings.json`.
+With the three pillars installed, move from generic Claude Code to Claude
+Code that knows your project. This means two files: `CLAUDE.md` at the
+project root and `.claude/settings.json`.
 
-**Atalho, se o objetivo agora é velocidade:** os passos 1 a 4 abaixo são
-o caminho manual — pra quem quer entender cada peça e montar com controle
-total sobre o que entra em cada arquivo. Se preferir ir rápido, o plugin
-`aia-harness` (fonte `leandrosilvaferreira/claude-plugins-registry`, já
-citada na tabela de fontes do [Guia de instalação](01-installation.md))
-tem um comando que escaneia o projeto e monta boa parte dessa estrutura
-sozinho — agentes especialistas, regras, hooks, memória, `settings.json`:
+**A shortcut when speed is the priority:** steps 1–4 below are the manual
+path for understanding each piece and controlling what enters each file.
+For faster setup, `aia-harness` (source:
+`leandrosilvaferreira/claude-plugins-registry`, listed in the
+[Installation guide](01-installation.md) source table) provides a command
+that scans the project and builds much of this structure automatically:
+specialist agents, rules, hooks, memory, and `settings.json`:
 
 ```bash
 /plugin marketplace add leandrosilvaferreira/claude-plugins-registry
@@ -278,252 +261,234 @@ sozinho — agentes especialistas, regras, hooks, memória, `settings.json`:
 /aia-harness:init
 ```
 
-Assim como os plugins da Parte 2, esses três comandos rodam dentro da
-sessão do Claude Code, não num terminal separado. Depois do
-`/aia-harness:init`, use o resto deste playbook pra entender o que foi
-gerado e por quê, em vez de montar cada arquivo do zero.
+Like Part 2's plugins, these commands run inside Claude Code rather than
+a separate terminal. After `/aia-harness:init`, use the rest of this
+playbook to understand what was generated and why, instead of building
+every file from scratch.
 
-<a id="1-copie-e-preencha-o-claudemd"></a>
+<a id="1-copy-and-fill-in-claudemd"></a>
 
-### 1. Preencha `AGENTS.md` e crie a ponte Claude
+### 1. Fill in `AGENTS.md` and create the Claude bridge
 
-Use os templates a partir da cópia local do toolkit. No projeto de destino:
+Use templates from the local toolkit copy. In the target project:
 
 ```bash
-cp -n /caminho/do/toolkit/templates/AGENTS.md.template AGENTS.md
-cp -n /caminho/do/toolkit/templates/CLAUDE.md.template CLAUDE.md
+cp -n /path/to/toolkit/templates/AGENTS.md.template AGENTS.md
+cp -n /path/to/toolkit/templates/CLAUDE.md.template CLAUDE.md
 ```
 
-Substitua `/caminho/do/toolkit` pelo caminho real. No shell POSIX, `-n` preserva o destino existente; em outro shell, use mecanismo equivalente. Se houver instruções, leia e incorpore apenas os trechos desejados.
+Replace `/path/to/toolkit` with the actual path. In a POSIX shell, `-n` preserves an existing destination; use an equivalent mechanism elsewhere. If instructions already exist, read them and incorporate only desired sections.
 
-Preencha nome, stack, comandos, contexto e convenções em `AGENTS.md`. O template Claude importa o arquivo com `@AGENTS.md`, usando a [sintaxe oficial de memória](https://code.claude.com/docs/en/memory). Preserve também instruções geradas pelo framework em ambos os arquivos.
+Fill in the name, stack, commands, context, and conventions in `AGENTS.md`. The Claude template imports it with `@AGENTS.md`, using the [official memory syntax](https://code.claude.com/docs/en/memory). Preserve framework-generated instructions in both files as well.
 
-O template compartilhado não instala um elenco de agentes nem exige delegação para toda tarefa. Adicione somente os papéis pertinentes e realmente suportados pelo cliente, conforme [orquestração](tools/02-subagent-orchestration.md). Instruções de produto e comportamento têm uma fonte única; especificidades do cliente ficam no arquivo/configuração correspondente.
+The shared template neither installs a roster of agents nor requires delegation for every task. Add only relevant roles actually supported by the client, as described in [orchestration](tools/02-subagent-orchestration.md). Product and behavior instructions have one source; client specifics belong in their corresponding file/configuration.
 
-### 2. Copie e ajuste o `.claude/settings.json`
+### 2. Copy and adjust `.claude/settings.json`
 
 ```bash
 mkdir -p .claude
-cp -n /caminho/do/toolkit/templates/settings.json.example .claude/settings.json
+cp -n /path/to/toolkit/templates/settings.json.example .claude/settings.json
 ```
 
-Se já houver configurações, faça backup e incorpore apenas os hooks necessários. O arquivo de exemplo não é um setup pronto: não ative um hook cujo script ainda não exista.
+If configuration already exists, back it up and incorporate only necessary hooks. The example is not a ready-to-run setup: do not activate hooks whose scripts do not exist yet.
 
-O exemplo já vem com dois **hooks** — scripts que rodam automaticamente em
-pontos específicos da sessão (antes de uma ferramenta executar, depois
-dela, no início ou fim da sessão) — registrados: um `PreToolUse` no `Bash`
-e um `SessionStart`. Os nomes `example-command-proxy.mjs` e `example-session-banner.mjs`
-são propositalmente placeholders — você escreve os `.mjs` de verdade,
-seguindo a disciplina de "falhar aberto" (nunca travar a sessão inteira
-por causa de um bug num hook) descrita em [Hooks — boas
-práticas](tools/10-hooks-best-practices.md).
+The example registers two **hooks**, scripts running automatically at
+specific session points (before or after a tool, or at session start/end):
+a Bash `PreToolUse` hook and a `SessionStart` hook. The names
+`example-command-proxy.mjs` and `example-session-banner.mjs` are deliberate
+placeholders: write the actual `.mjs` files following the fail-open
+discipline (never blocking the entire session because of a hook bug) in
+[Hook best practices](tools/10-hooks-best-practices.md).
 
-Para compactar comandos, prefira o [RTK oficial](tools/03-rtk-token-proxy.md), que instala sua própria integração. Não registre também o proxy de exemplo para a mesma finalidade. O helper de leitura segura de stdin continua disponível em [`templates/hooks/hook-io.mjs.example`](../templates/hooks/hook-io.mjs.example) para hooks personalizados.
+For command compression, prefer [official RTK](tools/03-rtk-token-proxy.md), which installs its own integration. Do not register the example proxy for the same purpose. The safe stdin reader remains available in [`templates/hooks/hook-io.mjs.example`](../templates/hooks/hook-io.mjs.example) for custom hooks.
 
-Nunca grave chaves de API no `settings.json` versionado. Use o mecanismo de credenciais ou de ambiente documentado pelo componente. Um arquivo `.env` não é carregado automaticamente por todo cliente, e uma string `${VARIAVEL}` não garante expansão fora dos campos que a suportam.
+Never store API keys in versioned `settings.json`. Use the component's documented credential or environment mechanism. Not every client automatically loads `.env`, and `${VARIABLE}` does not guarantee expansion outside fields supporting it.
 
-### 3. (Recomendado) copie a regra de ondas paralelas
+### 3. (Recommended) copy the parallel-wave rule
 
-Se você pretende usar o padrão de execução em ondas paralelas da Parte
-4 — e a recomendação é que use, é a parte que faz o fluxo ser rápido sem
-ficar arriscado — copie também a regra pronta pro seu diretório de regras:
+If you plan to use Part 4's parallel-wave execution pattern, recommended
+for speed without unnecessary risk, copy the ready-made rule into your
+rules directory:
 
 ```bash
 mkdir -p .claude/rules
-cp /caminho/do/toolkit/templates/rules/parallel-subagent-driven-development.md .claude/rules/
+cp /path/to/toolkit/templates/rules/parallel-subagent-driven-development.md .claude/rules/
 ```
 
-E referencie esse arquivo a partir do seu `CLAUDE.md` (uma linha basta,
-como qualquer outra regra). Ela existe porque a skill padrão do
-Superpowers pra esse estágio (`subagent-driven-development`) despacha um
-implementador por vez, por segurança — essa regra documenta as condições
-exatas em que despachar vários em paralelo continua seguro, com o mesmo
-contrato por trás.
+Reference it from `CLAUDE.md`; one line is enough, like any other rule.
+It exists because Superpowers' default skill for this stage,
+`subagent-driven-development`, dispatches one implementer at a time for
+safety. This rule documents the exact conditions under which parallel
+dispatch remains safe with the same underlying contract.
 
-### 4. Memória — decida agora ou decida depois
+### 4. Memory — decide now or later
 
-Ainda dentro de `.claude/`, esse também é o momento natural pra decidir se
-você já quer o sistema de memória leve (um índice sempre carregado, sem
-nenhuma dependência externa) — mas isso pode esperar até você sentir a dor
-de repetir a mesma lição pro agente numa sessão nova. A Parte 6 deste
-playbook cobre as duas opções (sistema leve e Obsidian) em profundidade; o
-doc dedicado do sistema leve é [Sistema de memória do
-Claude](tools/09-claude-memory-system.md).
+While working in `.claude/`, this is a natural time to decide whether you
+want lightweight memory: an always-loaded index without external
+dependencies. It can also wait until repeating lessons in new sessions
+becomes painful. Part 6 covers both lightweight memory and Obsidian in
+depth; the dedicated lightweight guide is [Claude memory
+system](tools/09-claude-memory-system.md).
 
-## Parte 4 — Seu primeiro fluxo de trabalho completo, ponta a ponta
+## Part 4 — Your first complete end-to-end workflow
 
-Esta é a parte mais importante do playbook — o resto monta o cenário, essa
-aqui é o filme inteiro rodando. Vamos usar um cenário fictício, genérico o
-bastante pra servir de molde pra qualquer projeto:
+This is the playbook's most important part. Everything else sets the stage;
+this runs the entire show. We will use a fictional scenario generic enough
+to serve as a template for any project:
 
-> Um SaaS de gestão de pedidos tem uma API REST em produção. O time de
-> operações pediu um jeito de baixar um relatório de pedidos em **CSV**
-> (um formato de arquivo de texto com valores separados por vírgula,
-> universal pra abrir em qualquer planilha) filtrado por período.
+> An order-management SaaS has a production REST API. The operations team
+> requested downloadable order reports in **CSV**, a comma-separated text
+> format universally supported by spreadsheets, filtered by date range.
 
-O pedido, do jeito que chegou, é propositalmente vago — de propósito, é
-assim que pedidos de verdade chegam. O fluxo completo tem cinco etapas:
+The original request is deliberately vague, because real requests arrive
+that way. The complete workflow has five stages:
 
 ```
-brainstorm  →  plano  →  implementação em ondas paralelas  →  revisão multi-agente  →  commit
+brainstorm  →  plan  →  parallel-wave implementation  →  multi-agent review  →  commit
 ```
 
-### 1. Brainstorm — destrinchar o pedido ambíguo
+### 1. Brainstorm — unpack the ambiguous request
 
 ```
-Antes de escrever qualquer código pra isso: preciso de um jeito de
-exportar um relatório de pedidos em CSV na nossa API.
+Before writing any code: I need a way to export order reports
+as CSV from our API.
 
-Não comece a implementar. Primeiro:
-- Pergunte o que falta pra fechar o escopo.
-- Diga se existe mais de uma interpretação razoável pro pedido, em vez de
-  escolher uma calado.
-- Levante suposições que eu provavelmente tenho e não deixei explícitas —
-  padrões já existentes no projeto, coisas que não devem ser tocadas,
-  necessidades de performance.
+Do not start implementation. First:
+- Ask what is missing to finalize scope.
+- Tell me whether multiple reasonable interpretations exist, rather than
+  silently choosing one.
+- Identify assumptions I probably have but did not state: existing
+  project patterns, things that must remain untouched, and performance
+  requirements.
 ```
 
-Isso é uma adaptação direta do prompt em [Brainstorm até
-plano](prompts/04-brainstorm-to-plan.md) — mas mesmo sem copiar prompt
-nenhum, o Superpowers instalado na Parte 2 já empurra o Claude Code nessa
-direção sozinho, porque a skill `brainstorming` (ver
-[Superpowers](tools/01-superpowers.md)) roda antes de qualquer resposta
-pra um pedido criativo ou ambíguo desses.
+This directly adapts [Brainstorm to plan](prompts/04-brainstorm-to-plan.md).
+Even without copying a prompt, Superpowers from Part 2 pushes Claude Code
+in this direction: `brainstorming` runs before any answer to creative or
+ambiguous requests like this (see [Superpowers](tools/01-superpowers.md)).
 
-Numa sessão real, espere uma rodada de perguntas como:
+In a real session, expect questions such as:
 
-- Quem pode exportar — qualquer usuário autenticado, ou só um papel
-  específico?
-- Quais campos entram no CSV (ID do pedido, cliente, valor, status, data)?
-- O período é obrigatório? Existe um teto (30 dias, 90 dias, sem
-  limite — importante pra não travar o servidor gerando um relatório de 5
-  anos de uma vez)?
-- O arquivo sai na hora (resposta síncrona) ou o projeto já tem um padrão
-  de job assíncrono pra relatório grande?
-- Formato exato — separador, encoding, primeira linha como cabeçalho?
+- Who can export: any authenticated user or only a specific role?
+- Which fields belong in the CSV: order ID, customer, amount, status, date?
+- Is the date range mandatory? Is there a cap: 30 days, 90 days, unlimited?
+  This matters to avoid freezing the server while generating five years
+  of reports at once.
+- Is the file returned immediately (synchronous response), or does the
+  project already have an asynchronous job pattern for large reports?
+- What exact format: separator, encoding, first row as header?
 
-Responda essas perguntas (ou deixe o agente assumir o caminho mais
-conservador quando você não tiver uma resposta forte) antes de seguir pro
-próximo passo.
+Answer these questions, or let the agent choose the most conservative
+approach where you have no strong preference, before proceeding.
 
-### 2. Plano — virar a intenção clarificada em passos verificáveis
+### 2. Plan — turn clarified intent into verifiable steps
 
-Com o escopo fechado, peça o plano:
+Once scope is settled, request a plan:
 
 ```
-Escopo fechado: GET /api/reports/orders/export, autenticado, aceita
-`from` e `to` como query params obrigatórios, limite de 90 dias por
-request, CSV com cabeçalho (id, cliente, valor, status, data), resposta
-em streaming.
+Final scope: authenticated GET /api/reports/orders/export, requiring
+`from` and `to` query params, a 90-day limit per request,
+CSV with headers (id, customer, amount, status, date), and a streaming
+response.
 
-Agora escreva um plano de implementação passo a passo. Cada passo precisa
-de uma verificação explícita — um comando, um teste, um comportamento
-observável — nunca "deveria funcionar". Quebre qualquer passo sem
-verificação clara em passos menores.
+Write a step-by-step implementation plan. Every step needs explicit
+verification: a command, test, or observable behavior, never “should work.”
+Split steps without clear verification into smaller ones.
 ```
 
-Isso aciona a skill `writing-plans` do Superpowers. Um plano razoável sai
-parecido com isto — **endpoint** aqui é só o termo pra "uma rota
-específica de uma API, identificada por URL e verbo HTTP":
+This triggers Superpowers' `writing-plans`. A reasonable plan resembles
+the following; **endpoint** means a specific API route identified by its
+URL and HTTP verb:
 
-1. Criar o endpoint e validar `from`/`to` (rejeitar período maior que 90
-   dias) — verificação: teste unitário cobre período válido, período
-   grande demais, e parâmetro faltando.
-2. Implementar a consulta no banco com paginação/streaming — verificação:
-   teste de integração com um volume grande de linhas não estoura
-   memória.
-3. Formatar a resposta como CSV com cabeçalho — verificação: teste
-   compara cabeçalho + uma linha de exemplo, byte a byte.
-4. Autorização — só papéis permitidos exportam — verificação: teste de
-   integração confirma 403 pra um usuário sem permissão.
-5. Atualizar a documentação da API (ou o teste de contrato, se o projeto
-   tiver um) — verificação: doc/contrato reflete o endpoint novo.
+1. Create the endpoint and validate `from`/`to`, rejecting ranges over 90
+   days. Verification: unit tests for valid, oversized, and missing ranges.
+2. Implement database querying with pagination/streaming. Verification:
+   an integration test with many rows does not exhaust memory.
+3. Format the response as CSV with headers. Verification: a test compares
+   the header and sample row byte for byte.
+4. Authorization: only permitted roles export. Verification: an integration
+   test confirms 403 for an unauthorized user.
+5. Update API documentation, or a contract test if one exists. Verification:
+   documentation/contract reflects the new endpoint.
 
-Cada passo do plano já sai marcado com `Files:` (quais arquivos aquele
-passo toca) e `Depends-on:` (quais outros passos ele precisa que já
-existam) — são exatamente os dois campos que a próxima etapa usa pra
-decidir o que pode rodar em paralelo.
+Every plan step includes `Files:` (files it touches) and `Depends-on:`
+(steps that must already exist). These are exactly the fields the next
+stage uses to decide what can run in parallel.
 
-### 3. Implementação — subagent-driven-development em ondas paralelas
+### 3. Implementation — subagent-driven-development in parallel waves
 
-Com os passos do plano marcados, a execução vira uma sequência de
-**ondas** — grupos de tasks que rodam ao mesmo tempo porque não têm
-arquivo em comum nem dependência entre si. O mecanismo completo está em
-[Orquestração de subagentes](tools/02-subagent-orchestration.md); a
-versão resumida, aplicada ao nosso cenário:
+With annotated plan steps, execution becomes a sequence of **waves**:
+groups of tasks running together because they share neither files nor
+dependencies. The complete mechanism is in [Subagent
+orchestration](tools/02-subagent-orchestration.md); here is the short version
+for this scenario:
 
-| Task | Descrição | `Files:` | `Depends-on:` | Especialista |
+| Task | Description | `Files:` | `Depends-on:` | Specialist |
 |---|---|---|---|---|
-| T01 | Endpoint + lógica de exportação | `app/api/reports/orders/export/route.ts`, `server/reports/export-orders.ts` | none | `backend-specialist` |
-| T02 | Testes de formatação CSV e validação de período | `server/reports/export-orders.test.ts` | none | `test-engineer` |
-| T03 | Índice de banco pra consulta por período | `db/schema/orders.ts` + migration | none | `database-architect` |
-| T04 | Botão "baixar CSV" no painel | `components/reports-panel.tsx` | **T01** | `frontend-specialist` |
-| T05 | Atualizar doc/contrato da API | `docs/api/reports.md` | **T01** | `documentation-writer` |
+| T01 | Endpoint and export logic | `app/api/reports/orders/export/route.ts`, `server/reports/export-orders.ts` | none | `backend-specialist` |
+| T02 | CSV formatting and date-range validation tests | `server/reports/export-orders.test.ts` | none | `test-engineer` |
+| T03 | Database index for date-range queries | `db/schema/orders.ts` + migration | none | `database-architect` |
+| T04 | “Download CSV” button on the dashboard | `components/reports-panel.tsx` | **T01** | `frontend-specialist` |
+| T05 | Update API documentation/contract | `docs/api/reports.md` | **T01** | `documentation-writer` |
 
-T01, T02 e T03 não dependem uma da outra e não tocam nenhum arquivo em
-comum — vão pra **Onda 1**, disparadas juntas. T04 e T05 dependem do
-contrato que T01 define (a URL e os parâmetros reais do endpoint), então
-esperam a Onda 1 terminar e formam a **Onda 2** — mesmo sem conflito de
-arquivo entre si, a dependência já bastaria pra adiar as duas.
+T01, T02, and T03 are independent and share no files, so they launch together
+in **Wave 1**. T04 and T05 depend on T01's contract, the actual endpoint URL
+and parameters, so they wait for Wave 1 and form **Wave 2**. Even without
+file conflicts between them, dependency alone requires this delay.
 
-Prompt real pra disparar a Onda 1 (adaptado de [Parallel wave
-dispatch](prompts/05-parallel-wave-dispatch.md)):
-
-```
-Execute a Onda 1 do plano acima: T01, T02 e T03, despachadas juntas na
-mesma mensagem, um especialista por task. Nenhum implementador commita —
-cada um só implementa, testa o que é seu, e reporta exatamente quais
-arquivos mudou. Eu, como orquestrador, commito depois — uma task por vez,
-na ordem T01 → T02 → T03, capturando o HEAD atual bem antes de cada
-commit.
-```
-
-Depois que a Onda 1 está implementada e commitada, a Onda 2 (T04, T05)
-roda do mesmo jeito — só que agora com o contrato real de T01 disponível
-pros dois especialistas consumirem.
-
-### 4. Revisão — painel multi-agente antes de fechar
-
-Antes de considerar qualquer onda pronta, ela passa por revisão — nunca
-autoavaliada pelo mesmo agente que implementou. Prompt real (adaptado de
-[Code review multi-agente](prompts/03-multi-agent-code-review.md)):
+A real Wave 1 dispatch prompt, adapted from [Parallel wave
+dispatch](prompts/05-parallel-wave-dispatch.md):
 
 ```
-Revise o diff da Onda 1 (T01, T02, T03) usando um painel de revisores
-independentes, em paralelo, num único lote: code-reviewer,
-security-reviewer, typescript-reviewer, e database-architect pra revisar
-o índice novo. Nenhum revisor vê o achado dos outros. Depois que todos
-reportarem, sintetize: junte achados duplicados, descarte qualquer coisa
-sem cenário concreto de falha, e ranqueie por severidade — CRITICAL,
-HIGH, MEDIUM, LOW.
+Execute Wave 1 of the plan above: T01, T02, and T03, dispatched together
+in the same message, one specialist per task. No implementer commits:
+each implements, tests their own work, and reports exactly which files
+changed. I, as orchestrator, commit afterward, one task at a time,
+in T01 → T02 → T03 order, capturing the current HEAD immediately before
+each commit.
 ```
 
-Num endpoint novo de exportação, achados plausíveis desse painel incluem
-coisas como: `security-reviewer` pegando uma checagem de autorização que
-ficou só no frontend e não no backend; `typescript-reviewer` pegando um
-tipo genérico demais escondido no formatador de CSV; `code-reviewer`
-notando que o passo 4 do plano (autorização) não tem teste cobrindo o
-caso 403. Cada achado sai no formato `arquivo:linha — severidade — a
-alegação — o cenário exato que quebra`. Nada sobrevive à síntese sem esse
-último campo.
+After Wave 1 is implemented and committed, Wave 2 (T04, T05) proceeds the
+same way, now with T01's actual contract available to both specialists.
 
-Corrija o que for CRITICAL/HIGH antes de seguir; MEDIUM/LOW ficam a
-critério.
+### 4. Review — a multi-agent panel before completion
 
-### 5. Commit — um por task, em ordem
-
-O orquestrador — você, na sessão principal — faz o commit, nunca o
-subagente que implementou. Um commit por task, na ordem da onda, HEAD
-capturado na hora:
+Before any wave is considered ready, it undergoes review, never a
+self-assessment by its implementer. A real prompt, adapted from
+[Multi-agent code review](prompts/03-multi-agent-code-review.md):
 
 ```
-Onda 1 aprovada nas duas revisões. Commite T01, T02 e T03 em ordem — uma
-mensagem por task, no padrão conventional commits, capturando o HEAD
-atual imediatamente antes de cada commit.
+Review the Wave 1 diff (T01, T02, T03) with independent reviewers in
+parallel, in one batch: code-reviewer, security-reviewer,
+typescript-reviewer, and database-architect for the new index.
+No reviewer sees the others' findings. Once all report, synthesize:
+merge duplicates, discard findings without a concrete failure scenario,
+and rank by severity: CRITICAL, HIGH, MEDIUM, LOW.
 ```
 
-O resultado esperado é uma sequência de commits pequenos e rastreáveis,
-não um commit gigante misturando três tasks:
+For a new export endpoint, plausible findings include a `security-reviewer`
+catching authorization enforced only on the frontend, a
+`typescript-reviewer` finding an overly broad type in CSV formatting, or a
+`code-reviewer` noticing plan step 4 lacks a 403 test. Every finding uses
+`file:line — severity — claim — exact failure scenario`. Nothing survives
+synthesis without that last field.
+
+Fix CRITICAL/HIGH findings before proceeding; MEDIUM/LOW remain discretionary.
+
+### 5. Commit — one per task, in order
+
+The orchestrator, you in the main session, commits rather than the
+implementing subagent. One commit per task, in wave order, capturing HEAD
+at that moment:
+
+```
+Wave 1 passed both reviews. Commit T01, T02, and T03 in order, one
+Conventional Commits message per task, capturing the current HEAD
+immediately before each commit.
+```
+
+The expected result is a sequence of small, traceable commits rather than
+one enormous commit mixing three tasks:
 
 ```
 feat: add CSV export endpoint for order reports
@@ -531,279 +496,260 @@ test: cover CSV formatting and date-range validation
 perf: add index for order export date-range query
 ```
 
-Repita esse ciclo de cinco passos pra Onda 2, e o pedido original —
-"adiciona um jeito de exportar relatórios" — sai do vago pra produção sem
-nenhuma etapa pulada.
+Repeat the five-step cycle for Wave 2, taking the original vague request,
+“add a way to export reports,” to production without skipping stages.
 
-## Parte 5 — Qualidade contínua
+## Part 5 — Continuous quality
 
-Depois que o fluxo da Parte 4 vira rotina, a próxima pergunta é: como
-travar qualidade sem travar a equipe? A resposta deste toolkit é rodar
-dois **linters** — ferramentas que analisam o código em busca de padrões
-problemáticos sem executá-lo — cada um cobrindo uma fatia diferente:
+Once Part 4 becomes routine, the next question is how to enforce quality
+without blocking the team. This toolkit runs two **linters**, tools that
+inspect code for problematic patterns without executing it, each covering
+a different area:
 
 ```bash
 npm install --save-dev eslint
 npm install --save-dev --save-exact @biomejs/biome
 ```
 
-O Biome fica com um conjunto pequeno e escolhido a dedo de regras (não o
-preset "recommended" inteiro, que vem com cerca de 200 regras); o ESLint
-(com `typescript-eslint` ou o plugin do seu framework) cobre o resto —
-regras que precisam de informação de tipo, regras específicas de
-framework, tudo que o conjunto curado do Biome deixa de fora de
-propósito. Sobreposição entre os dois só significa duas configs pra
-manter sincronizadas pela mesma regra — por isso a divisão é deliberada,
-não acidental.
+Biome covers a small, handpicked rule set rather than its entire
+“recommended” preset of roughly 200 rules. ESLint, with `typescript-eslint`
+or a framework plugin, covers the rest: type-aware rules, framework rules,
+and everything deliberately omitted from Biome's curated set. Overlap
+means maintaining two synchronized configurations for the same rule, so
+the division is deliberate.
 
-### Regra nova nunca nasce bloqueando
+### New rules never start by blocking
 
-Uma regra de lint nova não vira erro no mesmo commit que a introduz — isso
-ou trava todo mundo de uma vez, ou alguém desliga a regra por frustração.
-Em vez disso, ela nasce em `"warn"` pra base inteira do código, o que
-torna toda violação já existente visível sem quebrar o build de ninguém. A
-contagem de warnings vira um número real e rastreável — não um comentário
-de "depois a gente aperta isso" que ninguém revisita. Só quando essa
-contagem chega a zero a regra sobe pra `"error"` e fica lá.
+A new lint rule does not become an error in its introduction commit: that
+either blocks everyone at once or frustrates someone into disabling it.
+Instead, it starts as `"warn"` across the codebase, exposing existing
+violations without breaking anyone's build. The warning count becomes
+real and trackable, rather than a forgotten “tighten this later” comment.
+Only when it reaches zero does the rule become `"error"` and remain there.
 
 ```js
-// eslint.config.js (trecho)
+// eslint.config.js (excerpt)
 export default [
   {
     rules: {
-      // Regra nova, lançada em "warn" pra contagem ficar visível sem
-      // bloquear ninguém. Sobe pra "error" quando bater zero.
+      // Start a new rule at "warn" to expose counts without blocking.
+      // Promote to "error" once the count reaches zero.
       complexity: ["warn", 10],
     },
   },
 ];
 ```
 
-Pra zerar uma contagem de warnings de verdade — sem transformar "só
-conserta os avisos" num refactor silencioso enorme — use o prompt em
-[ESLint warning burndown](prompts/02-eslint-warning-burndown.md). Ele
-força uma decisão explícita antes de tocar em qualquer código: corrigir
-tudo, corrigir a maioria e rastrear o resto como dívida visível, ou
-reescopar a regra em si — o que é uma mudança de configuração, e precisa
-ser tratada como tal, nunca disfarçada de "código mais limpo".
+To eliminate warnings without turning “just fix the warnings” into a huge
+silent refactor, use [ESLint warning burndown](prompts/02-eslint-warning-burndown.md).
+It requires an explicit decision before code changes: fix everything, fix
+most and track the remainder as visible debt, or rescope the rule itself.
+The latter is a configuration change and must be treated as one, never
+disguised as cleaner code.
 
-Detalhes completos da divisão ESLint/Biome, o formatter desligado de
-propósito, e os gotchas de regras específicas: [Quality gates
-ESLint/Biome](tools/06-eslint-biome-quality-gates.md).
+For the complete ESLint/Biome division, intentionally disabled formatter,
+and rule-specific pitfalls, see [ESLint/Biome quality
+gates](tools/06-eslint-biome-quality-gates.md).
 
-### O atalho, se você não quiser montar isso à mão
+### The shortcut if you do not want manual setup
 
-Toda a Parte 5 até aqui explica o raciocínio, porque ele vale mais que a
-configuração. Mas se você só quer o resultado — inclusive um teto de **350
-linhas por arquivo**, que é a regra que mais muda como o código cresce —
-existe um caminho de uma linha. Cole no seu agente:
+Part 5 explains the reasoning because it matters more than configuration.
+For just the result, including a **350-line file limit**, the rule with
+the greatest effect on code growth, there is a one-line path. Paste into
+your agent:
 
 ```
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md
-e execute o prompt que está nesse arquivo neste projeto. Use MAX_LINES=350.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/08-eslint-quality-gates-install.md
+and execute its prompt in this project. Use MAX_LINES=350.
 ```
 
-Ele baixa três regras já escritas e testadas, adapta a configuração pra sua
-estrutura, e reporta quantos arquivos passaram do teto — sem consertar nada.
-Depois, a mesma linha com [`09-file-size-refactor.md`](prompts/09-file-size-refactor.md)
-faz ele quebrar esses arquivos em módulos menores. Os dois documentos:
-[08 — instalar e medir](prompts/08-eslint-quality-gates-install.md),
-[09 — quebrar os arquivos grandes](prompts/09-file-size-refactor.md).
+It downloads three existing, tested rules, adapts configuration to your
+structure, and reports how many files exceed the limit without fixing any.
+The same instruction with [`09-file-size-refactor.md`](prompts/09-file-size-refactor.md)
+then splits those files into smaller modules. The two documents:
+[08 — install and measure](prompts/08-eslint-quality-gates-install.md),
+[09 — split large files](prompts/09-file-size-refactor.md).
 
 
-## Parte 6 — Memória de longo prazo
+## Part 6 — Long-term memory
 
-Sem memória entre sessões, um agente reaprende do zero a mesma lição cara
-toda vez que abre o projeto — o mesmo bug já corrigido antes, a mesma
-decisão de arquitetura que só faz sentido depois de ver o que foi tentado
-e rejeitado. Duas opções cobrem isso, e elas não competem entre si.
+Without memory across sessions, an agent repeatedly relearns expensive
+lessons: a previously fixed bug, or an architectural decision that only
+makes sense after seeing rejected attempts. Two complementary options
+address this.
 
-### Opção 1 — sistema leve (sempre comece por aqui)
+### Option 1 — lightweight system (always start here)
 
-Um índice pequeno (`MEMORY.md`), sempre carregado no início da sessão, com
-uma linha por memória apontando pra um arquivo de tópico com frontmatter
-(`type: feedback | architecture | business-rule | reference`). Zero
-dependência externa — só arquivos. O teste pra decidir se algo merece
-virar memória: *uma sessão futura ficaria surpresa e grata de saber disso
-antes de começar a trabalhar?* Se não, não salva. Critério completo e
-estrutura: [Sistema de memória do Claude](tools/09-claude-memory-system.md).
+A small index (`MEMORY.md`), always loaded at session start, has one line
+per memory pointing to a topic file with frontmatter
+(`type: feedback | architecture | business-rule | reference`). No external
+dependencies, just files. The saving test: *would a future session be
+surprised and grateful to know this before starting work?* If not, do not
+save it. Full criteria and structure: [Claude memory
+system](tools/09-claude-memory-system.md).
 
-### Opção 2 — Obsidian (memória de longo prazo sem limite de tamanho)
+### Option 2 — Obsidian (unlimited long-term memory)
 
-Um vault Obsidian — arquivos Markdown organizados numa convenção de
-pastas — acessado só através de um **servidor MCP** (um processo que
-expõe operações estruturadas do vault como ferramentas, em vez de acesso
-direto ao sistema de arquivos), o que garante que toda escrita passa por
-validação: frontmatter obrigatório, um template por pasta, links que
-precisam apontar pra notas que realmente existem. Detalhes: [Obsidian
-como memória](tools/08-obsidian-memory.md).
+An Obsidian vault, Markdown files organized by folder convention, accessed
+only through an **MCP server**, a process exposing structured vault
+operations as tools rather than direct filesystem access. This ensures
+every write undergoes validation: required frontmatter, a template for
+each folder, and links pointing to actual notes. Details: [Obsidian as
+memory](tools/08-obsidian-memory.md).
 
-### Por que as duas camadas juntas são o ideal
+### Why both layers together are ideal
 
-O índice leve tem que ficar pequeno pra continuar sendo lido — um teto de
-mais ou menos 130 linhas é o ponto onde ele começa a virar ruído em vez de
-sinal. A maior parte do que vale a pena lembrar sobre um projeto não cabe
-nesse espaço: é específico demais, raro demais, ou grande demais. É pra
-isso que serve o vault — buscado sob demanda, sem limite de tamanho.
-Existe até um caminho de migração formal de um pro outro (buscar
-duplicata → casar o template da pasta de destino → criar → confirmar
-lendo de volta → só então apagar do índice leve) — nunca um "apaga e
-espera não precisar de novo".
+The lightweight index must remain small enough to read. Around 130 lines
+is where it starts becoming noise rather than signal. Most worthwhile
+project knowledge does not fit: it is too specific, rare, or large. That
+is the vault's purpose: searched on demand without size limits. There is
+even a formal migration path: search duplicates → match destination folder
+template → create → confirm through read-back → only then remove from the
+lightweight index. Never “delete and hope it is not needed again.”
 
-Pra configurar as duas camadas num projeto novo (ou fazer o retrofit num
-que já existe), use o prompt pronto em [Memory
-bootstrap](prompts/06-memory-bootstrap.md).
+To configure both layers in a new or existing project, use the ready-made
+[Memory bootstrap](prompts/06-memory-bootstrap.md) prompt.
 
-## Parte 7 — Extras opcionais
+## Part 7 — Optional extras
 
-Dois CLIs standalone — não são plugins do Claude Code, instalam com o
-gerenciador de pacotes que você já usa — que valem a pena uma vez que o
-fluxo básico das Partes 1 a 6 já está rodando.
+Two standalone CLIs, installed through your existing package manager rather
+than as Claude Code plugins, become useful once Parts 1–6 are running.
 
-### Graphify — navegação de código em projetos grandes
+### Graphify — code navigation in large projects
 
-Transforma uma pasta de código (ou docs, papers, imagens) num grafo de
-conhecimento persistente — detecção de comunidades, nós centrais, relações
-entre arquivos — pra responder "o que chama isso", "quais módulos são
-centrais", "o que quebra se eu mudar aqui" numa consulta só, em vez de
-dezenas de leituras exploratórias repetidas a cada sessão nova.
+Turns a folder of code, docs, papers, or images into a persistent knowledge
+graph: community detection, central nodes, and file relationships. It
+answers “what calls this?”, “which modules are central?”, and “what breaks
+if I change this?” in one query, instead of dozens of repeated exploratory
+reads each session.
 
 ```bash
 uv tool install graphifyy
 graphify claude install
 ```
 
-O pacote no PyPI é `graphifyy`, com dois "y" — o comando que ele instala é
-`graphify`, com um só. `uv tool install` é a forma preferida: instalar só
-com `pip install` pode colocar o pacote num Python diferente do runtime
-que o CLI do `graphify` usa, e o comando falha depois; `pipx install
-graphifyy` também é uma opção válida, pelo mesmo motivo de isolamento.
+The PyPI package is `graphifyy`, with two “y” characters; the command is
+`graphify`, with one. Prefer `uv tool install`: plain `pip install` can
+place the package in a different Python environment from the CLI runtime,
+causing later command failures. `pipx install graphifyy` is also valid for
+the same isolation reason.
 
-Depois de instalar o pacote, rode `graphify claude install` — conecta
-especificamente ao Claude Code, gravando o `CLAUDE.md` e configurando o
-hook automaticamente — ou `graphify install`, que detecta e registra em
-qualquer assistente de IA já instalado na máquina. Nenhuma chave de API é
-necessária pra um corpus só de código: a extração é baseada em AST (a
-árvore sintática do código, extraída sem executar nada) e roda
-inteiramente local.
+After installing the package, run `graphify claude install` to connect
+specifically to Claude Code, write `CLAUDE.md`, and configure the hook
+automatically. Alternatively, `graphify install` detects and registers with
+installed AI assistants. No API key is needed for a code-only corpus:
+extraction uses ASTs (code syntax trees extracted without executing code)
+and runs entirely locally.
 
-> 💬 **Peça pro seu agente:**
+> 💬 **Ask your agent:**
 > ```
-> Instale o Graphify pra mim: rode `uv tool install graphifyy` e depois `graphify claude install`.
+> Install Graphify for me: run `uv tool install graphifyy`, then `graphify claude install`.
 > ```
-> O Claude Code roda os dois comandos e confirma que funcionou — você não precisa fazer isso manualmente.
+> Claude Code runs both commands and confirms success; you do not need to do it manually.
 
-Saiba mais: [Graphify](tools/07-graphify.md).
+Learn more: [Graphify](tools/07-graphify.md).
 
-### agent-browser — automação de navegador pra agentes
+### agent-browser — browser automation for agents
 
-Um CLI nativo (não é um wrapper de Playwright/Puppeteer) que controla um
-Chrome/Chromium de verdade via protocolo DevTools, construído pra agentes
-de IA em vez de adaptado de uma ferramenta de teste feita pra humanos —
-trabalha em cima de snapshots de árvore de acessibilidade com referências
-curtas e estáveis (`@e1`, `@e2`...), o que aguenta muito melhor mudanças
-de layout do que um seletor CSS.
+A native CLI, rather than a Playwright/Puppeteer wrapper, controlling real
+Chrome/Chromium through the DevTools Protocol. Built for AI agents instead
+of adapted from a human-oriented testing tool, it uses accessibility-tree
+snapshots with short, stable references (`@e1`, `@e2`...), handling layout
+changes much better than CSS selectors.
 
 ```bash
 npm i -g agent-browser
 agent-browser install
 ```
 
-> 💬 **Peça pro seu agente:**
+> 💬 **Ask your agent:**
 > ```
-> Instale o agent-browser pra mim: rode `npm i -g agent-browser` e depois `agent-browser install`.
+> Install agent-browser for me: run `npm i -g agent-browser`, then `agent-browser install`.
 > ```
-> O Claude Code roda os dois comandos e confirma que funcionou — você não precisa fazer isso manualmente.
+> Claude Code runs both commands and confirms success; you do not need to do it manually.
 
-Saiba mais: [agent-browser](tools/11-agent-browser.md).
+Learn more: [agent-browser](tools/11-agent-browser.md).
 
-## Checklist final: fluxo de projeto
+## Final checklist: project workflow
 
-O checklist abaixo permite adoção modular. Para o setup da máquina, a base inteira do [prompt 10](prompts/10-development-environment-setup.md) é obrigatória, incluindo Graphify, RTK, Context7 e ambos os agentes.
+The checklist below supports modular adoption. For machine setup, the entire [prompt 10](prompts/10-development-environment-setup.md) foundation is mandatory, including Graphify, RTK, Context7, and both agents.
 
-- [ ] Claude Code instalado pelo método escolhido, autenticado e com `claude --version` funcionando em terminal novo
-- [ ] Superpowers instalado e testado com um pedido ambíguo
-- [ ] Ponytail instalado e testado com um pedido que convida over-engineering
-- [ ] Caveman descoberto e comunicação concisa testada; contadores de uso separados de estimativas de economia
-- [ ] `AGENTS.md` preenchido com stack, comandos e contexto reais; `CLAUDE.md` importa o arquivo e preserva somente instruções específicas do cliente
-- [ ] (Se precisar de configuração local) `.claude/settings.json` conciliado com o existente; hooks só registrados quando seus scripts existirem e forem necessários
-- [ ] (Se for usar ondas paralelas) `parallel-subagent-driven-development.md` copiado pra `.claude/rules/` e referenciado no `CLAUDE.md`
-- [ ] Fluxo completo — brainstorm → plano → implementação em ondas → revisão multi-agente → commit — rodado pelo menos uma vez, ponta a ponta
-- [ ] ESLint + Biome configurados, com a divisão curado/bulk decidida
-- [ ] Pelo menos uma regra nova rodando em modo warn→error
-- [ ] Sistema de memória leve (`MEMORY.md` + pasta de tópicos) configurado
-- [ ] (Opcional) Vault Obsidian + servidor MCP configurado
-- [ ] (Opcional) Graphify instalado, se o projeto for grande o bastante pra precisar
-- [ ] (Opcional) agent-browser instalado, se o projeto envolver automação de navegador
+- [ ] Claude Code installed through the chosen method, authenticated, with `claude --version` working in a fresh terminal
+- [ ] Superpowers installed and tested with an ambiguous request
+- [ ] Ponytail installed and tested with a request inviting overengineering
+- [ ] Caveman discovered and concise communication tested; usage counters kept separate from savings estimates
+- [ ] `AGENTS.md` filled with actual stack, commands, and context; `CLAUDE.md` imports it and retains only client-specific instructions
+- [ ] (If local configuration is needed) `.claude/settings.json` reconciled with existing settings; hooks registered only when their scripts exist and are needed
+- [ ] (If using parallel waves) `parallel-subagent-driven-development.md` copied to `.claude/rules/` and referenced from `CLAUDE.md`
+- [ ] Complete workflow run end to end at least once: brainstorm → plan → wave implementation → multi-agent review → commit
+- [ ] ESLint and Biome configured with the curated/bulk division decided
+- [ ] At least one new rule following warn→error adoption
+- [ ] Lightweight memory (`MEMORY.md` and topic folder) configured
+- [ ] (Optional) Obsidian vault and MCP server configured
+- [ ] (Optional) Graphify installed if project size warrants it
+- [ ] (Optional) agent-browser installed if the project involves browser automation
 
-## Perguntas frequentes e troubleshooting
+## Frequently asked questions and troubleshooting
 
-**E se eu já tenho ESLint configurado?**
-Não precisa jogar nada fora. O Biome entra do lado, com um conjunto
-pequeno e deliberado de regras que não pega o que o seu ESLint já cobre —
-a ideia inteira da Parte 5 é dividir trabalho entre os dois, não
-substituir um pelo outro. E qualquer regra nova, seja no Biome ou no
-ESLint, nasce em `"warn"` independente de o projeto ser novo ou ter dez
-anos de histórico — é assim que se evita transformar a adoção num dia de
-build quebrado pra todo mundo.
+**What if ESLint is already configured?**
+Keep it. Biome sits alongside it with a small, deliberate rule set avoiding
+what ESLint already covers. Part 5 divides work between them rather than
+replacing one. Every new rule starts at `"warn"`, whether in Biome or
+ESLint and whether the project is new or ten years old, preventing
+adoption from becoming a day of broken builds for everyone.
 
-**Preciso usar tudo isso ou posso escolher só uma parte?**
-Pode escolher. Cada peça entrega valor sozinha — é modular de propósito.
-Mas o ganho real é o composto: sozinho, o sistema de memória é uma
-conveniência menor; junto com orquestração de subagentes e os portões de
-qualidade, vira outro jeito de trabalhar. Se for adotar uma coisa só,
-adote Superpowers — é a que mais muda o resultado, porque é ela que
-garante que o resto do fluxo (planejar antes de implementar, revisar antes
-de fechar) realmente acontece em vez de ser pulado sob pressão de tempo.
+**Must I use everything, or can I choose a subset?**
+Choose a subset: each piece provides independent value, intentionally.
+The strongest benefit comes from combining them. Memory alone is a small
+convenience; together with subagent orchestration and quality gates, it
+changes the workflow. If adopting just one, choose Superpowers: it has
+the greatest effect because it ensures planning before implementation and
+review before completion actually happen instead of being skipped under
+time pressure.
 
-**Funciona com Codex também?**
-Sim. Use o [guia do Codex](tools/15-codex-workflow.md): ele cobre instalação nativa, `AGENTS.md`, plugins oficiais, skills, MCP e hooks suportados. Configure cada cliente separadamente; não copie `.claude/settings.json` como configuração do Codex. Os prompts de projeto continuam úteis, respeitando as ferramentas disponíveis e as permissões do agente usado.
+**Does this work with Codex too?**
+Yes. Use the [Codex guide](tools/15-codex-workflow.md), covering native installation, `AGENTS.md`, official plugins, skills, MCP, and supported hooks. Configure each client separately; do not copy `.claude/settings.json` as Codex configuration. Project prompts remain useful when adapted to the available tools and the chosen agent's permissions.
 
-**Isso deixa o Claude Code mais lento?**
-No fluxo do dia a dia, não — o efeito líquido costuma ser o oposto. A
-maior parte do que este playbook adiciona ou não tem custo nenhum (hooks
-interceptam *antes* de o modelo ver a chamada, então o proxy de tokens é
-ganho puro) ou economiza mais tempo do que consome (menos leituras
-exploratórias repetidas graças ao Graphify, menos retrabalho porque o
-escopo foi fechado antes de implementar). A exceção honesta é despachar
-vários subagentes: isso usa mais tokens no total, porque cada especialista
-tem seu próprio contexto, em troca de terminar mais rápido no relógio de
-parede e com revisão melhor — uma troca deliberada, não um efeito
-colateral. Graphify e Obsidian são opt-in — se o seu projeto não é grande
-o bastante pra precisar, o custo de não instalar nenhum dos dois é zero.
+**Does this slow Claude Code down?**
+Usually the net effect is the opposite. Most additions either cost nothing
+(hooks intercept before the model sees the call, so the token proxy is a
+pure gain) or save more time than they consume: fewer repeated exploratory
+reads through Graphify, less rework because scope was settled first. The
+honest exception is multiple subagents: each specialist has its own context,
+increasing total tokens in exchange for shorter elapsed time and better
+review. This is a deliberate tradeoff. Graphify and Obsidian are opt-in;
+if the project is too small to need them, skipping both costs nothing.
 
-**O que exatamente é um "subagente"?**
-Uma sessão separada do Claude Code, disparada pela sessão principal pra
-executar uma tarefa específica, com contexto próprio — ela não vê o
-histórico da conversa principal, só o que foi escrito explicitamente no
-prompt que a disparou, conforme o mecanismo de contexto do cliente. Por isso, cada tarefa delegada recebe instruções suficientes. A tabela de especialistas é opcional e fica nos acordos compartilhados quando o projeto precisar dela.
+**What exactly is a subagent?**
+A separate Claude Code session launched by the main session for a specific
+task, with its own context. It does not see the main conversation history,
+only what the launch prompt explicitly supplies, according to the client's
+context mechanism. Each delegated task therefore receives sufficient
+instructions. The optional specialist roster belongs in shared agreements
+when the project needs it.
 
-**Os plugins não instalam / o marketplace não é encontrado — e agora?**
-Confirme a versão do Claude Code primeiro (`claude --version`) — plugins
-exigem uma versão relativamente recente do CLI. Depois, confirme que o
-marketplace foi realmente adicionado antes do install:
+**Plugins will not install or the marketplace cannot be found. What now?**
+First check `claude --version`: plugins require a relatively recent CLI.
+Then confirm the marketplace was actually added before installation:
 
 ```bash
 /plugin marketplace list
 ```
 
-Se o marketplace não aparecer na lista, repita o `add` com a URL exata da
-tabela da Parte 2 — um typo no nome do repositório (`usuário/repo`) é o
-erro mais comum.
+If it is missing, repeat `add` with the exact URL from Part 2's table. A
+typo in the repository name (`user/repo`) is the most common mistake.
 
-## Próximos passos
+## Next steps
 
-Esse playbook cobre o caminho principal — dá pra rodar um projeto inteiro
-só com o que está aqui. Pra ir além:
+This playbook covers the main path, enough to run a complete project. To
+go further:
 
-- **[RTK — proxy de tokens](tools/03-rtk-token-proxy.md)** — CLI pública com integração oficial por agente, métricas de saída e escape sem filtro. Use esse fluxo antes de manter um proxy personalizado.
-- **[Sanitização de projeto](prompts/01-project-sanitation.md)** — um bom
-  segundo prompt pra rodar depois que o fluxo da Parte 4 já é rotina: uma
-  passada de limpeza no projeto que mede antes de agir, em vez de assumir
-  a gravidade de cada achado.
-- Releia [Visão geral](00-overview.md) depois de já ter rodado o fluxo
-  completo pelo menos uma vez — faz mais sentido em retrospecto do que na
-  primeira leitura.
-- Os créditos no [README](../README.md) apontam pros projetos originais
-  por trás de cada plugin — Superpowers, Ponytail, Caveman, aia-harness.
-  Vale conhecer o trabalho original de cada autor.
+- **[RTK — token proxy](tools/03-rtk-token-proxy.md)**: a public CLI with official per-agent integration, output metrics, and an unfiltered escape hatch. Use it before maintaining a custom proxy.
+- **[Project sanitation](prompts/01-project-sanitation.md)**: a good second
+  prompt once Part 4 becomes routine, cleaning up the project by measuring
+  before acting rather than assuming each finding's severity.
+- Reread the [Overview](00-overview.md) after completing the workflow at
+  least once: it makes more sense in retrospect than on first reading.
+- The [README](../README.md) credits link to the original projects behind
+  each plugin: Superpowers, Ponytail, Caveman, and aia-harness. Their
+  authors' original work is worth exploring.

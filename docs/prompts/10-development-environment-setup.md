@@ -1,332 +1,345 @@
-# Setup completo do ambiente de desenvolvimento
+# Complete development environment setup
 
-Este prompt instala, configura, atualiza e valida o ambiente global de desenvolvimento. Serve para uma máquina nova ou para corrigir uma máquina que já tem ferramentas instaladas. Inclui Node.js, Docker, Codex, Claude Code e todas as extensões obrigatórias indicadas abaixo.
+This prompt installs, configures, updates and validates the global development environment. It works for a new machine or for fixing one that already has tools installed. It includes Node.js, Docker, Codex, Claude Code and all mandatory extensions listed below.
 
-O escopo é o computador, incluindo configurações fora do projeto. Dependências locais, lockfiles, credenciais e dados existentes devem ser preservados. Leia o [guia de uso](../03-environment-setup.md) para escolher o agente, acompanhar intervenções, retomar uma execução e reproduzir o resultado em outra máquina.
+The scope is the computer, including configuration outside the project. Existing local dependencies, lockfiles, credentials and data must be preserved. Read the [usage guide](../03-environment-setup.md) to choose an agent, track required interventions, resume a run and reproduce the result on another machine.
 
-## Como usar
+## How to use
 
-Em um agente com terminal e acesso aos arquivos do computador, cole **todo o bloco da seção “Prompt”**. Não cole no terminal como se fosse um comando de shell. Uma conversa sem execução de comandos pode explicar o setup, mas não realizar as instalações.
+In an agent with a terminal and access to the computer's files, paste **the entire block in the “Prompt” section**. Do not paste it into the terminal as a shell command. A conversation without command execution can explain the setup, but cannot perform installations.
 
-Se o repositório estiver disponível localmente, cole no agente:
+If the repository is available locally, paste into the agent:
 
 ```text
-Leia docs/prompts/10-development-environment-setup.md deste repositório e execute integralmente o bloco da seção “Prompt” neste computador.
-Use templates/environment-manifest.json.example como formato inicial do manifesto, preenchendo os valores observados e acrescentando os demais componentes encontrados.
-Grave o relatório e o manifesto fora dos projetos, em um diretório de setup do usuário, e informe os caminhos finais.
+Read docs/prompts/10-development-environment-setup.md in this repository and execute the entire block in the “Prompt” section on this computer.
+Use templates/environment-manifest.json.example as the initial manifest format, filling in observed values and adding other components found.
+Save the report and manifest outside projects, in a user setup directory, and report the final paths.
 ```
 
-Para usar sem clonar, depois que esta versão estiver publicada na branch `main`:
+To use without cloning, after this version is published on the `main` branch:
 
 ```text
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/10-development-environment-setup.md
-e execute integralmente o bloco da seção “Prompt” neste computador. Grave relatório e manifesto em um diretório de setup do usuário, fora dos projetos, e informe os caminhos finais.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/10-development-environment-setup.md
+and execute the entire block in the “Prompt” section on this computer. Save the report and manifest in a user setup directory, outside projects, and report the final paths.
 ```
 
 ## Prompt
 
 ```markdown
-# Instalar, configurar, atualizar e otimizar todo o ambiente de desenvolvimento
+# Install, configure, update and optimize the entire development environment
 
-Prepare este computador para desenvolvimento, principalmente com Node.js, e uso do Codex e Claude Code.
+Prepare this computer for development, primarily with Node.js, and for using Codex and Claude Code.
 
-Este prompt deve funcionar em dois cenários:
+This prompt must work in two scenarios:
 
-- **Ambiente novo, sem ferramentas:** instalar e configurar toda a base obrigatória, incluindo plugins, skills, MCPs e hooks.
-- **Ambiente existente:** inventariar, atualizar, corrigir, limpar duplicatas e melhorar as integrações.
+- **New environment, no tools:** install and configure the entire mandatory foundation, including plugins, skills, MCPs and hooks.
+- **Existing environment:** inventory, update, fix, remove duplicates and improve integrations.
 
-Execute o trabalho. Não entregue apenas um tutorial ou recomendações.
+Do the work. Do not deliver only a tutorial or recommendations.
 
-Adapte comandos, caminhos e métodos ao sistema operacional, arquitetura, shell e data da execução. Consulte documentação oficial atual.
+Adapt commands, paths and methods to the operating system, architecture, shell and execution date. Consult current official documentation.
 
-## 1. Autorização e regras
+## 1. Authorization and rules
 
-Estão autorizados:
+The following are authorized:
 
-- Instalação de todos os componentes da lista obrigatória.
-- Atualização de todos os componentes globais de desenvolvimento existentes.
-- Configuração e ativação dos plugins, skills, MCPs e hooks obrigatórios.
-- Remoção de duplicatas confirmadas e resíduos dispensáveis.
-- Correção de PATH, inicialização do shell e integrações.
-- Execução de comandos e leitura ou alteração de arquivos fora do projeto quando necessárias ao setup.
+- Installation of every component in the mandatory list.
+- Updating all existing global development components.
+- Configuration and activation of mandatory plugins, skills, MCPs and hooks.
+- Removal of confirmed duplicates and unnecessary leftovers.
+- Fixes to PATH, shell initialization and integrations.
+- Running commands and reading or changing files outside the project when needed for setup.
 
-Preserve projetos, dependências locais, lockfiles, credenciais, sessões, históricos e configurações personalizadas.
+Preserve projects, local dependencies, lockfiles, credentials, sessions, histories and custom settings.
 
-Faça backup antes de alterar configurações ou remover componentes com dados relevantes. Registre como restaurar.
+Back up before changing configuration or removing components with relevant data. Record how to restore it.
 
-Não repita pedidos de autorização já concedida. Solicite minha intervenção somente para autenticação, exigências do sistema, custos, novos extras ou migrações com impacto incompatível.
+Do not repeat requests for authorization already granted. Request my intervention only for authentication, system requirements, costs, new extras or migrations with incompatible impact.
 
-Não publique conteúdo, envie mensagens, contrate serviços ou altere projetos como consequência do setup.
+Do not publish content, send messages, purchase services or change projects as a consequence of setup.
 
-O processo deve ser repetível: novas execuções devem verificar, atualizar e corrigir sem duplicar instalações ou configurações.
+The process must be repeatable: subsequent runs must check, update and fix without duplicating installations or configuration.
 
-## 2. Base obrigatória
+## 2. Mandatory foundation
 
-**Todos os itens abaixo devem ser instalados quando ausentes, atualizados quando necessário e configurados para uso. Apenas verificar sua existência não atende ao objetivo.**
+**Every item below must be installed when absent, updated when needed and configured for use. Merely checking its existence does not meet the goal.**
 
-### Sistema e desenvolvimento
+### System and development
 
-- Pré-requisitos necessários: certificados, download, extração e compilação.
+- Required prerequisites: certificates, downloading, extraction and compilation.
 - Git.
 - GitHub CLI.
-- Gerenciador de pacotes adequado ao sistema.
-- Gerenciador de versões do Node.js, preferencialmente `fnm` quando compatível e adequado.
-- Node.js LTS e npm.
+- A package manager appropriate for the system.
+- A Node.js version manager, preferably `fnm` when compatible and appropriate.
+- Node.js LTS and npm.
 - pnpm.
-- ripgrep, fd e jq, ou equivalentes justificados quando houver incompatibilidade.
+- ripgrep, fd and jq, or justified equivalents when incompatible.
 
 ### Containers
 
-- Docker, incluindo cliente e engine funcionais.
-- Docker Compose disponível pelo comando `docker compose`.
-- Componentes necessários ao funcionamento, conforme o sistema operacional.
+- Docker, including a working client and engine.
+- Docker Compose available through `docker compose`.
+- Components required for operation on the operating system.
 
-### Agentes
+### Agents
 
 - Codex CLI.
 - Claude Code CLI.
 
-### Produtividade e extensões dos agentes
+### Agent productivity and extensions
 
-- **RTK:** instalação e integração para os comandos suportados.
-- **Ponytail:** plugin ou skills, com intensidade `full` como padrão para tarefas de programação.
-- **Caveman:** skills e comunicação concisa como padrão, preservando clareza e redação normal em código, documentação e commits.
-- **Superpowers:** instalação das skills e configuração nos agentes compatíveis.
-- **Context7:** instalação ou conexão do servidor MCP e configuração nos clientes compatíveis.
-- **Graphify:** instalação e configuração do mecanismo oficialmente suportado.
+- **RTK:** installation and integration for supported commands.
+- **Ponytail:** plugin or skills, with `full` intensity as the default for programming tasks.
+- **Caveman:** skills and concise communication by default, preserving clarity and normal wording in code, documentation and commits.
+- **Superpowers:** skills installation and configuration in compatible agents.
+- **Context7:** MCP server installation or connection and configuration in compatible clients.
+- **Graphify:** installation and configuration through the officially supported mechanism.
 
-Resolva a identidade e origem corretas dessas ferramentas antes de instalar. Não instale um pacote apenas porque possui nome semelhante.
+Resolve these tools' correct identities and sources before installing. Do not install a package merely because its name is similar.
 
-Use os mecanismos oficiais de cada projeto e plataforma. Quando um componente não for suportado, registre a incompatibilidade, continue os demais e apresente a alternativa adequada.
+Use each project's and platform's official mechanisms. When a component is unsupported, record the incompatibility, continue with the others and present an appropriate alternative.
 
-**Plugins obrigatórios não são extras opcionais e não devem ser ignorados porque ainda não existem na máquina.**
+**Mandatory plugins are not optional extras and must not be skipped because they are not yet on the machine.**
 
-## 3. Diagnóstico e inventário
+### Project capability prerequisites
 
-Antes de alterar o ambiente, identifique:
+This toolkit configures machines and individual projects. In this machine flow, evaluate docs/tools/README.md and its scope matrix against the intended development work; project skills and application configuration remain local to each codebase.
 
-- Sistema operacional, versão, distribuição e arquitetura.
-- Ambiente nativo, WSL, máquina virtual, container ou remoto.
-- Shell, terminal, PATH, arquivos de inicialização e privilégios.
-- Gerenciadores de pacotes e runtimes.
-- Ferramentas globais por usuário, sistema, runtime e ambiente.
-- Plugins, skills, MCPs, hooks e extensões dos agentes e editores.
-- Configurações globais e por projeto, incluindo sua precedência.
-- Componentes ativos, desativados, duplicados, incompatíveis ou descontinuados.
-- Requisitos dos projetos relevantes.
+- Next.js: for next-dev-loop, prepare compatible agent-browser and browser dependencies when Next.js development is selected. Read docs/tools/17-nextjs-runtime-and-performance.md for the current Next.js/Turbopack and browser version requirements. Do not upgrade applications or change their bundler here. next-bundle-optimizer uses the project's installed analyzer.
+- PostgreSQL: supabase-postgres-best-practices is local guidance for PostgreSQL anywhere; it does not require a Supabase account, SDK or new database service. Install database tools only for the selected workflow.
+- GitHub Actions: when CI investigation is selected, prepare GitHub CLI and authorized login for gh-fix-ci. Record supported clients and missing permissions without copying credentials.
+- Security review: check Git/history and compatible tools for differential-review; preserve the native session model/provider/authentication.
+- UI: shadcn instructions belong only to projects that adopt shadcn/ui. Do not globally initialize a design system.
+- Sentry: check client MCP/OAuth support when this service is selected. Configure the intended scope only with an authorized organization/project; missing access remains pending. Do not create accounts, install application SDKs or enable paid services as a side effect.
 
-Registre nome, finalidade, versão ou revisão, caminho, origem, método de atualização e integrações de cada componente.
+Inventory optional capabilities with required: false until a selected workflow makes their prerequisites necessary. Record source/revision, scope, client, installation, discovery, live evidence and update method. Evaluate every item, without installing every project-specific option globally. Continue independent machine work when a capability is unavailable.
 
-Use os mecanismos de inventário de cada ecossistema. Não dependa apenas dos executáveis encontrados no PATH.
+## 3. Diagnosis and inventory
 
-Diferencie duplicatas reais de links simbólicos, referências compartilhadas e instalações necessárias em ambientes distintos.
+Before changing the environment, identify:
 
-Se houver um inventário ou manifesto do ambiente de origem, inclua seus componentes na reprodução do ambiente novo. Sem esse inventário, instale toda a base obrigatória e informe que ferramentas não identificadas da máquina anterior não podem ser reproduzidas automaticamente.
+- Operating system, version, distribution and architecture.
+- Native environment, WSL, virtual machine, container or remote environment.
+- Shell, terminal, PATH, startup files and privileges.
+- Package managers and runtimes.
+- Global tools by user, system, runtime and environment.
+- Plugins, skills, MCPs, hooks and extensions for agents and editors.
+- Global and project configuration, including precedence.
+- Active, disabled, duplicate, incompatible or discontinued components.
+- Relevant projects' requirements.
 
-## 4. Instalação e atualização
+Record each component's name, purpose, version or revision, path, source, update method and integrations.
 
-Execute na ordem adequada às dependências:
+Use each ecosystem's inventory mechanisms. Do not rely only on executables found in PATH.
 
-1. Diagnóstico e backups.
-2. Pré-requisitos e gerenciador de pacotes.
-3. Git, GitHub CLI e utilitários.
-4. Gerenciador de versões, Node.js, npm e pnpm.
-5. Codex CLI e Claude Code CLI.
-6. Plugins, skills, MCPs e hooks obrigatórios.
-7. Docker e Docker Compose.
-8. Atualização dos demais componentes globais existentes.
-9. Limpeza, validação e relatório.
+Distinguish real duplicates from symbolic links, shared references and installations needed in different environments.
 
-Para cada componente:
+If an inventory or manifest from the source environment exists, include its components when reproducing the new environment. Without that inventory, install the entire mandatory foundation and state that unidentified tools from the previous machine cannot be reproduced automatically.
 
-- Consulte fontes oficiais atuais.
-- Use versão estável compatível.
-- Reaproveite instalações que já estejam adequadas.
-- Preserve o método de instalação existente quando suportado.
-- Evite instalar a mesma ferramenta por gerenciadores diferentes.
-- Confirme versão, caminho e executável efetivamente utilizado.
+## 4. Installation and updates
 
-Atualize também os componentes globais existentes que não aparecem na lista obrigatória: pacotes, CLIs, plugins, skills, MCPs locais, extensões e ferramentas utilizadas por hooks.
+Execute in the appropriate dependency order:
 
-Preserve alterações locais em plugins ou skills personalizados. Não descarte trabalho do usuário para forçar uma atualização.
+1. Diagnosis and backups.
+2. Prerequisites and package manager.
+3. Git, GitHub CLI and utilities.
+4. Version manager, Node.js, npm and pnpm.
+5. Codex CLI and Claude Code CLI.
+6. Mandatory plugins, skills, MCPs and hooks.
+7. Docker and Docker Compose.
+8. Updates to other existing global components.
+9. Cleanup, validation and report.
 
-Para serviços MCP remotos, verifique compatibilidade e conexão; não trate o serviço como pacote local.
+For each component:
 
-Atualizar um componente anteriormente desativado não autoriza ativá-lo. Essa restrição não se aplica aos componentes obrigatórios que precisam ser configurados neste setup.
+- Consult current official sources.
+- Use a compatible stable version.
+- Reuse installations that are already suitable.
+- Preserve the existing installation method when supported.
+- Avoid installing the same tool through different managers.
+- Confirm the version, path and executable actually used.
 
-Não atualize dependências locais dos projetos nem aplicativos sem relação com desenvolvimento.
+Also update existing global components absent from the mandatory list: packages, CLIs, plugins, skills, local MCPs, extensions and tools used by hooks.
 
-## 5. Shell, Node.js e projetos
+Preserve local changes in custom plugins or skills. Do not discard the user's work to force an update.
 
-- Configure PATH e inicialização nos arquivos corretos do shell.
-- Garanta funcionamento em novas sessões e nos terminais utilizados pelos agentes.
-- Configure a versão LTS mais recente compatível do Node.js como padrão fora dos projetos.
-- Configure seleção automática de versão por projeto quando suportada.
-- Respeite `.node-version`, `.nvmrc`, `engines`, `packageManager` e lockfiles.
-- Preserve versões específicas exigidas pelos projetos.
-- Identifique conflitos entre requisitos e explique a resolução.
-- Configure pnpm pelo mecanismo oficialmente suportado.
-- Preserve os gerenciadores escolhidos pelos projetos.
-- Não altere dependências, lockfiles ou versões declaradas como parte do setup.
-- Corrija permissões na causa, sem permissões indiscriminadas ou uso de administrador por padrão.
+For remote MCP services, check compatibility and connectivity; do not treat the service as a local package.
 
-No Windows, diferencie ambiente nativo e WSL. Não misture executáveis e dependências entre eles.
+Updating a previously disabled component does not authorize enabling it. This restriction does not apply to mandatory components that need to be configured in this setup.
 
-## 6. Plugins, skills, MCPs e hooks
+Do not update projects' local dependencies or applications unrelated to development.
 
-Instale e configure cada componente obrigatório nos agentes em que houver suporte oficial.
+## 5. Shell, Node.js and projects
 
-- Verifique instalação, descoberta, carregamento e funcionamento.
-- Use os formatos e caminhos documentados para cada cliente.
-- Preserve instruções personalizadas e preferências existentes.
-- Identifique hooks duplicados, execução repetida de comandos e integrações concorrentes.
-- Não duplique instalações quando uma distribuição já incluir as mesmas skills.
-- Não suponha que configuração no Codex também configure o Claude Code, ou vice-versa.
+- Configure PATH and initialization in the correct shell files.
+- Ensure operation in new sessions and the terminals agents use.
+- Configure the latest compatible Node.js LTS version as the default outside projects.
+- Configure automatic version selection per project when supported.
+- Respect `.node-version`, `.nvmrc`, `engines`, `packageManager` and lockfiles.
+- Preserve specific versions projects require.
+- Identify conflicting requirements and explain the resolution.
+- Configure pnpm through the officially supported mechanism.
+- Preserve the package managers chosen by projects.
+- Do not change dependencies, lockfiles or declared versions as part of setup.
+- Fix permission issues at their cause, without indiscriminate permissions or administrator use by default.
 
-Configure as preferências:
+On Windows, distinguish native and WSL environments. Do not mix their executables or dependencies.
 
-- **Ponytail:** intensidade `full` para programação, preservando segurança, acessibilidade e requisitos explícitos.
-- **Caveman:** respostas concisas em português; explicações completas quando solicitadas; código, documentação e commits com redação normal.
-- **Context7:** documentação atual de bibliotecas, APIs e ferramentas quando pertinente; nunca enviar segredos nas consultas.
-- **RTK:** integração com os mecanismos de execução suportados, evitando aplicação dupla de wrappers ou hooks.
-- **Superpowers:** skills disponíveis e carregadas nos clientes compatíveis.
-- **Graphify:** ferramenta e integração prontas para uso pelo mecanismo suportado.
+## 6. Plugins, skills, MCPs and hooks
 
-Para trabalhos com LLM de Graphify e Caveman, preserve cliente nativo, modelo e autenticação autorizados na sessão. No Codex, mantenha login ChatGPT quando utilizado; no Claude, preserve a modalidade vigente. Passe o mesmo modelo explicitamente quando houver delegação suportada. Não troque silenciosamente provedor/modelo nem ative cobrança por API ou proxy. A CLI standalone não herda automaticamente a autenticação do agente; registre limitações em vez de inventar suporte.
+Install and configure each mandatory component in agents with official support.
 
-As instruções deste prompt e minhas preferências explícitas prevalecem sobre fluxos de skills que repetiriam autorizações já concedidas.
+- Verify installation, discovery, loading and operation.
+- Use each client's documented formats and paths.
+- Preserve custom instructions and existing preferences.
+- Identify duplicate hooks, repeated command execution and competing integrations.
+- Do not duplicate installations when a distribution already includes the same skills.
+- Do not assume configuring Codex also configures Claude Code, or vice versa.
 
-## 7. Codex, Claude Code e permissões
+Configure preferences:
 
-- Garanta funcionamento de ambas as CLIs em terminais novos.
-- Preserve modelos, provedores, sessões e configurações existentes.
-- Em ambiente novo, use os fluxos oficiais de autenticação.
-- Verifique autenticação sem revelar credenciais.
-- Abra o fluxo de login quando necessário e informe exatamente minha intervenção.
-- Não habilite cobrança por API ou troque modalidade de autenticação sem minha escolha.
+- **Ponytail:** `full` intensity for programming, preserving security, accessibility and explicit requirements.
+- **Caveman:** concise responses in the user's language; complete explanations when requested; normal wording in code, documentation and commits.
+- **Context7:** current documentation for libraries, APIs and tools when relevant; never send secrets in queries.
+- **RTK:** integration with supported execution mechanisms, avoiding duplicate wrappers or hooks.
+- **Superpowers:** skills available and loaded in compatible clients.
+- **Graphify:** tool and integration ready for use through the supported mechanism.
+
+For Graphify and Caveman LLM work, preserve the native client, model and authentication authorized in the session. In Codex, retain ChatGPT login when used; in Claude, preserve the current authentication mode. Pass the same model explicitly when supported delegation is available. Do not silently switch provider/model or enable API billing or a proxy. The standalone CLI does not automatically inherit the agent's authentication; record limitations instead of inventing support.
+
+This prompt's instructions and my explicit preferences take precedence over skill workflows that would repeat authorizations already granted.
+
+## 7. Codex, Claude Code and permissions
+
+- Ensure both CLIs work in new terminals.
+- Preserve existing models, providers, sessions and configuration.
+- In a new environment, use official authentication flows.
+- Check authentication without revealing credentials.
+- Open the login flow when needed and specify exactly what intervention I must provide.
+- Do not enable API billing or change authentication mode without my choice.
 
 ### Codex
 
-Configure acesso completo, rede e ausência de aprovações rotineiras pelos mecanismos oficiais suportados, com persistência quando disponível.
+Configure full access, networking and no routine approval prompts through officially supported mechanisms, with persistence when available.
 
-Diferencie permissões da CLI, aplicativo desktop, sistema operacional e organização. Verifique cada contexto utilizado.
+Distinguish CLI, desktop app, operating system and organization permissions. Verify every context used.
 
-Não presuma que mudar um arquivo altera automaticamente as permissões da sessão atual. Confirme em nova sessão.
+Do not assume changing a file automatically changes the current session's permissions. Confirm in a new session.
 
-### Sistema operacional
+### Operating system
 
-- Verifique as permissões necessárias às funcionalidades utilizadas.
-- Confirme a identidade dos aplicativos e componentes.
-- Abra as telas pertinentes quando possível.
-- Oriente sobre elevação, senha no sistema, autenticação biométrica ou reinicialização.
-- Nunca solicite senhas, tokens ou códigos de autenticação no chat.
-- Não contorne proteções ou políticas administrativas.
-- Se uma política impedir a configuração, registre a restrição e continue as etapas independentes.
+- Check permissions required by the features used.
+- Confirm application and component identities.
+- Open the relevant screens when possible.
+- Provide guidance on elevation, system password entry, biometric authentication or restarting.
+- Never request passwords, tokens or authentication codes in chat.
+- Do not bypass protections or administrative policies.
+- If a policy prevents configuration, record the restriction and continue independent steps.
 
-## 8. Docker e Docker Compose
+## 8. Docker and Docker Compose
 
-Instale e configure uma solução Docker funcional, incluindo engine, cliente e Compose.
+Install and configure a working Docker solution, including engine, client and Compose.
 
-- No macOS e Windows, utilize Docker Desktop quando adequado e configure os pré-requisitos oficiais.
-- No Linux, utilize Docker Engine e o plugin Docker Compose compatíveis com a distribuição.
-- Verifique arquitetura, virtualização, requisitos do sistema e licença.
-- Se houver custo aplicável, peça minha escolha antes de contratar.
-- Reutilize uma instalação funcional e evite engines ou serviços concorrentes.
-- Configure contexto correto, acesso do usuário e inicialização persistente quando suportada.
-- Preserve containers, imagens, volumes, redes e configurações existentes.
-- Informe intervenções necessárias e reinicializações.
+- On macOS and Windows, use Docker Desktop when appropriate and configure official prerequisites.
+- On Linux, use Docker Engine and the Docker Compose plugin compatible with the distribution.
+- Check architecture, virtualization, system requirements and licensing.
+- If costs apply, ask for my choice before purchasing.
+- Reuse a working installation and avoid competing engines or services.
+- Configure the correct context, user access and persistent startup when supported.
+- Preserve existing containers, images, volumes, networks and configuration.
+- Report required interventions and restarts.
 
-Docker só está pronto quando o cliente consegue acessar a engine e executar containers e projetos Compose.
+Docker is ready only when the client can access the engine and run containers and Compose projects.
 
-## 9. Faxina e remoção de duplicatas
+## 9. Cleanup and duplicate removal
 
-- Identifique qual instalação está em uso antes de remover outra.
-- Verifique referências no PATH, shell, agentes, editores e hooks.
-- Remova duplicatas confirmadas pelo gerenciador responsável.
-- Preserve ou consolide configurações necessárias.
-- Elimine entradas repetidas, links quebrados e referências obsoletas.
-- Remova resíduos comprovadamente dispensáveis.
-- Limpe caches pelos mecanismos oficiais quando houver benefício concreto.
-- Não remova ferramentas apenas por serem antigas ou semelhantes.
-- Não trate versões exigidas por projetos como duplicatas.
-- Preserve arquivos de finalidade desconhecida.
-- Não execute limpeza indiscriminada de volumes ou outros dados do Docker.
-- Confirme funcionamento após cada remoção.
+- Identify which installation is in use before removing another.
+- Check references in PATH, shell, agents, editors and hooks.
+- Remove confirmed duplicates through their responsible manager.
+- Preserve or consolidate necessary configuration.
+- Eliminate repeated entries, broken links and obsolete references.
+- Remove demonstrably unnecessary leftovers.
+- Clear caches through official mechanisms when there is a concrete benefit.
+- Do not remove tools merely because they are old or similar.
+- Do not treat versions required by projects as duplicates.
+- Preserve files with unknown purposes.
+- Do not indiscriminately clean Docker volumes or other data.
+- Confirm operation after every removal.
 
-Se houver dúvida sobre dependência ou impacto, preserve o componente e registre a pendência.
+When dependency or impact is uncertain, preserve the component and record the outstanding issue.
 
-## 10. Melhorias adicionais
+## 10. Additional improvements
 
-Depois da base completa, avalie melhorias relevantes para:
+After completing the foundation, evaluate relevant improvements for:
 
-- Terminal e navegação.
-- Git e colaboração.
-- Documentação e contexto dos agentes.
-- Automação de navegador.
-- Testes, formatação, análise de código e acessibilidade.
-- Containers e ambientes reproduzíveis.
-- Diagnóstico, desempenho e consumo de recursos.
+- Terminal and navigation.
+- Git and collaboration.
+- Documentation and agent context.
+- Browser automation.
+- Testing, formatting, code analysis and accessibility.
+- Containers and reproducible environments.
+- Diagnosis, performance and resource consumption.
 
-Considere ferramentas atuais e alternativas melhores, sem instalar por novidade ou popularidade.
+Consider current tools and better alternatives, without installing for novelty or popularity.
 
-Para cada recomendação, informe problema resolvido, benefício, compatibilidade, manutenção, sobreposição, custos e escopo de instalação.
+For each recommendation, state the problem solved, benefit, compatibility, maintenance, overlap, costs and installation scope.
 
-Priorize poucas melhorias de alto impacto. Prefira recursos nativos ou soluções existentes quando suficientes.
+Prioritize a few high-impact improvements. Prefer native features or existing solutions when sufficient.
 
-Instale novos extras após minha escolha. A base obrigatória e a atualização dos componentes existentes não dependem dessa escolha.
+Install new extras after my choice. The mandatory foundation and updates to existing components do not depend on that choice.
 
-## 11. Validação
+## 11. Validation
 
-Teste em nova sessão, sem depender de variáveis temporárias:
+Test in a new session, without relying on temporary variables:
 
-- Git, GitHub CLI e gerenciadores utilizados.
-- Node.js LTS padrão, npm e pnpm.
-- Acesso HTTPS ao registro configurado.
-- Troca de versão por projeto e retorno ao padrão.
-- Inicialização e autenticação de Codex e Claude Code.
-- Instalação e funcionamento de RTK.
-- Descoberta e carregamento de Ponytail, Caveman e Superpowers.
-- Conexão do Context7 e dos demais MCPs habilitados.
-- Funcionamento do Graphify.
-- Execução dos hooks sem duplicação.
-- Persistência das configurações e permissões verificáveis.
-- Ausência de conflitos relevantes e referências quebradas.
+- Git, GitHub CLI and the managers used.
+- Default Node.js LTS, npm and pnpm.
+- HTTPS access to the configured registry.
+- Per-project version switching and returning to the default.
+- Codex and Claude Code startup and authentication.
+- RTK installation and operation.
+- Ponytail, Caveman and Superpowers discovery and loading.
+- Context7 and other enabled MCP connections.
+- Graphify operation.
+- Hook execution without duplication.
+- Persistence of configuration and verifiable permissions.
+- Absence of relevant conflicts and broken references.
 
-Para Docker:
+For Docker:
 
-1. Execute `docker version` e confirme cliente e servidor.
-2. Execute `docker info`.
-3. Execute `docker compose version`.
-4. Execute `docker run --rm hello-world`.
-5. Crie um projeto Compose mínimo em diretório temporário.
-6. Execute `docker compose up -d` e confirme o serviço funcionando.
-7. Encerre com `docker compose down` e remova apenas recursos criados pelo teste.
+1. Run `docker version` and confirm client and server.
+2. Run `docker info`.
+3. Run `docker compose version`.
+4. Run `docker run --rm hello-world`.
+5. Create a minimal Compose project in a temporary directory.
+6. Run `docker compose up -d` and confirm the service works.
+7. Stop it with `docker compose down` and remove only resources created by the test.
 
-Use diretórios temporários para testes. Preserve projetos existentes.
+Use temporary directories for tests. Preserve existing projects.
 
-Execute diagnósticos oficiais pertinentes, como `brew doctor` quando aplicável. Investigue avisos relevantes.
+Run relevant official diagnostics, such as `brew doctor` when applicable. Investigate relevant warnings.
 
-Não execute chamadas pagas apenas para validar sem autorização.
+Do not make paid calls merely for validation without authorization.
 
-## 12. Entrega e reprodução
+## 12. Delivery and reproduction
 
-Entregue um relatório em Markdown com:
+Deliver a Markdown report with:
 
-- Ambiente identificado.
-- Checklist de toda a base obrigatória.
-- Componentes instalados, atualizados ou reaproveitados.
-- Versões anteriores e finais quando aplicável.
-- Origens, caminhos e métodos de instalação.
-- Plugins, skills, MCPs e hooks configurados.
-- Duplicatas removidas e limpeza realizada.
-- Configurações alteradas, backups e restauração.
-- Testes e resultados.
-- Pendências, incompatibilidades e bloqueios.
-- Melhorias adicionais recomendadas.
+- The identified environment.
+- A checklist of the entire mandatory foundation.
+- Components installed, updated or reused.
+- Previous and final versions when applicable.
+- Sources, paths and installation methods.
+- Configured plugins, skills, MCPs and hooks.
+- Duplicates removed and cleanup performed.
+- Configuration changes, backups and restoration.
+- Tests and results.
+- Outstanding issues, incompatibilities and blockers.
+- Recommended additional improvements.
 
-Gere também um manifesto reutilizável do ambiente final, com componentes, fontes, versões ou revisões, escopos e configurações necessárias. Não inclua segredos ou dados privados.
+Also generate a reusable manifest of the final environment, with components, sources, versions or revisions, scopes and required configuration. Do not include secrets or private data.
 
-Esse manifesto deve permitir reproduzir o ambiente em outra máquina, adaptando caminhos e requisitos ao sistema de destino.
+This manifest must enable reproducing the environment on another machine, adapting paths and requirements to the target system.
 
-Não considere o trabalho concluído apenas porque as instalações terminaram. Confirme configuração e funcionamento de cada componente obrigatório e deixe explícito o que ainda depende de mim.
+Do not consider the work complete merely because installations finished. Confirm every mandatory component's configuration and operation, and make clear what still depends on me.
 ```

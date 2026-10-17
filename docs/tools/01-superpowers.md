@@ -1,119 +1,119 @@
 # Superpowers
 
 > [!IMPORTANT]
-> Se você só for adotar **uma** ferramenta deste repositório inteiro, que seja essa. O resto do toolkit — orquestração de subagentes, proxy de tokens, personas de engenharia, quality gates de lint — otimiza *como* o trabalho é feito. Superpowers muda *quando* e *se* o trabalho deveria sequer começar: ela transforma o agente de IA de um executor que sai codando na primeira interpretação plausível do seu pedido em um parceiro disciplinado que questiona, planeja, delega e verifica antes de escrever a primeira linha de código. Todo o resto deste repositório pressupõe esse hábito já instalado.
+> If you adopt only **one** tool from this entire repository, make it this one. The rest of the toolkit — subagent orchestration, token proxies, engineering personas, lint quality gates — optimizes *how* work gets done. Superpowers changes *when* and *whether* work should even begin: it turns the AI agent from an executor that starts coding at the first plausible interpretation of your request into a disciplined partner that questions, plans, delegates, and verifies before writing the first line of code. Everything else in this repository assumes that habit is already in place.
 
-## O que é
+## What it is
 
-`superpowers` é um plugin do Claude Code — um pacote instalável que adiciona **skills** (habilidades: fluxos de trabalho nomeados que o agente pode invocar sob demanda) ao agente. Ele empacota uma biblioteca de **skills de processo**: fluxos reutilizáveis para cada etapa real de construir software — explorar a intenção por trás de um pedido, planejar, implementar, depurar, revisar, encerrar uma branch.
+`superpowers` is a Claude Code plugin — an installable package that adds **skills** (named workflows the agent can invoke on demand). It bundles a library of **process skills**: reusable workflows for every real stage of building software — exploring the intent behind a request, planning, implementing, debugging, reviewing, and finishing a branch.
 
-Isso é diferente de uma skill de *implementação*, que ensina uma tecnologia ou API específica ("como usar o React Router", "como estruturar uma migration"). Skills de processo ficam **acima** das de implementação: decidem quando e como abordar uma tarefa, antes de qualquer skill específica de domínio decidir o que escrever. É essa camada extra — a que decide *se* já dá pra começar a codar — que falta na maioria dos fluxos de IA, e é exatamente o que este plugin resolve.
+This differs from an *implementation* skill, which teaches a specific technology or API ("how to use React Router," "how to structure a migration"). Process skills sit **above** implementation skills: they decide when and how to approach a task before any domain-specific skill decides what to write. That extra layer — deciding *whether* coding can begin yet — is missing from most AI workflows, and it is exactly what this plugin addresses.
 
-Fonte: [`anthropics/claude-plugins-official`](https://github.com/anthropics/claude-plugins-official).
+Source: [`anthropics/claude-plugins-official`](https://github.com/anthropics/claude-plugins-official).
 
-## Instalação
+## Installation
 
-Dentro de uma sessão do Claude Code:
+Inside a Claude Code session:
 
 ```text
 /plugin marketplace add anthropics/claude-plugins-official
 /plugin install superpowers@claude-plugins-official
 ```
 
-Sem configuração adicional. A partir daí, a skill `using-superpowers` — a regra central descrita a seguir — é carregada automaticamente no início de toda conversa, e as demais skills ficam disponíveis para o agente invocar sob demanda.
+No additional configuration. From then on, the `using-superpowers` skill — the central rule described next — loads automatically at the beginning of every conversation, and the other skills are available for the agent to invoke on demand.
 
-## A regra central
+## The central rule
 
-Existe uma skill que roda por baixo de todas as outras: `using-superpowers`. Ela é carregada no início de toda conversa e define uma única regra, tratada como inegociável no próprio texto da skill:
+One skill runs underneath all the others: `using-superpowers`. It loads at the beginning of every conversation and defines a single rule, treated as nonnegotiable in the skill's own text:
 
-> Se existe sequer 1% de chance de uma skill se aplicar ao que você está fazendo, você é obrigado a invocá-la — **antes de qualquer resposta ou ação**, incluindo perguntas de esclarecimento, explorar o código, ou checar arquivos.
+> If there is even a 1% chance that a skill applies to what you are doing, you must invoke it — **before any response or action**, including clarification questions, code exploration, or file checks.
 
-Isso inverte a ordem que parece natural. O instinto é: entender o pedido, fazer uma pergunta de esclarecimento se precisar, *depois* procurar uma ferramenta. Superpowers roda a skill de processo primeiro — geralmente `brainstorming` para qualquer coisa criativa — e as perguntas de esclarecimento acontecem *dentro* dela, não antes. Responder, ou até só perguntar, antes de invocar a skill é exatamente o modo de falha que essa regra existe para evitar.
+This reverses the seemingly natural order. The instinct is: understand the request, ask a clarification question if needed, *then* find a tool. Superpowers runs the process skill first — usually `brainstorming` for anything creative — and clarification questions happen *inside* it, not before. Answering, or even just asking, before invoking the skill is precisely the failure mode this rule exists to prevent.
 
-### Skills de processo vêm antes de skills de implementação
+### Process skills come before implementation skills
 
-Quando mais de uma skill se aplica, quem decide a abordagem entra primeiro:
+When more than one skill applies, the one deciding the approach comes first:
 
-- "Vamos construir X" → `brainstorming` primeiro, skills de implementação depois.
-- "Corrige esse bug" → `systematic-debugging` primeiro, skills de domínio depois.
+- "Let's build X" → `brainstorming` first, implementation skills afterward.
+- "Fix this bug" → `systematic-debugging` first, domain skills afterward.
 
-### Os "red flags" — pensamentos que são o agente se convencendo a pular a regra
+### The "red flags" — thoughts where the agent talks itself into skipping the rule
 
-A skill inclui uma tabela de racionalizações comuns, porque "é só uma pergunta simples" é exatamente o tipo de pensamento que leva a pular a etapa que evitaria retrabalho depois. Uma amostra, traduzida do original:
+The skill includes a table of common rationalizations, because "it's just a simple question" is exactly the kind of thinking that skips the step that would prevent rework later. A sample from the original:
 
-| Pensamento | Por que é uma armadilha |
+| Thought | Why it is a trap |
 |---|---|
-| "Isso é só uma pergunta simples" | Perguntas são tarefas. Verifique se uma skill se aplica. |
-| "Preciso entender mais o contexto primeiro" | A checagem de skill vem ANTES das perguntas de esclarecimento. |
-| "Deixa eu só explorar o código primeiro" | As skills dizem COMO explorar. Verifique antes de explorar. |
-| "Isso não precisa de uma skill formal" | Se a skill existe, use-a. |
-| "Eu lembro dessa skill" | Skills evoluem. Leia a versão atual. |
-| "A skill é exagero pra isso" | Coisas simples viram complexas. Use-a mesmo assim. |
+| "This is just a simple question" | Questions are tasks. Check whether a skill applies. |
+| "I need more context first" | The skill check comes BEFORE clarification questions. |
+| "Let me explore the code first" | Skills tell you HOW to explore. Check before exploring. |
+| "This doesn't need a formal skill" | If the skill exists, use it. |
+| "I remember this skill" | Skills evolve. Read the current version. |
+| "The skill is overkill for this" | Simple things become complex. Use it anyway. |
 
-E uma ressalva importante, também tirada do texto original da skill: instruções explícitas suas — o `CLAUDE.md` do projeto, ou um pedido direto do tipo "pula o brainstorming, só faz X" — têm prioridade sobre as skills. A regra existe para impedir que o agente pule a etapa **por conta própria**, não para tirar de você a decisão final. Voltamos a esse ponto nas perguntas frequentes, no fim deste documento.
+An important caveat, also from the skill's original text: your explicit instructions — the project's `CLAUDE.md` or a direct request such as "skip brainstorming, just do X" — take precedence over skills. The rule prevents the agent from skipping the step **on its own**, not from leaving you the final decision. We return to this in the frequently asked questions at the end of this document.
 
-## As seis skills essenciais
+## The six essential skills
 
-Estas são as skills que formam o núcleo do ciclo — da ideia solta ao código testado. Para cada uma: o que faz, quando entra em ação, e um exemplo concreto. Os exemplos giram em torno de um mesmo cenário fictício — uma loja online genérica — para que dê pra acompanhar a mesma história do início ao fim.
+These skills form the core cycle — from a loose idea to tested code. For each: what it does, when it activates, and a concrete example. The examples revolve around the same fictional scenario — a generic online store — so you can follow one story from start to finish.
 
 ### `brainstorming`
 
-**O que faz:** conduz uma exploração socrática — perguntas direcionadas, uma de cada vez, no estilo do método de ensino por perguntas de Sócrates — da intenção, dos requisitos e do design por trás de um pedido, **antes** de qualquer trabalho criativo começar. "Criativo" aqui inclui criar uma feature, construir um componente, adicionar funcionalidade ou mudar um comportamento existente.
+**What it does:** leads a Socratic exploration — focused questions, one at a time, in the style of Socrates' teaching through questions — of the intent, requirements, and design behind a request, **before** any creative work begins. "Creative" here includes creating a feature, building a component, adding functionality, or changing existing behavior.
 
-**Quando entra em ação:** todo pedido desse tipo passa primeiro por uma classificação em três caminhos, que o agente diz em voz alta para você poder corrigir:
+**When it activates:** every such request first goes through a three-path classification, which the agent states aloud so you can correct it:
 
-- **Spike** — uma pergunta de viabilidade ("dá pra fazer X?"). O resultado é uma resposta, não código permanente.
-- **Bounded** (limitado) — uma mudança bem delimitada num fluxo que **já existe** no código: um flag novo, um endpoint pequeno, uma correção de um arquivo só.
-- **Architectural** (arquitetural) — projeto novo, subsistema novo, ou qualquer mudança que reestrutura como as peças se encaixam.
+- **Spike** — a feasibility question ("can we do X?"). The result is an answer, not permanent code.
+- **Bounded** — a well-defined change to a flow that **already exists** in the code: a new flag, a small endpoint, a one-file fix.
+- **Architectural** — a new project, new subsystem, or any change restructuring how the pieces fit together.
 
-Na dúvida entre dois caminhos, a skill manda escolher o mais pesado. E o ajuste é de mão única: complexidade escondida que aparece no meio da tarefa faz o caminho subir de nível — nunca descer.
+When uncertain between two paths, the skill says to choose the heavier one. Adjustment goes one way: hidden complexity discovered mid-task escalates the path — never downgrades it.
 
-O detalhe que mais gente perde: em **qualquer** um dos três caminhos existe um portão de aprovação (a skill chama isso de *hard gate*). Nenhuma linha de código, nenhum scaffold, nenhuma skill de implementação é chamada antes de você ouvir o que o agente pretende fazer e dar um "sim" explícito. O que muda entre os caminhos é só o tamanho da cerimônia — duas frases no chat para o bounded, um documento de design completo salvo em disco para o architectural — a aprovação em si nunca é opcional.
+The detail most people miss: **all** three paths have an approval gate (the skill calls it a *hard gate*). No code, no scaffold, no implementation skill is invoked before you hear what the agent intends to do and give an explicit "yes." Only the ceremony's size changes between paths — two chat sentences for bounded work, a full design document saved to disk for architectural work — approval itself is never optional.
 
-**Exemplo prático.** Pedido: "adiciona um sistema de notificações no app."
+**Practical example.** Request: "add a notification system to the app."
 
-Sem a skill, um agente "executor" já sairia escrevendo um serviço de notificação com e-mail, push e in-app de uma vez — são as opções óbvias — e provavelmente construiria pelo menos uma delas errada, porque nunca perguntou qual era o requisito real.
+Without the skill, an "executor" agent would start writing a notification service with email, push, and in-app all at once — the obvious options — and probably build at least one incorrectly because it never asked about the actual requirement.
 
-Com a skill:
+With the skill:
 
 ```text
-Agente: Isso é um subsistema novo, então vou tratar como arquitetural — vou
-fazer algumas perguntas antes de propor um design.
+Agent: This is a new subsystem, so I'll treat it as architectural — I'll
+ask a few questions before proposing a design.
 
-Primeira pergunta: quais canais de notificação importam agora — e-mail,
-push, in-app, ou mais de um?
+First question: which notification channels matter now — email,
+push, in-app, or more than one?
 
-Você: só in-app por enquanto.
+You: just in-app for now.
 
-Agente: Entendido. Segunda pergunta: precisa ser em tempo real (a
-notificação aparece sem recarregar a página) ou um contador que atualiza
-no próximo carregamento já resolve?
+Agent: Understood. Second question: does it need to be real time (the
+notification appears without reloading the page), or would a counter that
+updates on the next page load suffice?
 
-Você: tempo real seria ideal.
+You: real time would be ideal.
 
-Agente: Terceira: qual o volume esperado — dezenas de notificações por
-dia, ou milhares por minuto em horário de pico?
+Agent: Third: what volume do you expect — dozens of notifications per
+day, or thousands per minute at peak times?
 ```
 
-Só depois dessa sequência — nunca mais de uma pergunta por mensagem — a skill propõe 2 a 3 abordagens com vantagens e desvantagens de cada uma (por exemplo: *polling* simples a cada N segundos vs. um stream via *Server-Sent Events*, SSE, um canal HTTP de mão única do servidor pro navegador vs. um WebSocket completo), recomenda uma, apresenta o design em seções aprovadas uma a uma, e só então escreve um documento de design (spec). A skill para ali — literalmente para, sem tocar em código — até você aprovar esse documento por escrito.
+Only after this sequence — never more than one question per message — does the skill propose 2 to 3 approaches with their advantages and disadvantages (for example: simple *polling* every N seconds vs. a stream through *Server-Sent Events*, SSE, a one-way HTTP channel from server to browser vs. a full WebSocket), recommend one, present the design in individually approved sections, and only then write a design document (spec). The skill stops there — literally stops without touching code — until you approve that document in writing.
 
 ### `writing-plans`
 
-**O que faz:** pega uma especificação já aprovada e transforma num plano de implementação passo a passo e verificável, assumindo que quem for executar — possivelmente um subagente sem nenhum contexto do projeto — não sabe nada sobre o seu código nem sobre boas práticas de teste.
+**What it does:** turns an already approved specification into a step-by-step, verifiable implementation plan, assuming whoever executes it — possibly a subagent with no project context — knows nothing about your code or testing best practices.
 
-**Quando entra em ação:** logo depois que `brainstorming` termina o caminho arquitetural, ou sempre que já existe um requisito multi-etapa antes de tocar em código. Nunca antes de existir um design aprovado.
+**When it activates:** immediately after `brainstorming` finishes the architectural path, or whenever a multistep requirement already exists before touching code. Never before an approved design exists.
 
-Mecânica que vale conhecer:
+Mechanics worth knowing:
 
-- Todo plano começa com um cabeçalho fixo: uma frase de objetivo (Goal), a arquitetura em 2-3 frases, o stack técnico, o caminho do documento de spec que o plano implementa, e uma seção de **restrições globais** (regras que valem para todas as tarefas — versão mínima de uma lib, convenção de nomes, etc.).
-- Cada tarefa lista os arquivos exatos que cria ou modifica, as interfaces que consome de tarefas anteriores e produz para as seguintes, e os passos são "bite-sized" (mordida pequena): 2 a 5 minutos cada — "escreva o teste que falha", "rode e confirme que falha", "implemente o mínimo", "rode e confirme que passa", "commit".
-- Regra explícita de **zero placeholder**: frases como "adicione tratamento de erro apropriado", "similar à Task 3" ou um teste descrito em prosa sem o código de verdade são tratadas como falha do plano, não como detalhe a resolver depois. Cada passo precisa trazer o conteúdo real que quem for implementar vai usar.
-- Antes de entregar, a própria skill se autorrevisa: cobre toda a spec? tem placeholder escondido? os nomes de função e tipo usados numa tarefa tardia batem com os definidos numa tarefa anterior?
+- Every plan starts with a fixed header: a one-sentence Goal, the architecture in 2–3 sentences, the technical stack, the path to the spec document the plan implements, and a **global constraints** section (rules applying to every task — minimum library version, naming convention, etc.).
+- Each task lists the exact files it creates or modifies, interfaces consumed from previous tasks and produced for subsequent ones, and "bite-sized" steps: 2 to 5 minutes each — "write the failing test," "run and confirm it fails," "implement the minimum," "run and confirm it passes," "commit."
+- An explicit **zero-placeholder** rule: phrases such as "add appropriate error handling," "similar to Task 3," or a test described in prose without actual code are considered plan failures, not details to resolve later. Each step must include the actual content the implementer will use.
+- Before delivery, the skill reviews itself: does it cover the entire spec? Are there hidden placeholders? Do function and type names used in later tasks match those defined earlier?
 
-**Exemplo prático.** Continuando o sistema de notificações: com o design aprovado (in-app, tempo real via SSE, volume baixo), `writing-plans` gera um arquivo como `docs/superpowers/plans/2026-08-14-notificacoes-in-app.md`, com tarefas neste formato:
+**Practical example.** Continuing the notification system: with the design approved (in-app, real-time through SSE, low volume), `writing-plans` generates a file such as `docs/superpowers/plans/2026-08-14-in-app-notifications.md`, with tasks in this format:
 
 ```text
-### Task 3: Endpoint SSE de notificações
+### Task 3: Notification SSE endpoint
 
 **Files:**
 - Create: `src/routes/notifications/stream.ts`
@@ -121,217 +121,217 @@ Mecânica que vale conhecer:
 
 **Interfaces:**
 - Consumes: `NotificationService.subscribe(userId): AsyncIterable<Notification>` (Task 2)
-- Produces: rota `GET /notifications/stream`, emite eventos SSE `notification`
+- Produces: `GET /notifications/stream` route, emits `notification` SSE events
 
-- [ ] Passo 1: escrever o teste que falha (conecta, publica uma
-      notificação pro usuário, espera receber o evento SSE)
-- [ ] Passo 2: rodar e confirmar que falha porque a rota não existe
-- [ ] Passo 3: implementar a rota mínima que passa no teste
-- [ ] Passo 4: rodar e confirmar que passa
-- [ ] Passo 5: commit
+- [ ] Step 1: write the failing test (connect, publish a
+      notification for the user, wait to receive the SSE event)
+- [ ] Step 2: run and confirm it fails because the route does not exist
+- [ ] Step 3: implement the minimal route passing the test
+- [ ] Step 4: run and confirm it passes
+- [ ] Step 5: commit
 ```
 
-Nenhuma dessas linhas é um resumo — o plano de verdade traz o corpo do teste, a assinatura exata da função, o caminho exato do arquivo. Quem for implementar a Task 3 não precisa adivinhar nada disso.
+None of these lines is a summary — the actual plan includes the test body, exact function signature, and exact file path. Whoever implements Task 3 need not guess any of those details.
 
-> Prompt pronto que cobre exatamente essa transição, de ideia solta a plano formal: [Brainstorm até plano](../prompts/04-brainstorm-to-plan.md).
+> Ready-made prompt covering exactly this transition from a loose idea to a formal plan: [Brainstorm to plan](../prompts/04-brainstorm-to-plan.md).
 
 ### `subagent-driven-development`
 
-**O que faz:** executa um plano despachando um **subagente** implementador — uma instância separada do agente, que não herda o histórico da conversa atual e recebe só o contexto que você decide passar para ela — para cada tarefa, sob um contrato fixo: se a tarefa está ambígua, o subagente pergunta **antes** de escrever qualquer código; implementa seguindo TDD (a próxima skill desta lista); se autorrevisa antes de reportar; e devolve um de quatro status explícitos — `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT` ou `BLOCKED` — nunca um resumo livre.
+**What it does:** executes a plan by dispatching an implementer **subagent** — a separate agent instance that does not inherit the current conversation history and receives only the context you choose to pass — for each task under a fixed contract: if the task is ambiguous, the subagent asks **before** writing any code; implements using TDD (the next skill in this list); self-reviews before reporting; and returns one of four explicit statuses — `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED` — never a free-form summary.
 
-**Quando entra em ação:** depois que existe um plano escrito e você decide executá-lo na sessão atual. (A alternativa, `executing-plans`, roda numa sessão separada com pausas para revisão humana entre tarefas — ver a seção de skills de apoio.)
+**When it activates:** after a written plan exists and you decide to execute it in the current session. (The alternative, `executing-plans`, runs in a separate session with human review pauses between tasks — see the supporting skills section.)
 
-Detalhe importante: o comportamento padrão da skill é **serial** — um implementador por vez, nunca dois em paralelo — porque dois subagentes editando o mesmo arquivo ao mesmo tempo podem se atropelar, e dois commits concorrentes podem corromper o histórico do git. Depois que um subagente termina e reporta, o orquestrador despacha um *segundo* subagente — um revisor de tarefa — que confere duas coisas obrigatórias: a tarefa bate com a especificação, **e** a qualidade do código está adequada. Só as duas aprovadas juntas fecham a tarefa; senão entra num loop de correção com um teto de tentativas antes de escalar a decisão para você. No fim de todas as tarefas, roda ainda uma revisão final olhando a branch inteira.
+Important detail: the skill defaults to **serial** execution — one implementer at a time, never two in parallel — because two subagents editing the same file simultaneously can interfere, and two concurrent commits can corrupt git history. After a subagent finishes and reports, the orchestrator dispatches a *second* subagent — a task reviewer — checking two mandatory things: the task matches the specification, **and** code quality is adequate. Only both approvals together complete the task; otherwise a correction loop begins with a bounded number of attempts before escalating the decision to you. After all tasks, a final review examines the entire branch.
 
 > [!TIP]
-> Esse padrão serial é o *default* da skill, não uma lei física — dá para rodar várias tarefas **genuinamente independentes** em paralelo com segurança, desde que nenhuma duas toquem no mesmo arquivo e nenhum implementador faça commit sozinho. É exatamente o que [Orquestração de subagentes](02-subagent-orchestration.md) descreve como "execução em ondas", e o prompt pronto [Parallel wave dispatch](../prompts/05-parallel-wave-dispatch.md) automatiza.
+> This serial pattern is the skill's *default*, not a physical law — multiple **genuinely independent** tasks can run safely in parallel, provided no two touch the same file and no implementer commits independently. This is exactly what [Subagent orchestration](02-subagent-orchestration.md) describes as "wave execution," automated by the ready-made [Parallel wave dispatch](../prompts/05-parallel-wave-dispatch.md) prompt.
 
-**Exemplo prático:**
+**Practical example:**
 
 ```text
-[Task 2 do plano de notificações: NotificationService.send()]
+[Task 2 of the notification plan: NotificationService.send()]
 
-Subagente implementador: Antes de começar — se o envio falhar (usuário
-sem preferências configuradas, por exemplo), a função deve lançar uma
-exceção ou devolver um resultado tipado com erro?
+Implementer subagent: Before starting — if delivery fails (a user
+without configured preferences, for example), should the function throw an
+exception or return a typed error result?
 
-Você: devolve um resultado tipado — { ok: false, reason: string }.
+You: return a typed result — { ok: false, reason: string }.
 
-Subagente: [implementa via TDD, roda os testes, se autorrevisa, encontra
-e corrige um caso que faltava — usuário com notificações desativadas nas
-preferências — e faz commit]
+Subagent: [implements through TDD, runs tests, self-reviews, finds
+and fixes a missing case — a user with notifications disabled in
+preferences — and commits]
 
-Status: DONE. 6/6 testes passando. Sem pendências.
+Status: DONE. 6/6 tests passing. Nothing outstanding.
 
-[Orquestrador despacha um subagente revisor de tarefa]
+[Orchestrator dispatches a task-reviewer subagent]
 
-Revisor: Spec ✅ — todos os requisitos da Task 2 atendidos. Qualidade:
-aprovado. Sem achados.
+Reviewer: Spec ✅ — all Task 2 requirements met. Quality:
+approved. No findings.
 
-[Task 2: completa. Próxima tarefa.]
+[Task 2: complete. Next task.]
 ```
 
-Se o subagente implementador tivesse travado ("preciso de mais contexto sobre X"), o orquestrador responderia e o redespacharia — nunca force um subagente travado a tentar de novo sem mudar nada.
+If the implementer subagent had become stuck ("I need more context about X"), the orchestrator would answer and redispatch it — never force a stuck subagent to retry without changing anything.
 
 ### `dispatching-parallel-agents`
 
-**O que faz:** quando existem 2 ou mais problemas genuinamente independentes — sem estado compartilhado, sem um depender da ordem do outro — despacha um subagente para cada um **na mesma mensagem**, em vez de investigar ou implementar um de cada vez.
+**What it does:** when 2 or more genuinely independent problems exist — no shared state, neither depending on the other's order — dispatches a subagent for each **in the same message** instead of investigating or implementing one at a time.
 
-**Quando entra em ação:** o caso canônico da skill é investigação: várias falhas desconectadas (arquivos de teste diferentes, subsistemas diferentes) depois de uma mudança grande. Ela também vale para qualquer par de tarefas independentes fora desse caso — mas quando as tarefas são passos de **um mesmo** plano de implementação, o padrão mais específico é a "execução em ondas" descrita acima em `subagent-driven-development` e detalhada em [Orquestração de subagentes](02-subagent-orchestration.md).
+**When it activates:** the skill's canonical case is investigation: several disconnected failures (different test files, different subsystems) after a large change. It also applies to any pair of independent tasks outside that case — but when tasks are steps in **the same** implementation plan, the more specific pattern is "wave execution," described above under `subagent-driven-development` and detailed in [Subagent orchestration](02-subagent-orchestration.md).
 
-**Exemplo prático.** Depois de um refactor grande no checkout, três suítes de teste ficam vermelhas ao mesmo tempo, em arquivos sem relação entre si:
-
-```text
-tests/cart/discount-calculation.test.ts   — 2 falhas
-tests/checkout/payment-flow.test.ts       — 1 falha
-tests/orders/history-pagination.test.ts   — 3 falhas
-```
-
-Investigar uma de cada vez desperdiça tempo, porque corrigir o cálculo de desconto não tem nenhum efeito sobre a paginação do histórico de pedidos. A skill despacha os três de uma vez, cada um com escopo, contexto e restrições próprios:
+**Practical example.** After a large checkout refactor, three test suites turn red simultaneously in unrelated files:
 
 ```text
-Subagente 1: "Corrija as 2 falhas em discount-calculation.test.ts. Não
-mude nenhum outro arquivo. Devolva: causa raiz + o que foi mudado."
-Subagente 2: "Corrija a falha em payment-flow.test.ts. [mesmas regras]"
-Subagente 3: "Corrija as 3 falhas em history-pagination.test.ts. [mesmas regras]"
+tests/cart/discount-calculation.test.ts   — 2 failures
+tests/checkout/payment-flow.test.ts       — 1 failure
+tests/orders/history-pagination.test.ts   — 3 failures
 ```
 
-As três chamadas saem na mesma resposta — é isso que define "paralelo" aqui: mais de um despacho na mesma mensagem roda de forma concorrente; um despacho por mensagem roda em série, mesmo que os problemas sejam independentes. Quando os três voltam, o orquestrador lê os três resumos, confere se algum mexeu em arquivo do outro, e só então roda a suíte completa.
+Investigating them one by one wastes time because fixing discount calculations has no effect on order-history pagination. The skill dispatches all three at once, each with its own scope, context, and constraints:
+
+```text
+Subagent 1: "Fix the 2 failures in discount-calculation.test.ts. Do not
+change any other file. Return: root cause + what changed."
+Subagent 2: "Fix the failure in payment-flow.test.ts. [same rules]"
+Subagent 3: "Fix the 3 failures in history-pagination.test.ts. [same rules]"
+```
+
+All three calls go out in the same response — this defines "parallel" here: more than one dispatch in the same message runs concurrently; one dispatch per message runs serially even if the problems are independent. When all three return, the orchestrator reads all three summaries, checks whether any changed another's files, and only then runs the full suite.
 
 ### `systematic-debugging`
 
-**O que faz:** investigação de **causa raiz** — a origem real do problema, não o ponto onde o sintoma aparece — baseada em evidência, antes de propor qualquer correção. A regra que o próprio texto da skill chama de "lei de ferro": **nenhuma correção sem investigação de causa raiz primeiro.**
+**What it does:** evidence-based **root-cause** investigation — the actual source of a problem, not where its symptom appears — before proposing any fix. The rule the skill's own text calls its "iron law": **no fixes without root-cause investigation first.**
 
-**Quando entra em ação:** qualquer bug, teste falhando ou comportamento inesperado — especialmente sob pressão de tempo, que é exatamente quando "só troca essa linha e testa" fica mais tentador.
+**When it activates:** any bug, failing test, or unexpected behavior — especially under time pressure, precisely when "just change this line and test" becomes most tempting.
 
-Mecânica real, em quatro fases obrigatórias, nesta ordem:
+The actual mechanics, in four mandatory phases, in this order:
 
-1. **Investigação da causa raiz** — ler a mensagem de erro inteira (não só a primeira linha), reproduzir o problema de forma confiável, checar o que mudou recentemente (`git log`, `git diff`), e — em sistemas com várias camadas — instrumentar **cada fronteira** entre componentes com log, para ver exatamente onde o valor esperado vira o valor errado, em vez de adivinhar a camada culpada.
-2. **Análise de padrão** — comparar com um exemplo parecido que funciona; listar toda diferença, por menor que pareça.
-3. **Hipótese e teste mínimo** — uma hipótese de cada vez ("acho que a causa é X, porque Y"), a menor mudança possível para testá-la, nunca duas mudanças ao mesmo tempo.
-4. **Implementação** — só agora escreve um teste que reproduz o bug (isso entrega para `test-driven-development`), corrige a causa raiz — nunca o sintoma — e verifica.
+1. **Root-cause investigation** — read the entire error message (not just the first line), reproduce the problem reliably, check recent changes (`git log`, `git diff`), and — in multilayer systems — instrument **every boundary** between components with logging to see exactly where the expected value becomes wrong instead of guessing the guilty layer.
+2. **Pattern analysis** — compare against a similar working example; list every difference, however small it seems.
+3. **Hypothesis and minimal test** — one hypothesis at a time ("I think the cause is X because Y"), the smallest possible change to test it, never two changes simultaneously.
+4. **Implementation** — only now write a test reproducing the bug (handoff to `test-driven-development`), fix the root cause — never the symptom — and verify.
 
-Se três correções seguidas falharem, a skill manda **parar** e questionar a arquitetura em vez de tentar uma quarta: três tentativas falhas geralmente significam que o problema não está onde você está procurando.
+If three consecutive fixes fail, the skill says to **stop** and question the architecture instead of trying a fourth: three failed attempts usually mean the problem is not where you are looking.
 
-**Exemplo prático.** Relato: "o total do carrinho às vezes vem errado depois de aplicar um cupom de desconto."
+**Practical example.** Report: "the cart total is sometimes wrong after applying a discount coupon."
 
-Sem a skill, o agente veria a linha que calcula o desconto, acharia que entendeu o problema, mudaria o arredondamento, e entregaria — sem nunca confirmar que essa era mesmo a causa.
+Without the skill, the agent would see the discount-calculation line, think it understood the problem, change rounding, and deliver — never confirming that this was actually the cause.
 
-Com a skill:
+With the skill:
 
 ```text
-Agente: Vou reproduzir antes de mexer em qualquer coisa.
-[Reproduz: acontece só quando o usuário muda a quantidade de um item
-DEPOIS de já ter aplicado o cupom.]
+Agent: I'll reproduce it before changing anything.
+[Reproduces: happens only when the user changes an item's quantity
+AFTER applying the coupon.]
 
-Vou checar o que mudou recentemente na área de descontos.
-[git log --oneline -- src/cart/discount.ts, últimos 30 dias]
+I'll check recent changes in the discount area.
+[git log --oneline -- src/cart/discount.ts, last 30 days]
 
-O sistema tem 3 camadas aqui — serviço de carrinho, motor de desconto,
-formatador de preço. Vou logar o valor em cada fronteira pra achar onde
-ele vira errado, em vez de chutar a camada.
-[Roda uma vez com logging temporário]
+The system has 3 layers here — cart service, discount engine,
+price formatter. I'll log the value at every boundary to find where
+it becomes wrong instead of guessing the layer.
+[Runs once with temporary logging]
 
-Achado: o valor entra certo no motor de desconto, mas SAI aplicado duas
-vezes. Hipótese: o carrinho recalcula o desconto do zero a cada mudança
-de quantidade, mas nunca remove o desconto anterior antes de recalcular.
+Finding: the value enters the discount engine correctly, but LEAVES with the discount applied
+twice. Hypothesis: the cart recalculates the discount from scratch on every quantity
+change but never removes the previous discount before recalculating.
 
-[Faz a menor mudança possível pra testar a hipótese, confirma, SÓ ENTÃO
-escreve o teste de regressão e corrige na origem: o recálculo do
-carrinho, não o motor de desconto.]
+[Makes the smallest possible change to test the hypothesis, confirms, ONLY THEN
+writes the regression test and fixes the source: cart
+recalculation, not the discount engine.]
 ```
 
-A correção final fica numa linha bem diferente da que o "chute" inicial teria mudado — e vem acompanhada de um teste que trava esse cenário específico para sempre.
+The final fix lands on a very different line than the initial "guess" would have changed — and comes with a test protecting that specific scenario permanently.
 
 ### `test-driven-development`
 
-**O que faz:** o ciclo clássico vermelho-verde-refatorar (*red-green-refactor*): escreve o teste primeiro (vermelho — ele **tem** que falhar), a implementação mínima que faz o teste passar (verde), depois melhora o código mantendo os testes passando (refatorar). A lei de ferro da skill: **nenhum código de produção sem um teste que falhou primeiro.**
+**What it does:** the classic *red-green-refactor* cycle: write the test first (red — it **must** fail), the minimal implementation making it pass (green), then improve the code while keeping tests passing (refactor). The skill's iron law: **no production code without a test that failed first.**
 
-**Quando entra em ação:** toda feature nova e todo bug fix, antes de escrever qualquer código de implementação — inclusive dentro de cada tarefa despachada por `subagent-driven-development`.
+**When it activates:** every new feature and bug fix, before writing any implementation code — including within each task dispatched by `subagent-driven-development`.
 
-O detalhe que costuma ser pulado: depois de escrever o teste, rodar e **confirmar que ele falha pelo motivo certo** — "função não existe" ou "resultado errado", nunca um erro de digitação ou de configuração. Um teste que passa de primeira não prova nada: você nunca viu ele falhar, então não sabe se ele testa a coisa certa. E se código de implementação foi escrito antes do teste por engano, a regra é literal: apague e comece de novo. Não "adapte enquanto escreve o teste depois", não guarde "como referência".
+The detail commonly skipped: after writing the test, run it and **confirm it fails for the right reason** — "function does not exist" or "wrong result," never a typo or configuration error. A test passing on its first run proves nothing: you never saw it fail, so you do not know whether it tests the right thing. If implementation code was accidentally written before the test, the rule is literal: delete it and start over. Do not "adapt it while writing the test afterward" or keep it "as a reference."
 
-**Exemplo prático.** Função `applyDiscountCode()` na mesma loja fictícia:
+**Practical example.** The `applyDiscountCode()` function in the same fictional store:
 
 ```javascript
-// VERMELHO — escreve primeiro, roda, confirma que falha
-test('aplica 10% de desconto com cupom válido', () => {
+// RED — write first, run, confirm failure
+test('applies a 10% discount with a valid coupon', () => {
   const cart = { items: [{ price: 100 }], total: 100 };
   const result = applyDiscountCode(cart, 'SAVE10');
   expect(result.total).toBe(90);
 });
-// Rodando: FAIL — applyDiscountCode não está definida. Motivo certo.
+// Run: FAIL — applyDiscountCode is not defined. Correct reason.
 
-// VERDE — implementação mínima que passa
+// GREEN — minimal passing implementation
 function applyDiscountCode(cart, code) {
   if (code === 'SAVE10') {
     return { ...cart, total: cart.total * 0.9 };
   }
   return cart;
 }
-// Rodando: PASS.
+// Run: PASS.
 
-// REFATORAR — só depois de verde, sem mudar comportamento
-// (ex: extrair a tabela de cupons pra um objeto separado)
+// REFACTOR — only after green, without changing behavior
+// (e.g., extract the coupon table into a separate object)
 ```
 
-Sem a skill, é comum ver a ordem inversa: implementar `applyDiscountCode` já cobrindo vários cupons e casos de borda "por precaução", escrever um teste depois só pra bater o olho, e nunca saber de verdade se aquele teste pegaria uma regressão.
+Without the skill, the reverse order is common: implement `applyDiscountCode` already covering several coupons and edge cases "just in case," write a test afterward just for a glance, and never actually know whether that test would catch a regression.
 
-## O resto do elenco: as skills de apoio
+## The rest of the cast: supporting skills
 
-As seis acima cobrem o coração do ciclo — da ideia ao código testado. As sete abaixo cobrem o resto do ciclo de vida: como isolar o trabalho, como fechar uma tarefa, como dar e receber revisão, e como a própria biblioteca de skills se mantém. Menos protagonismo individual, mas cada uma fecha uma lacuna que, sem ela, vira um hábito ruim silencioso.
+The six above cover the heart of the cycle — from idea to tested code. The seven below cover the rest of the lifecycle: isolating work, finishing a task, giving and receiving reviews, and maintaining the skill library itself. Less individual prominence, but each closes a gap that would otherwise become a silent bad habit.
 
-| Skill | Papel no ciclo de vida |
+| Skill | Lifecycle role |
 |---|---|
-| `using-git-worktrees` | Isola o trabalho numa *worktree* — uma segunda cópia de trabalho do mesmo repositório git, em outra pasta, numa branch própria — antes de a implementação começar, pra nunca sujar a branch em que você já estava. |
-| `executing-plans` | A alternativa a `subagent-driven-development` quando não há subagentes disponíveis, ou quando você quer rodar o plano numa sessão separada com uma pausa de revisão humana entre cada tarefa, em vez de execução contínua. |
-| `requesting-code-review` | Despacha um subagente revisor com contexto preciso (nunca o histórico inteiro da sessão) depois de cada tarefa, de uma feature grande, ou antes de mergear — pega problema antes de ele se espalhar. |
-| `receiving-code-review` | Como processar o retorno de uma revisão: ler tudo, reafirmar o requisito com suas próprias palavras, verificar contra o código de verdade, e só então concordar ou discordar tecnicamente — nunca um "você está certíssimo!" automático, nem uma implementação cega. |
-| `finishing-a-development-branch` | Depois que os testes estão verdes: roda a suíte completa, detecta se você está numa worktree, apresenta as opções reais (merge local / push + PR / manter como está) e limpa o workspace — nunca descarta trabalho sem uma confirmação explícita e literal. |
-| `verification-before-completion` | O freio final: nenhuma alegação de "pronto", "corrigido" ou "os testes passam" sem ter rodado o comando de verificação **naquele mesmo turno** e lido a saída real. "Deveria funcionar agora" não conta. |
-| `writing-skills` | A skill que escreve outras skills — literalmente TDD aplicado à documentação de processo: escreve um cenário de pressão, observa um agente falhar sem a skill, escreve a skill, confirma que agora ele obedece. É assim que o próprio catálogo de skills evolui. |
+| `using-git-worktrees` | Isolates work in a *worktree* — a second working copy of the same git repository in another folder on its own branch — before implementation begins, so it never dirties your existing branch. |
+| `executing-plans` | The alternative to `subagent-driven-development` when subagents are unavailable or you want to run the plan in a separate session with a human review pause between tasks instead of continuous execution. |
+| `requesting-code-review` | Dispatches a reviewer subagent with precise context (never the entire session history) after each task, a major feature, or before merging — catches problems before they spread. |
+| `receiving-code-review` | How to process review feedback: read everything, restate the requirement in your own words, check against the actual code, and only then agree or disagree technically — never an automatic "you're absolutely right!" or blind implementation. |
+| `finishing-a-development-branch` | After tests are green: runs the full suite, detects whether you are in a worktree, presents actual options (local merge / push + PR / keep as is), and cleans the workspace — never discards work without explicit, literal confirmation. |
+| `verification-before-completion` | The final brake: no "done," "fixed," or "tests pass" claim without running the verification command **in that same turn** and reading the actual output. "It should work now" does not count. |
+| `writing-skills` | The skill writing other skills — literally TDD applied to process documentation: write a pressure scenario, observe an agent fail without the skill, write the skill, confirm it now obeys. This is how the skill catalog itself evolves. |
 
-## Do pedido vago ao código: um exemplo encadeado
+## From vague request to code: a chained example
 
-As seções acima mostram cada skill isolada. Na prática elas se encadeiam dentro de **um** pedido só, sem você precisar invocar nada manualmente — a regra central (`using-superpowers`) é quem decide qual roda a seguir. Reconstruindo o exemplo da loja fictícia do início ao fim:
+The sections above show each skill individually. In practice they chain together within **one** request without you manually invoking anything — the central rule (`using-superpowers`) decides what runs next. Reconstructing the fictional store example from start to finish:
 
-**1. Pedido:** "adiciona um sistema de notificações no app."
+**1. Request:** "add a notification system to the app."
 
-**2. `brainstorming` assume, antes de qualquer resposta.** Classifica como arquitetural (subsistema novo), faz as perguntas uma de cada vez (canal, tempo real, volume), propõe SSE em vez de polling ou WebSocket completo, apresenta o design em seções, escreve `docs/superpowers/specs/2026-08-14-notificacoes-design.md`, e para — literalmente para, sem tocar em código — até você aprovar por escrito.
+**2. `brainstorming` takes over before any response.** Classifies it as architectural (new subsystem), asks questions one at a time (channel, real time, volume), proposes SSE instead of polling or a full WebSocket, presents the design in sections, writes `docs/superpowers/specs/2026-08-14-notifications-design.md`, and stops — literally stops without touching code — until you approve in writing.
 
-**3. Você aprova. `writing-plans` assume.** Transforma a spec aprovada em `docs/superpowers/plans/2026-08-14-notificacoes-in-app.md`: cabeçalho com objetivo, arquitetura e restrições globais, e uma lista de tarefas bite-sized — migração da tabela de notificações, `NotificationService`, endpoint SSE, componente de sino de notificação no frontend — cada uma com arquivos exatos e testes com código de verdade, sem nenhum placeholder. No fim, pergunta: execução via subagente, ou inline nesta mesma sessão?
+**3. You approve. `writing-plans` takes over.** Turns the approved spec into `docs/superpowers/plans/2026-08-14-in-app-notifications.md`: a header with goal, architecture, and global constraints, and bite-sized tasks — notification-table migration, `NotificationService`, SSE endpoint, frontend notification-bell component — each with exact files and tests containing actual code, without placeholders. At the end, it asks: subagent execution or inline in this same session?
 
-**4. Você escolhe subagente. `subagent-driven-development` assume.** Um implementador por tarefa, cada um seguindo `test-driven-development` por dentro (teste primeiro, roda, vê falhar, implementa o mínimo, roda de novo, commit), se autorrevisando antes de reportar. Duas das tarefas — a migração do banco e o texto de um e-mail transacional de exemplo — não dependem uma da outra nem tocam nos mesmos arquivos: é aqui que a execução em ondas de [Orquestração de subagentes](02-subagent-orchestration.md) despacha as duas juntas em vez de esperar uma terminar. Cada tarefa passa por um subagente revisor (spec + qualidade) antes de ser marcada como completa.
+**4. You choose subagents. `subagent-driven-development` takes over.** One implementer per task, each following `test-driven-development` internally (test first, run, see failure, implement the minimum, rerun, commit), self-reviewing before reporting. Two tasks — the database migration and the text for a sample transactional email — neither depend on each other nor touch the same files: this is where [Subagent orchestration](02-subagent-orchestration.md)'s wave execution dispatches both together instead of waiting for one to finish. Each task passes through a reviewer subagent (spec + quality) before being marked complete.
 
-**5. Se aparecesse um bug no meio do caminho** — digamos, o contador de notificações não lidas dessincroniza depois de marcar uma como lida — `systematic-debugging` assumiria antes de qualquer correção: reproduzir, checar mudanças recentes, instrumentar as fronteiras entre o serviço e o componente, uma hipótese por vez.
+**5. If a bug appeared along the way** — say the unread notification counter falls out of sync after marking one as read — `systematic-debugging` would take over before any fix: reproduce, check recent changes, instrument boundaries between service and component, one hypothesis at a time.
 
-**6. Depois da última tarefa, revisão final, e `finishing-a-development-branch` assume.** A suíte completa roda verde, a skill detecta que você está numa worktree isolada, e pergunta: merge local, push + PR, ou manter como está?
+**6. After the final task, final review, and `finishing-a-development-branch` takes over.** The full suite runs green, the skill detects an isolated worktree, and asks: local merge, push + PR, or keep as is?
 
-Seis skills, uma cadeia só, zero decisão de "qual ferramenta usar agora" tomada manualmente por você no meio do caminho. Para um exemplo ainda mais completo — incluindo como isso se encaixa no resto do fluxo do repositório — ver o [Playbook de onboarding](../02-playbook-onboarding.md).
+Six skills, one chain, zero manual "which tool now?" decisions from you along the way. For a more complete example — including how this fits into the rest of the repository's workflow — see the [Onboarding playbook](../02-playbook-onboarding.md).
 
-## Dicas e boas práticas
+## Tips and best practices
 
-**Quando é apropriado pular uma skill.** Estritamente, segundo o texto da própria `using-superpowers`, a resposta é "nunca, se ela se aplica" — mas "se aplica" é medido pela classificação de `brainstorming` (spike / bounded / architectural), que já existe justamente para escalar a cerimônia para o tamanho da tarefa. Uma correção de uma linha, numa área do código já lida e entendida, é **bounded**: um par de perguntas, um design de duas frases no chat, aprovação, implementa — nunca um documento de spec de 300 palavras. O erro comum é forçar uma tarefa pequena para o caminho architectural (cerimônia demais) ou chamar de bounded algo que na verdade reestrutura uma interface da qual outras partes do sistema dependem (cerimônia de menos). Vale a pena o seu projeto formalizar, no próprio `CLAUDE.md`, um critério objetivo do que conta como trivial de verdade (número de arquivos, presença ou não de um fluxo já existente para mudar) — assim o agente não fica reclassificando o mesmo tipo de tarefa toda hora.
+**When it is appropriate to skip a skill.** Strictly, according to `using-superpowers` itself, the answer is "never, if it applies" — but "applies" is measured by `brainstorming`'s classification (spike / bounded / architectural), which exists precisely to scale ceremony to task size. A one-line fix in an already read and understood area is **bounded**: a couple of questions, a two-sentence design in chat, approval, implement — never a 300-word spec document. The common mistake is forcing a small task onto the architectural path (too much ceremony) or calling something bounded when it actually restructures an interface other system parts depend on (too little ceremony). Your project should formalize objective criteria for genuinely trivial work in its `CLAUDE.md` (file count, whether an existing flow is available to change) so the agent does not keep reclassifying the same kind of task.
 
-**Combinando com orquestração de subagentes.** `subagent-driven-development` decide **o quê** cada subagente faz e sob qual contrato (perguntar antes, TDD, autorrevisão, status explícito) — mas o padrão dela é um implementador por vez, em série. [Orquestração de subagentes](02-subagent-orchestration.md) decide **quantos** rodam ao mesmo tempo: tarefas com arquivos totalmente disjuntos e sem dependência entre si podem rodar em "ondas" paralelas, desde que nenhum subagente faça commit sozinho — isso fica para o orquestrador, depois que a onda inteira termina. As duas camadas são complementares, não concorrentes: uma nunca substitui o contrato da outra.
+**Combining with subagent orchestration.** `subagent-driven-development` decides **what** each subagent does and under which contract (ask first, TDD, self-review, explicit status) — but defaults to one implementer at a time, serially. [Subagent orchestration](02-subagent-orchestration.md) decides **how many** run simultaneously: tasks with entirely disjoint files and no mutual dependencies can run in parallel "waves," provided no subagent commits independently — the orchestrator does that after the whole wave ends. The two layers complement rather than compete: neither replaces the other's contract.
 
-**Escolha de modelo.** Preserve o modelo principal e a autenticação autorizados. Sem política de seleção autorizada, passe o modelo da sessão na delegação suportada. Com essa política, escolha capacidade por tarefa e risco, conforme o [guia de orquestração](02-subagent-orchestration.md#parte-b--disciplina-de-escolha-de-modelo). Um exemplo de skill não autoriza troca de provedor ou cobrança por API. Skills de processo também respeitam instruções do usuário, inclusive execução direta e aprovações já concedidas.
+**Model selection.** Preserve the authorized main model and authentication. Without an authorized selection policy, pass the session model in supported delegation. With such a policy, choose capability by task and risk according to the [orchestration guide](02-subagent-orchestration.md#part-b--model-selection-discipline). A skill example does not authorize a provider switch or API billing. Process skills also respect user instructions, including direct execution and approvals already granted.
 
-**Skills de processo não substituem skills de implementação — elas as precedem.** Depois que `brainstorming` aprova o design de um componente, por exemplo, a skill de padrões específicos do seu stack ainda entra em cena para decidir os detalhes da implementação. `using-superpowers` só garante que a ordem entre as duas nunca se inverte.
+**Process skills do not replace implementation skills — they precede them.** After `brainstorming` approves a component design, for example, the stack-specific patterns skill still decides implementation details. `using-superpowers` only ensures the order never reverses.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Isso deixa tudo mais lento?**
-Para uma tarefa trivial, se você forçar o caminho architectural sem necessidade, sim. Mas a classificação em spike/bounded/architectural existe exatamente para evitar isso — uma correção bounded custa um par de perguntas e duas frases de design, não um documento de spec. O tempo que a skill "gasta" perguntando costuma ser menor que o tempo perdido implementando a interpretação errada de um pedido ambíguo, ou descobrindo duas semanas depois um bug cuja causa raiz nunca foi investigada de verdade.
+**Does this make everything slower?**
+For a trivial task, if you unnecessarily force the architectural path, yes. But the spike/bounded/architectural classification exists exactly to avoid that — a bounded fix costs a couple of questions and two design sentences, not a spec document. Time the skill "spends" asking is usually less than time lost implementing the wrong interpretation of an ambiguous request or discovering two weeks later a bug whose root cause was never actually investigated.
 
-**Funciona para tarefas pequenas também?**
-Sim — é literalmente para isso que existe o caminho **bounded**: contexto rápido, as perguntas que realmente importam, um design de poucas frases no chat, aprovação, implementa. Sem documento de spec, sem plano formal. A skill nunca é tudo ou nada.
+**Does it work for small tasks too?**
+Yes — that is literally why the **bounded** path exists: quick context, the questions that actually matter, a few-sentence design in chat, approval, implement. No spec document, no formal plan. The skill is never all-or-nothing.
 
-**Dá para desativar uma skill específica?**
-O plugin não vem com um botão de "desligar só essa skill". O que existe, e é explícito no próprio texto de `using-superpowers`, é uma hierarquia de prioridade: instruções diretas suas — um `CLAUDE.md` de projeto, ou um pedido explícito do tipo "pula o brainstorming, só implementa isso" — têm prioridade sobre qualquer skill. A regra existe para impedir que o agente pule uma etapa por conta própria, não para tirar de você a palavra final. Para desativar de vez, a opção é desinstalar o plugin inteiro.
+**Can I disable a specific skill?**
+The plugin has no "turn off just this skill" button. What exists, explicitly in `using-superpowers` itself, is a priority hierarchy: your direct instructions — a project's `CLAUDE.md` or an explicit request such as "skip brainstorming, just implement this" — take precedence over any skill. The rule prevents the agent from skipping a step on its own, not from leaving you the final say. To disable it permanently, uninstall the entire plugin.
 
-**E se eu simplesmente pedir pro agente codar direto, sem passar pelo processo?**
-Funciona — e é diferente de o agente decidir pular a etapa sozinho. Um pedido explícito seu é a instrução de maior prioridade no sistema; a skill só existe para cobrir os casos em que ninguém disse nada e o agente, por conta própria, iria direto para o código.
+**What if I simply ask the agent to code directly without the process?**
+That works — and differs from the agent deciding to skip the step on its own. Your explicit request is the highest-priority instruction in the system; the skill only covers cases where nobody said anything and the agent would go directly to code on its own.
 
-**Superpowers conflita com Ponytail ou Caveman?**
-Não — são camadas independentes que resolvem problemas diferentes. Superpowers decide **quando** parar para perguntar, planejar e verificar. [Ponytail](04-ponytail.md) decide **o que** construir, uma vez que já está implementando (o mínimo que resolve o problema, sem abstração especulativa). [Caveman](05-caveman.md) decide só **como** o agente fala sobre o que fez. As três compõem bem porque nenhuma opina sobre o território da outra — ver [Visão geral](../00-overview.md) para como as peças do toolkit se encaixam.
+**Does Superpowers conflict with Ponytail or Caveman?**
+No — they are independent layers solving different problems. Superpowers decides **when** to stop to ask, plan, and verify. [Ponytail](04-ponytail.md) decides **what** to build once implementation is underway (the minimum that solves the problem, without speculative abstraction). [Caveman](05-caveman.md) decides only **how** the agent talks about what it did. All three compose well because none governs another's territory — see [Overview](../00-overview.md) for how the toolkit pieces fit together.

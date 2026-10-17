@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
+      - name: Test documentation link validation
+        run: node --test scripts/validate-docs.test.mjs
       - name: Validate documentation and configuration contracts
         run: node scripts/validate-docs.mjs
       - name: Validate a disposable Next.js project

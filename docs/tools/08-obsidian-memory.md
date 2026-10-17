@@ -1,46 +1,46 @@
-# Obsidian como Memória
+# Obsidian as Memory
 
-## O que é
+## What it is
 
-Um cofre do Obsidian ("vault", no termo que o próprio aplicativo usa) — arquivos Markdown simples, guardados em disco, organizados por uma convenção de pastas — usado como memória de longo prazo de um projeto. A peça central desse padrão: **nenhuma leitura ou escrita toca esses arquivos diretamente.** Tudo passa por um servidor MCP (*Model Context Protocol*, um protocolo que expõe operações como ferramentas estruturadas — com nome, parâmetros e validação — pra um agente de IA chamar, em vez de deixar o agente mexer em arquivos crus do sistema de arquivos).
+An Obsidian vault — plain Markdown files stored on disk and organized by a folder convention — used as a project's long-term memory. The central feature of this pattern: **no read or write touches these files directly.** Everything goes through an MCP server (*Model Context Protocol*, a protocol that exposes operations as structured tools — with names, parameters, and validation — for an AI agent to call, instead of letting the agent manipulate raw filesystem files).
 
-É esse detalhe que evita que o cofre vire só mais uma pilha de notas que vai saindo do padrão com o tempo. Toda escrita passa por validação:
+This detail prevents the vault from becoming just another pile of notes that gradually drifts from its conventions. Every write goes through validation:
 
-- **frontmatter obrigatório** — os metadados no topo de um arquivo Markdown, entre duas linhas `---`, tipo título e descrição;
-- **um modelo (*template*) por pasta**, que define quais seções a nota precisa ter e em que ordem;
-- **checagem de links** — um `[[wikilink]]` (o estilo de link com colchetes duplos que o Obsidian usa pra conectar notas) pra uma nota que não existe é rejeitado, não silenciosamente aceito quebrado;
-- **um estilo consistente de slug** (a versão "achatada" do nome do arquivo — minúscula, sem acento, com hífen no lugar de espaço) **e de tag.**
+- **required frontmatter** — metadata at the top of a Markdown file, between two `---` lines, such as title and description;
+- **one template per folder**, defining which sections a note must have and in what order;
+- **link checking** — a `[[wikilink]]` (the double-bracket link style Obsidian uses to connect notes) to a nonexistent note is rejected, rather than silently accepted as a broken link;
+- **a consistent slug style** (the "flattened" version of a filename — lowercase, without accents, with hyphens instead of spaces) **and tag style.**
 
-Uma edição manual, direto no arquivo, ignora tudo isso — e só quebra a convenção visivelmente bem mais tarde, numa escrita não relacionada.
+A manual edit directly in the file bypasses all of this — and only visibly breaks the convention much later, during an unrelated write.
 
-## Por que usar
+## Why use it
 
-Um índice sempre carregado (veja [Sistema de memória do Claude](09-claude-memory-system.md)) precisa ficar pequeno pra continuar sendo útil — se ele cresce demais, vira algo que se passa os olhos por cima em vez de ler de verdade. A maior parte do que vale a pena lembrar sobre um projeto não cabe ali: é específica demais, é raramente necessária, ou simplesmente empurraria o índice pra além do tamanho que ainda compensa carregar em toda sessão.
+An always-loaded index (see [Claude memory system](09-claude-memory-system.md)) needs to stay small to remain useful — if it grows too large, it becomes something to skim rather than actually read. Most things worth remembering about a project do not fit there: they are too specific, rarely needed, or would simply push the index beyond the size worth loading in every session.
 
-O cofre é pra onde vai essa cauda longa — a parte grande, mas individualmente pouco acessada, do que um projeto "sabe": buscável sob demanda, sem limite de tamanho, estruturado o suficiente pra uma busca realmente achar o que precisa, em vez de virar um amontoado de arquivos soltos.
+The vault is where this long tail goes — the large but individually infrequently accessed portion of what a project "knows": searchable on demand, without a size limit, and structured enough for searches to find what they need instead of becoming a heap of loose files.
 
-## Como instalar
+## How to install
 
-Existem vários servidores MCP de código aberto que expõem um cofre do Obsidian (ou qualquer pasta de Markdown) como um conjunto de ferramentas. Não existe um pacote único "oficial" recomendado aqui de propósito — procure "obsidian" num registro de MCP (um catálogo de servidores MCP disponíveis pra instalar) e escolha um que suporte modelo e frontmatter obrigatórios, se você quiser esse padrão exato de validação. Um servidor desse tipo costuma expor ferramentas parecidas com estas (os nomes exatos variam de servidor pra servidor):
+Several open-source MCP servers expose an Obsidian vault (or any Markdown folder) as a set of tools. No single "official" package is recommended here deliberately — search for "obsidian" in an MCP registry (a catalog of MCP servers available to install) and choose one supporting mandatory templates and frontmatter if you want this exact validation pattern. Such a server usually exposes tools resembling these (exact names vary by server):
 
-- busca (por texto, por tag, por propriedade de frontmatter, por data)
-- leitura de nota (conteúdo completo, ou só metadados/tamanho)
-- criação e edição (nota inteira, ou só uma seção por título)
-- links (quem aponta pra essa nota, pra onde essa nota aponta, links quebrados)
-- estrutura (renomear, mover, criar pasta)
+- search (by text, tag, frontmatter property, date)
+- note reading (full content or just metadata/size)
+- creation and editing (whole note or just a section by heading)
+- links (what points to this note, where this note points, broken links)
+- structure (rename, move, create folder)
 
-Passos gerais de instalação:
+General installation steps:
 
-1. Crie a pasta do cofre no seu projeto (ex.: `vault/`) e as subpastas da estrutura PARA (próxima seção).
-2. Escreva um modelo por pasta — o frontmatter e as seções obrigatórias que uma nota daquela pasta precisa ter.
-3. Instale o servidor MCP escolhido e configure-o no seu agente, apontando pra pasta do cofre. A configuração geralmente é um arquivo tipo `.mcp.json`:
+1. Create the vault folder in your project (e.g., `vault/`) and the PARA subfolders (next section).
+2. Write one template per folder — the frontmatter and required sections that notes in that folder must have.
+3. Install the chosen MCP server and configure it in your agent, pointing to the vault folder. Configuration is usually a file such as `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "obsidian": {
       "command": "npx",
-      "args": ["-y", "<pacote-do-servidor-escolhido>"],
+      "args": ["-y", "<chosen-server-package>"],
       "env": {
         "VAULT_PATH": "${CLAUDE_PROJECT_DIR}/vault"
       }
@@ -49,37 +49,37 @@ Passos gerais de instalação:
 }
 ```
 
-   Os nomes exatos de comando e variável de ambiente mudam de servidor pra servidor — confira o README de qual você escolher antes de copiar isso ao pé da letra.
+   Exact command and environment variable names vary by server — check the README of your chosen server before copying this literally.
 
-4. Reinicie a sessão do agente e confirme que as ferramentas do cofre aparecem na lista de ferramentas disponíveis.
-5. Escreva o hook (um script que roda automaticamente em certos pontos do ciclo de vida da sessão — antes de uma ferramenta ser chamada, por exemplo) que bloqueia acesso direto ao cofre (seção "Reforçando 'só MCP' com um hook", abaixo) — sem isso, os passos 1 a 4 são só uma convenção de boa vontade, fácil de esquecer sob pressão.
+4. Restart the agent session and confirm that vault tools appear in the list of available tools.
+5. Write the hook (a script that runs automatically at certain points in the session lifecycle — before a tool is called, for example) blocking direct vault access (the "Enforcing 'MCP only' with a hook" section below) — without it, steps 1 through 4 are merely a goodwill convention, easily forgotten under pressure.
 
-## Estrutura de pastas
+## Folder structure
 
-Uma estrutura genérica no estilo PARA (o método de organização criado por Tiago Forte, sigla pra **P**rojects, **A**reas, **R**esources, **A**rchives) funciona bem, com dois acréscimos práticos:
+A generic PARA-style structure (the organizational method created by Tiago Forte, standing for **P**rojects, **A**reas, **R**esources, **A**rchives) works well, with two practical additions:
 
-| Pasta | Guarda |
+| Folder | Stores |
 |---|---|
-| **projetos ativos** | Trabalho com um estado final definido — termina quando o projeto termina. |
-| **áreas contínuas** | Responsabilidades sem data de término — ex.: "manutenção do módulo de pagamentos". |
-| **conhecimento consolidado** | Lições atemporais e reutilizáveis — o equivalente ao "Archives" do PARA original, mas tratado como destino ativo, não como arquivo morto. |
-| **referência** | Material de consulta — documentação externa, decisões de terceiros, links úteis. |
-| **registro diário/de sessão** | Um rascunho rotativo, um arquivo por dia — nunca a morada final de nada. |
-| **modelos (*templates*)** | Define o formato exigido de cada uma das pastas acima. |
+| **active projects** | Work with a defined end state — ends when the project ends. |
+| **ongoing areas** | Responsibilities with no end date — e.g., "payment module maintenance." |
+| **consolidated knowledge** | Timeless, reusable lessons — equivalent to the original PARA "Archives," but treated as an active destination rather than dead storage. |
+| **reference** | Reference material — external documentation, third-party decisions, useful links. |
+| **daily/session log** | A rotating scratchpad, one file per day — never the final home of anything. |
+| **templates** | Defines the required format for each folder above. |
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-Montando essa estrutura num projeto novo, do zero:
+Building this structure in a new project from scratch:
 
-### 1. Crie as pastas
+### 1. Create the folders
 
 ```bash
-mkdir -p vault/{01-projetos,02-areas,03-conhecimento,04-referencia,daily,templates}
+mkdir -p vault/{01-projects,02-areas,03-knowledge,04-reference,daily,templates}
 ```
 
-### 2. Escreva um modelo por pasta
+### 2. Write one template per folder
 
-Por exemplo, `vault/templates/03-conhecimento.md`:
+For example, `vault/templates/03-knowledge.md`:
 
 ```markdown
 ---
@@ -89,113 +89,113 @@ metadata:
   type:
 ---
 
-## Contexto
+## Context
 
-## Regra ou fato
+## Rule or fact
 
-## Por que importa
+## Why it matters
 
 ## Related
 ```
 
-O servidor MCP usa esse modelo pra validar toda nota nova ou editada dentro de `03-conhecimento/` — mesmas seções, mesma ordem (é permitido ter seções extras, mas não pode faltar nenhuma das exigidas).
+The MCP server uses this template to validate every new or edited note inside `03-knowledge/` — same sections, same order (extra sections are allowed, but none of the required sections may be missing).
 
-### 3. Instale e configure o servidor MCP
+### 3. Install and configure the MCP server
 
-Aponte-o pra pasta `vault/` (veja "Como instalar" acima).
+Point it to the `vault/` folder (see "How to install" above).
 
-### 4. Escreva o hook de proteção
+### 4. Write the protection hook
 
-Veja a seção "Reforçando 'só MCP' com um hook" abaixo — copie o hook, ajuste o caminho (`vault/`) pro nome real da sua pasta, e registre-o no seu agente pra rodar em `PreToolUse` (antes de qualquer chamada de `Read`, `Grep`, `Glob`, `Write` ou `Edit`).
+See "Enforcing 'MCP only' with a hook" below — copy the hook, adjust the path (`vault/`) to your actual folder name, and register it in your agent to run on `PreToolUse` (before any `Read`, `Grep`, `Glob`, `Write`, or `Edit` call).
 
-### 5. Teste os dois caminhos
+### 5. Test both paths
 
-Peça ao agente pra criar, através do MCP, uma nota bem formada numa das pastas — deve funcionar. Depois peça uma leitura direta do arquivo (`Read` no caminho do cofre) — o hook deve bloquear e explicar por quê. Os dois exemplos completos estão na próxima seção.
+Ask the agent to create a well-formed note in one of the folders through MCP — it should work. Then request a direct file read (`Read` on the vault path) — the hook should block it and explain why. Both complete examples appear in the next section.
 
-## Exemplos
+## Examples
 
-### Exemplo 1 — nota bem formada, aceita
+### Example 1 — well-formed note, accepted
 
-Arquivo: `vault/03-conhecimento/regra-aprovacao-pedidos-grandes.md`
+File: `vault/03-knowledge/large-order-approval-rule.md`
 
 ```markdown
 ---
-name: regra-aprovacao-pedidos-grandes
-description: Pedidos com 10 itens ou mais exigem aprovação manual de um supervisor antes de seguir pro processamento.
+name: large-order-approval-rule
+description: Orders with 10 or more items require manual supervisor approval before proceeding to processing.
 metadata:
   type: business-rule
 ---
 
-## Contexto
+## Context
 
-Descoberto ao investigar por que alguns pedidos ficavam parados em
-"pendente" sem nenhum erro correspondente no log.
+Discovered while investigating why some orders were stuck in
+"pending" without any corresponding error in the log.
 
-## Regra ou fato
+## Rule or fact
 
-Pedidos com 10 itens ou mais entram automaticamente numa fila de
-aprovação manual — não é bug, é uma validação de negócio intencional.
+Orders with 10 or more items automatically enter a manual
+approval queue — this is not a bug, but intentional business validation.
 
-## Por que importa
+## Why it matters
 
-Um agente investigando "por que esse pedido não processou sozinho" sem
-saber dessa regra vai procurar um bug onde não tem nenhum.
+An agent investigating "why didn't this order process automatically" without
+knowing this rule will look for a bug where none exists.
 
 ## Related
 
-- [[fluxo-de-processamento-de-pedidos]]
+- [[order-processing-flow]]
 ```
 
-Por que passa na validação: `name` bate com o nome do arquivo (sem a extensão `.md`) e está em kebab-case (minúsculo, com hífen); `description` está preenchida; `metadata.type` é um dos tipos aceitos; as seções batem com o modelo da pasta, na mesma ordem, com `Related` por último; e o wikilink `[[fluxo-de-processamento-de-pedidos]]` aponta pra uma nota que realmente existe no cofre.
+Why it passes validation: `name` matches the filename (without the `.md` extension) and is in kebab-case (lowercase, with hyphens); `description` is filled in; `metadata.type` is an accepted type; the sections match the folder template in the same order, with `Related` last; and the wikilink `[[order-processing-flow]]` points to a note that actually exists in the vault.
 
-### Exemplo 2 — nota malformada, rejeitada
+### Example 2 — malformed note, rejected
 
-Tentativa de criar `vault/03-conhecimento/RegraDeAprovação.md`:
+Attempt to create `vault/03-knowledge/ApprovalRulé.md`:
 
 ```markdown
 ---
-name: RegraDeAprovação
+name: ApprovalRulé
 metadata:
-  type: nota
+  type: note
 ---
 
-# Aprovação de pedidos grandes
+# Large order approval
 
-Pedidos grandes precisam de aprovação. Ver [[Fluxo Que Não Existe]].
+Large orders need approval. See [[Flow That Does Not Exist]].
 ```
 
-O servidor rejeita a escrita, com uma mensagem parecida com esta (a redação exata varia de servidor pra servidor):
+The server rejects the write with a message resembling this (exact wording varies by server):
 
 ```
-ToolError: escrita rejeitada —
-  • frontmatter: campo obrigatório "description" ausente
-  • frontmatter: "name" (RegraDeAprovação) não está em kebab-case; use regra-de-aprovacao
-  • metadata.type: "nota" não é um tipo aceito (use feedback | architecture | business-rule | reference)
-  • estrutura: faltam as seções obrigatórias do modelo desta pasta ("Por que importa", "Related")
-  • wikilink: [[Fluxo Que Não Existe]] não existe — nenhuma nota corresponde a esse título
+ToolError: write rejected —
+  • frontmatter: required field "description" missing
+  • frontmatter: "name" (ApprovalRulé) is not kebab-case; use approval-rule
+  • metadata.type: "note" is not an accepted type (use feedback | architecture | business-rule | reference)
+  • structure: required sections from this folder's template are missing ("Why it matters", "Related")
+  • wikilink: [[Flow That Does Not Exist]] does not exist — no note matches this title
 ```
 
-Cinco problemas de uma vez, todos coisas que uma edição manual direto no arquivo deixaria passar batido:
+Five problems at once, all things a manual edit directly in the file would let slip through:
 
-1. `description` ausente.
-2. `name` fora do padrão kebab-case e com acento.
-3. `metadata.type` fora do vocabulário aceito — esse cofre usa o mesmo vocabulário do índice sempre carregado (`feedback | architecture | business-rule | reference`, veja [Sistema de memória do Claude](09-claude-memory-system.md)), justamente pra migração entre os dois ser mecânica, sem precisar reclassificar nada.
-4. Faltam seções que o modelo da pasta exige.
-5. Um wikilink pra uma nota que não existe — rejeitado de cara, em vez de virar um link quebrado silencioso.
+1. Missing `description`.
+2. `name` violates kebab-case and includes an accent.
+3. `metadata.type` falls outside the accepted vocabulary — this vault uses the same vocabulary as the always-loaded index (`feedback | architecture | business-rule | reference`, see [Claude memory system](09-claude-memory-system.md)), precisely so migration between them is mechanical, without reclassifying anything.
+4. Sections required by the folder template are missing.
+5. A wikilink to a nonexistent note — rejected immediately instead of silently becoming a broken link.
 
-## Reforçando "só MCP" com um hook
+## Enforcing "MCP only" with a hook
 
-Uma regra escrita — "sempre use as ferramentas MCP" — é fácil de esquecer no meio de uma sessão, sob pressão de contexto. Em vez de confiar só na convenção, reforce mecanicamente com um hook: um `PreToolUse` (roda antes de a ferramenta ser executada) que nega qualquer chamada direta de `Read`, `Grep`, `Glob`, `Write` ou `Edit` cujo caminho toque a pasta do cofre. Uma exceção estreita, só leitura, pra pasta do registro diário é aceitável se for útil — o resto do cofre continua exclusivamente MCP.
+A written rule — "always use MCP tools" — is easy to forget mid-session under context pressure. Instead of relying only on convention, enforce it mechanically with a hook: a `PreToolUse` hook (runs before the tool executes) that denies any direct `Read`, `Grep`, `Glob`, `Write`, or `Edit` call whose path touches the vault folder. A narrow, read-only exception for the daily log folder is acceptable if useful — the rest of the vault remains exclusively MCP.
 
-Mesmo leitor de stdin (entrada padrão) JSON do hook do proxy de tokens: [`hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example), que expõe `readStdinRaw()` (lê o stdin sem nunca lançar exceção) e `parseHookEvent()` (tenta fazer o parse, devolvendo `null` tanto pra JSON inválido quanto pro valor literal `null` — os dois casos que costumam derrubar um hook escrito às pressas):
+The same JSON stdin (standard input) reader as the token proxy hook: [`hook-io.mjs.example`](../../templates/hooks/hook-io.mjs.example), which exposes `readStdinRaw()` (reads stdin without ever throwing) and `parseHookEvent()` (attempts to parse, returning `null` for both invalid JSON and the literal value `null` — the two cases that often crash a hastily written hook):
 
 ```js
 #!/usr/bin/env node
-// Hook PreToolUse — matcher: Read|Grep|Glob|Write|Edit
+// PreToolUse hook — matcher: Read|Grep|Glob|Write|Edit
 (async () => {
   const { readStdinRaw, parseHookEvent } = await import("./hook-io.mjs");
   const event = parseHookEvent(readStdinRaw());
-  if (event === null) process.exit(0); // nada pra analisar — falha aberta
+  if (event === null) process.exit(0); // nothing to analyze — fail open
 
   const path =
     event?.tool_input?.file_path ??
@@ -203,65 +203,65 @@ Mesmo leitor de stdin (entrada padrão) JSON do hook do proxy de tokens: [`hook-
     event?.tool_input?.pattern ??
     "";
 
-  if (!path.includes("vault/")) process.exit(0); // não é o cofre — permite
+  if (!path.includes("vault/")) process.exit(0); // not the vault — allow
 
   const isDailyRead =
     path.includes("vault/daily/") && ["Read", "Grep", "Glob"].includes(event.tool_name);
-  if (isDailyRead) process.exit(0); // exceção estreita: só leitura da pasta diária
+  if (isDailyRead) process.exit(0); // narrow exception: read-only daily folder access
 
-  console.error("vault/ é MCP-only — use as ferramentas MCP do cofre, não acesso direto a arquivo.");
-  process.exit(2); // bloqueia; a mensagem acima é mostrada ao agente
+  console.error("vault/ is MCP-only — use the vault's MCP tools, not direct file access.");
+  process.exit(2); // blocks; the message above is shown to the agent
 })();
 ```
 
-Veja [Boas práticas de hooks](10-hooks-best-practices.md) pro raciocínio geral por trás de "falhar aberto" e do cuidado específico com `JSON.parse("null")` que o trecho acima já evita.
+See [Hook best practices](10-hooks-best-practices.md) for the general reasoning behind "failing open" and the specific care around `JSON.parse("null")` that the snippet above already handles.
 
-## Automatizando captura e consolidação
+## Automating capture and consolidation
 
-Automatizar o ciclo de "capturar, depois consolidar" em vez de depender de o agente lembrar de fazer isso sozinho — dois hooks fecham o loop:
+Automate the "capture, then consolidate" cycle instead of relying on the agent to remember to do it — two hooks close the loop:
 
-- Um hook de **fim de sessão** (roda quando a sessão termina) registra um resumo curto na nota do dia — o que foi feito, decisões tomadas, problemas encontrados.
-- Um hook de **início de sessão** (roda quando uma sessão começa, num dia posterior) promove os registros diários de ontem pra notas de conhecimento permanentes, e só então apaga o registro diário bruto já compilado.
+- An **end-of-session** hook (runs when the session ends) records a short summary in the day's note — work done, decisions made, problems encountered.
+- A **start-of-session** hook (runs when a session starts on a later day) promotes yesterday's daily entries into permanent knowledge notes, and only then deletes the compiled raw daily log.
 
-Esse "só então apaga" importa: é o que mantém a pasta diária um rascunho rotativo, em vez de virar um segundo armazenamento permanente competindo com a pasta de conhecimento. Uma nota diária nunca compilada continua lá, disponível, até algum início de sessão futuro processá-la.
+That "only then deletes" matters: it keeps the daily folder a rotating scratchpad instead of a second permanent store competing with the knowledge folder. A daily note that has never been compiled stays available until some future session start processes it.
 
-## Migrando pro índice sempre carregado
+## Migrating from the always-loaded index to the vault
 
-O índice sempre carregado (veja [Sistema de memória do Claude](09-claude-memory-system.md)) e o cofre não são dois armazenamentos concorrentes — existe um caminho de migração explícito de um pro outro, pra quando uma entrada do índice para de merecer seu lugar em algo lido em toda sessão:
+The always-loaded index (see [Claude memory system](09-claude-memory-system.md)) and vault are not competing stores — there is an explicit migration path between them for when an index entry no longer deserves its place in something read every session:
 
-1. **Dedup** — busque no cofre primeiro; estenda uma nota existente em vez de criar quase-duplicata.
-2. **Bata com o modelo** — puxe o modelo obrigatório da pasta de destino e siga exatamente.
-3. **Crie** a nota.
-4. **Confirme lendo de volta** — nenhuma leitura bem-sucedida depois da escrita significa que a migração não aconteceu de verdade.
-5. **Só então** apague a cópia curta do índice sempre carregado.
+1. **Dedup** — search the vault first; extend an existing note instead of creating a near-duplicate.
+2. **Match the template** — fetch the destination folder's required template and follow it exactly.
+3. **Create** the note.
+4. **Confirm by reading it back** — without a successful read after writing, the migration has not actually happened.
+5. **Only then** delete the short copy from the always-loaded index.
 
-Nunca pule direto pro passo 5. Uma migração não confirmada é perda de dado, não uma mudança de lugar — a entrada não existiu em lugar nenhum durante o tempo que levou pra alguém notar o erro.
+Never jump straight to step 5. An unconfirmed migration is data loss, not relocation — the entry existed nowhere during the time it took someone to notice the mistake.
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-**Ler o cofre direto "só dessa vez" é exatamente o hábito que o hook existe pra quebrar.** Se você se pegar querendo contornar o bloqueio, isso é sinal de que falta uma ferramenta MCP (tipo uma listagem em lote), não motivo pra ignorar a regra.
+**Reading the vault directly "just this once" is exactly the habit the hook exists to break.** If you find yourself wanting to bypass the block, that signals a missing MCP tool (such as batch listing), not a reason to ignore the rule.
 
-**A exceção da pasta diária, no hook acima, é só leitura.** Um hook que também libera escrita direta em `daily/` derruba a validação de frontmatter e modelo pra esses arquivos também — mantenha escrita sempre via MCP, mesmo na pasta diária.
+**The daily-folder exception in the hook above is read-only.** A hook that also permits direct writing to `daily/` bypasses frontmatter and template validation for those files too — always keep writes through MCP, even in the daily folder.
 
-**Busque antes de criar.** Um wikilink pra uma nota que ainda não existe falha na hora, sob política estrita de links — crie a nota de destino primeiro, ou use texto simples até ela existir.
+**Search before creating.** A wikilink to a note that does not yet exist fails immediately under a strict link policy — create the target note first, or use plain text until it exists.
 
-**Mantenha "Related" como a última seção**, mesmo que o modelo tecnicamente permita em outra posição — é onde ferramentas de compilação e deduplicação esperam encontrá-la.
+**Keep "Related" as the last section**, even if the template technically permits another position — that is where compilation and deduplication tools expect it.
 
-**Uma escrita que "deu certo" mas não foi confirmada por leitura não está confirmada de verdade.** Trate como possivelmente perdida até o passo 4 da migração (ler de volta) realmente acontecer.
+**A write that "succeeded" but was not confirmed by reading is not truly confirmed.** Treat it as possibly lost until migration step 4 (reading it back) actually happens.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Por que não deixar o agente editar os arquivos `.md` direto?**
-Porque sem validação centralizada, o cofre degrada com o tempo: frontmatter inconsistente, links quebrados, nomes de arquivo sem padrão — cada edição manual é uma chance de fugir da convenção, e ninguém percebe até muito depois.
+**Why not let the agent edit `.md` files directly?**
+Because without centralized validation, the vault degrades over time: inconsistent frontmatter, broken links, inconsistent filenames — every manual edit is a chance to stray from convention, and nobody notices until much later.
 
-**Isso substitui o índice sempre carregado (`MEMORY.md`)?**
-Não, complementa. O índice é pequeno e lido em toda sessão; o cofre é grande, buscado sob demanda. Veja [Sistema de memória do Claude](09-claude-memory-system.md) pro outro lado dessa mesma moeda.
+**Does this replace the always-loaded index (`MEMORY.md`)?**
+No, it complements it. The index is small and read every session; the vault is large and searched on demand. See [Claude memory system](09-claude-memory-system.md) for the other side of the same coin.
 
-**Preciso ter o aplicativo Obsidian instalado de verdade?**
-Não necessariamente. O "cofre" é só uma pasta de Markdown com uma convenção — o aplicativo Obsidian é uma forma agradável de navegar isso visualmente, mas o mecanismo de acesso que importa aqui é o servidor MCP, não o app.
+**Do I actually need the Obsidian application installed?**
+Not necessarily. The "vault" is just a Markdown folder with a convention — the Obsidian application is a pleasant way to browse it visually, but the access mechanism that matters here is the MCP server, not the app.
 
-**Qual servidor MCP eu uso?**
-Não recomendamos um específico de propósito — procure "obsidian" num registro de MCP e confirme que o servidor escolhido suporta frontmatter e modelos obrigatórios, se você quiser esse padrão exato.
+**Which MCP server should I use?**
+We deliberately do not recommend a specific one — search for "obsidian" in an MCP registry and confirm that your chosen server supports mandatory frontmatter and templates if you want this exact pattern.
 
-**O que acontece com o registro diário depois de compilado?**
-É apagado, pra pasta diária continuar sendo um rascunho rotativo, em vez de virar um segundo armazenamento permanente competindo com a pasta de conhecimento.
+**What happens to the daily log after compilation?**
+It is deleted, so the daily folder stays a rotating scratchpad instead of becoming a second permanent store competing with the knowledge folder.

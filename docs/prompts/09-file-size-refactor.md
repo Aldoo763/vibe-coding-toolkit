@@ -1,80 +1,78 @@
-# Quebrar os arquivos gigantes que o teto de linhas revelou
+# Split the giant files revealed by the line ceiling
 
-## Atalho: só o link
+## Shortcut: just the link
 
-Depois que o prompt 08 já mediu e te deu a lista de arquivos acima do
-teto, cole esta linha:
+After prompt 08 measures and gives you the list of files above the ceiling,
+paste this line:
 
 ```
-Leia https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/09-file-size-refactor.md
-e execute o prompt que está nesse arquivo neste projeto. Use MAX_LINES=350,
-BATCH_SIZE=3 e RULE_ID=quality/max-lines. Descubra sozinho os comandos de
-lint, teste e typecheck lendo o package.json.
+Read https://raw.githubusercontent.com/soumatheusgomes/vibe-coding-toolkit/main/docs/prompts/09-file-size-refactor.md
+and execute the prompt in that file in this project. Use MAX_LINES=350,
+BATCH_SIZE=3 and RULE_ID=quality/max-lines. Discover the lint, test and
+typecheck commands by reading package.json yourself.
 ```
 
-O resto deste documento é o mesmo prompt, aberto.
+The rest of this document contains the same prompt in full.
 
-## Quando usar
+## When to use
 
-Use este prompt depois que o teto de tamanho por arquivo já está
-instalado e o linter já apontou quais arquivos estouraram — normalmente
-logo após o [`08-eslint-quality-gates-install.md`](08-eslint-quality-gates-install.md).
-Ele é o segundo tempo: o 08 instala a régua e mede; este aqui manda o
-agente pegar os arquivos que não couberam e transformá-los em módulos
-menores e isolados.
+Use this prompt after the per-file size ceiling is installed and the linter
+has identified the files exceeding it — usually right after
+[`08-eslint-quality-gates-install.md`](08-eslint-quality-gates-install.md).
+This is the second phase: 08 installs the ruler and measures; this prompt
+tells the agent to take the files that did not fit and turn them into
+smaller, isolated modules.
 
-Não use pra zerar avisos de lint em geral — isso é o
-[`02-eslint-warning-burndown.md`](02-eslint-warning-burndown.md), que é
-mais amplo e trata regra por regra. Este prompt é só sobre tamanho de
-arquivo, porque quebrar um arquivo de 800 linhas é um tipo de trabalho
-diferente de corrigir 240 avisos de `complexity`: aqui cada mudança move
-código entre arquivos, e é aí que a mudança de comportamento se esconde.
+Do not use it for clearing lint warnings in general — that is
+[`02-eslint-warning-burndown.md`](02-eslint-warning-burndown.md), which is
+broader and works rule by rule. This prompt only concerns file size,
+because splitting an 800-line file is different work from fixing 240
+`complexity` warnings: every change here moves code between files, which
+is where behavior changes hide.
 
-## Por que funciona
+## Why it works
 
-A pergunta que faz esse trabalho dar errado é sempre a mesma: *onde
-cortar*. Um agente sem instrução corta onde a contagem de linhas manda —
-tira 200 linhas do fim do arquivo, joga num `utils.ts`, e o resultado são
-dois arquivos que só fazem sentido lidos juntos. O arquivo passou no
-linter e o código ficou pior.
+The question that makes this work go wrong is always the same: *where to
+cut*. An agent without guidance cuts where the line count dictates — takes
+200 lines from the end, puts them in `utils.ts`, and produces two files
+that only make sense when read together. The file passes lint and the code
+gets worse.
 
-Por isso o prompt define o corte por responsabilidade, não por linha, e
-usa as mesmas quatro costuras que a própria mensagem da regra sugere:
-lógica de negócio vira serviço de domínio, bloco de UI repetido vira
-sub-componente, acesso a dados vira repositório, e aglomerado de helpers
-vira módulo utilitário do domínio. Se nenhuma dessas costuras existe no
-arquivo, a instrução é dizer isso e parar — inventar uma abstração só pra
-satisfazer o linter é trocar um problema visível por um invisível.
+That is why the prompt defines the split by responsibility, not line
+number, using the same four seams the rule's own message suggests: business
+logic becomes a domain service, repeated UI becomes a subcomponent, data
+access becomes a repository, and a cluster of helpers becomes a domain
+utility module. If none of these seams exists in the file, the instruction
+is to say so and stop — inventing an abstraction just to satisfy the linter
+trades a visible problem for an invisible one.
 
-O segundo mecanismo é o ritmo: **um arquivo por vez, um commit por
-arquivo**, com testes e checagem de tipos rodando entre cada um. Quebrar
-seis arquivos num commit só significa que, quando algo quebrar, você não
-sabe qual extração causou. E o terceiro é a regra de preservação: as
-exportações públicas do arquivo original continuam existindo, com o mesmo
-nome e a mesma assinatura. Quem importava aquele arquivo não deveria nem
-saber que ele foi dividido.
+The second mechanism is pacing: **one file at a time, one commit per file**,
+with tests and type checks between each. Splitting six files in one commit
+means that when something breaks, you do not know which extraction caused
+it. The third is preservation: the original file's public exports remain,
+with the same names and signatures. Importers should not even know the
+file was split.
 
-Fechando, o prompt exige que a contagem final venha de rodar o comando de
-novo, nunca de somar mentalmente o que foi feito.
+Finally, the prompt requires the final count to come from rerunning the
+command, never from mentally adding up what was done.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[LINT_COMMAND]`** — o comando que roda o linter mostrando a saída
-  completa, por arquivo e por regra. Alguns wrappers de CI resumem a
-  saída; se o seu resumir, use a invocação direta.
-- **`[TEST_COMMAND]`** — o comando da suíte de testes.
-- **`[TYPECHECK_COMMAND]`** — o comando de checagem de tipos. Se o
-  projeto for JavaScript puro, escreva `none` e o prompt pula esse passo.
-- **`[MAX_LINES]`** — o teto configurado na regra. Padrão do toolkit:
+- **`[LINT_COMMAND]`** — the command that runs lint with full output per file
+  and rule. Some CI wrappers summarize output; if yours does, invoke it
+  directly.
+- **`[TEST_COMMAND]`** — the test suite command.
+- **`[TYPECHECK_COMMAND]`** — the type-checking command. For plain JavaScript,
+  write `none` and the prompt skips this step.
+- **`[MAX_LINES]`** — the ceiling configured in the rule. Toolkit default:
   `350`.
-- **`[BATCH_SIZE]`** — quantos arquivos quebrar antes de parar e te
-  mostrar o resultado. Comece com `3`. Subir isso antes de confiar no
-  resultado das três primeiras é a forma mais rápida de acumular um diff
-  que ninguém revisa.
-- **`[RULE_ID]`** — o id da regra de tamanho. Se você instalou pelo
-  prompt 08, é `quality/max-lines`.
+- **`[BATCH_SIZE]`** — how many files to split before stopping and showing
+  you the result. Start with `3`. Increasing this before trusting the first
+  three results is the fastest way to accumulate a diff nobody reviews.
+- **`[RULE_ID]`** — the size rule's ID. If installed through prompt 08, it is
+  `quality/max-lines`.
 
-## O prompt
+## The prompt
 
 ```
 Split the files that exceed this project's per-file size budget into
@@ -170,11 +168,10 @@ Mark nothing as done that you did not verify by running the command again.
 Codebase: [STACK/FRAMEWORK]. Budget: [MAX_LINES] lines. Rule: [RULE_ID].
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine que o prompt 08 acabou de reportar onze arquivos acima de 350
-linhas num app Next.js, sendo o maior um `src/app/dashboard/page.tsx` de
-780 linhas. Você preencheria:
+Imagine prompt 08 just reported eleven files above 350 lines in a Next.js
+app, the largest being a 780-line `src/app/dashboard/page.tsx`. Fill in:
 
 - `[LINT_COMMAND]` → `npm run lint`
 - `[TEST_COMMAND]` → `npm test`
@@ -183,29 +180,28 @@ linhas num app Next.js, sendo o maior um `src/app/dashboard/page.tsx` de
 - `[BATCH_SIZE]` → `3`
 - `[RULE_ID]` → `quality/max-lines`
 
-O agente lista os onze de verdade, pega os três maiores, e no
-`page.tsx` reporta: responsabilidade atual "monta o dashboard e também
-calcula os agregados de saldo"; costuras encontradas "cálculo de
-agregados (lógica de negócio) e três cartões de métrica repetidos (UI)";
-exportações públicas "default `DashboardPage`". Ele extrai os agregados
-pra um módulo de domínio e os cartões pra um sub-componente, mantém o
-`export default` intacto, roda typecheck, testes e lint, confirma que
-nenhum aviso novo apareceu, e commita. Depois faz o segundo arquivo. No
-terceiro, encontra um parser de 400 linhas que é uma máquina de estados
-única e coesa — reporta "sem costura natural", não mexe, e para. No fim,
-diz que restam oito arquivos acima do teto, listados.
+The agent lists the actual eleven files, takes the three largest, and
+reports for `page.tsx`: current responsibility "builds the dashboard and
+also calculates balance aggregates"; seams found "aggregate calculations
+(business logic) and three repeated metric cards (UI)"; public exports
+"default `DashboardPage`". It extracts aggregates to a domain module and
+cards to a subcomponent, preserves `export default`, runs typecheck, tests
+and lint, confirms no new warnings, and commits. Then it handles the second
+file. In the third, it finds a 400-line parser that is one cohesive state
+machine — reports "no natural seam", leaves it untouched, and stops. At
+the end, it says eight files remain above the ceiling and lists them.
 
-## Dicas
+## Tips
 
-- `[BATCH_SIZE]` baixo não é excesso de cautela: é o que mantém o diff no
-  tamanho que um humano revisa de verdade. Três arquivos por rodada, com
-  commit por arquivo, dá seis pontos de retorno se algo der errado.
-- Quando o agente disser "sem costura natural", leia o arquivo antes de
-  discordar. Às vezes ele está certo, e o certo é subir o `ignore` da
-  regra pra aquele arquivo específico em vez de picotá-lo.
-- Combine com [`03-multi-agent-code-review.md`](03-multi-agent-code-review.md)
-  no fim de cada lote — extração de código é exatamente o tipo de mudança
-  em que um revisor separado enxerga o que quem extraiu não enxerga.
-- As pegadinhas do passo 4d têm exemplos concretos, com código, em
+- A low `[BATCH_SIZE]` is not excessive caution: it keeps the diff at a size
+  a human actually reviews. Three files per round, one commit per file,
+  gives six recovery points if something goes wrong.
+- When the agent says "no natural seam", read the file before disagreeing.
+  Sometimes it is right, and the right action is adding that specific file
+  to the rule's `ignore` instead of chopping it up.
+- Combine with [`03-multi-agent-code-review.md`](03-multi-agent-code-review.md)
+  at the end of each batch — extraction is exactly the kind of change
+  where a separate reviewer sees what the extractor misses.
+- The pitfalls in step 4d have concrete code examples in
   [`../tools/06-eslint-biome-quality-gates.md`](../tools/06-eslint-biome-quality-gates.md)
-  — vale ler antes da primeira rodada.
+  — worth reading before the first round.

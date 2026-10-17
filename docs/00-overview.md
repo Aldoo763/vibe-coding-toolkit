@@ -1,82 +1,82 @@
-# Visão geral
+# Overview
 
-O toolkit permite iniciar uma base Next.js, configurar ou atualizar um projeto existente e consultar ferramentas separadamente. Os caminhos reutilizam a mesma coleção de templates e acordos.
+**Set up your machine. Bootstrap or upgrade your projects.** The toolkit prepares development environments and individual codebases. New projects, existing projects, and partial adoption reuse the same templates and working agreements.
 
-<a id="três-caminhos"></a>
+<a id="four-paths"></a>
 
-## Quatro caminhos
+## Four paths
 
-- **Máquina:** [setup global](03-environment-setup.md), com instalação, integração dos clientes, backups e manifesto.
-- **Projeto novo:** [bootstrap Next](04-project-bootstrap.md), com `PRODUCT.md`, scaffold oficial, skills locais, lint e evidências.
-- **Projeto existente:** [setup completo](prompts/12-existing-project-setup.md), com diagnóstico, brainstorming, harness, adoção/atualização das peças aplicáveis e validação antes/depois.
-- **Adoção parcial:** [instalação](01-installation.md), [ferramentas](tools/) e [prompts](prompts/), escolhendo somente o necessário.
+- **Machine:** [global setup](03-environment-setup.md), including installation, client integration, backups, and a manifest.
+- **New project:** [Next.js bootstrap](04-project-bootstrap.md), including `PRODUCT.md`, the official scaffold, local skills, lint, and evidence.
+- **Existing project:** [complete setup](prompts/12-existing-project-setup.md), including diagnosis, brainstorming, a harness, adoption/updates of applicable components, and before/after validation.
+- **Partial adoption:** [installation](01-installation.md), [tools](tools/), and [prompts](prompts/), choosing only what you need.
 
-O agente precisa de acesso ao ambiente para executar e validar. Claude Code e Codex usam configurações próprias; outras LLMs podem seguir os requisitos com capacidades equivalentes, sem assumir compatibilidade de formatos.
+The agent needs environment access to execute and validate. Claude Code and Codex use their own configurations; other LLMs can meet the requirements with equivalent capabilities, without assuming format compatibility.
 
-## Produto antes da base
+## Product before foundation
 
-A descrição define problema, público, fluxos essenciais e restrições. `PRODUCT.md` registra MVP, hipóteses e critérios de aceitação. A stack serve esse escopo: Next/App Router, TypeScript, Tailwind, ESLint, Drizzle/PostgreSQL, Zod, Pino e Vitest formam o núcleo. Autenticação e serviços dependem do produto; uma aplicação sem persistência pode omitir banco com justificativa. Veja os [padrões e critérios de adaptação](06-project-defaults.md).
+The description defines the problem, audience, essential flows, and constraints. `PRODUCT.md` records the MVP, assumptions, and acceptance criteria. The stack serves that scope: Next.js/App Router, TypeScript, Tailwind, ESLint, Drizzle/PostgreSQL, Zod, Pino, and Vitest form the core. Authentication and services depend on the product; an application without persistence may omit the database with a documented reason. See [defaults and adaptation criteria](06-project-defaults.md).
 
-O scaffold vem da versão estável de `create-next-app`, consultada no momento do setup. O toolkit mantém a receita e os complementos, evitando carregar uma aplicação de exemplo com domínio, credenciais ou dependências particulares.
+The scaffold comes from the stable version of `create-next-app`, checked during setup. The toolkit maintains the recipe and additions, avoiding a sample application with its own domain, credentials, or dependencies.
 
-<a id="2-brainstorm--plano--implementação--revisão"></a>
-<a id="4-duas-camadas-de-personalidade-compostas"></a>
-<a id="por-que-isso-importa"></a>
+<a id="2-brainstorm--plan--implementation--review"></a>
+<a id="4-two-composable-personality-layers"></a>
+<a id="why-this-matters"></a>
 
-## Processo proporcional
+## Proportional process
 
-[Superpowers](tools/01-superpowers.md) fornece skills de design, planejamento, execução e verificação. Use o caminho adequado ao tamanho do pedido. Se o usuário autorizar execução direta, respeite essa instrução; não repita aprovações já concedidas.
+[Superpowers](tools/01-superpowers.md) provides design, planning, execution, and verification skills. Use the path that matches the request's size. If the user authorizes direct execution, respect that instruction; do not repeat approvals already granted.
 
-[Ponytail](tools/04-ponytail.md) mantém a menor solução completa: reutilização, escopo explícito e checks pertinentes. Segurança, validação, acessibilidade e requisitos pedidos permanecem. [Caveman](tools/05-caveman.md) reduz ruído da conversa, preservando o idioma e a clareza; documentos e código usam redação normal.
+[Ponytail](tools/04-ponytail.md) keeps the solution small and complete: reuse, explicit scope, and relevant checks. Security, validation, accessibility, and requested requirements remain intact. [Caveman](tools/05-caveman.md) reduces conversational noise while preserving language and clarity; documents and code use normal wording.
 
-<a id="1-orquestração-não-implementação-solo"></a>
+<a id="1-orchestration-not-solo-implementation"></a>
 
-## Delegação quando compensa
+## Delegate when it helps
 
-O agente principal pode implementar mudanças pequenas. Subagentes ajudam em investigação ampla, tarefas independentes e revisão especializada. Use somente ferramentas e papéis realmente disponíveis.
+The main agent can implement small changes. Subagents help with broad investigation, independent tasks, and specialist review. Use only tools and roles that are actually available.
 
-Ondas paralelas exigem responsabilidade por arquivo e ausência de dependência entre tarefas da mesma onda. O [guia de orquestração](tools/02-subagent-orchestration.md) detalha esse protocolo. Preserve o modelo principal e a autenticação; seleção dinâmica de subagentes leves depende de política autorizada, capacidade suficiente e suporte do cliente. O prompt de projeto existente autoriza essa seleção dentro da sessão vigente, respeitando restrições explícitas.
+Parallel waves require file ownership and no dependencies between tasks in the same wave. The [orchestration guide](tools/02-subagent-orchestration.md) details this protocol. Preserve the main model and authentication; dynamic selection of lightweight subagents requires an authorized policy, sufficient capability, and client support. The existing-project prompt authorizes this selection within the current session, subject to explicit restrictions.
 
-## Harness e revisão contínua
+## Harness and continuous review
 
-O [setup de projeto existente](prompts/12-existing-project-setup.md) organiza instruções curtas, documentação localizável, comandos reproduzíveis, invariantes verificáveis e evidências para retomada. Cada peça do catálogo recebe uma decisão explícita; equivalentes funcionais são preservados.
+The [existing-project setup](prompts/12-existing-project-setup.md) organizes short instructions, discoverable documentation, reproducible commands, verifiable invariants, and evidence for resuming work. Each catalog component receives an explicit decision; working equivalents are preserved.
 
-Após implementação ou correção, as instruções compartilhadas recomendam de 3 a 8 ciclos posteriores de code review, escolhidos conforme risco e escopo. A [convenção de revisão](tools/02-subagent-orchestration.md#revisão-após-implementação-ou-correção) exige focos úteis, evidência e limite de rodada; a sugestão não dispara revisões automaticamente.
+After implementation or a fix, shared instructions recommend 3 to 8 subsequent code review cycles, selected by risk and scope. The [review convention](tools/02-subagent-orchestration.md#review-after-implementation-or-fixes) requires useful focuses, evidence, and a bounded round; the suggestion does not start reviews automatically.
 
-<a id="6-um-grafo-de-conhecimento-do-código"></a>
-<a id="7-um-sistema-de-memória-em-duas-camadas"></a>
+<a id="6-a-code-knowledge-graph"></a>
+<a id="7-a-two-layer-memory-system"></a>
 
-## Conhecimento e contexto
+## Knowledge and context
 
-[Context7](tools/12-context7.md) consulta documentação atual de bibliotecas. Resolva o identificador correto e faça uma consulta por conceito, sem enviar segredos ou código privado.
+[Context7](tools/12-context7.md) queries current library documentation. Resolve the correct identifier and query one concept at a time, without sending secrets or private code.
 
-[Graphify](tools/07-graphify.md) oferece um grafo consultável de estrutura e relações. Extração de código pode ser determinística; semântica de documentos utiliza a integração nativa autorizada quando disponível. Um grafo incompleto ou antigo precisa ser tratado como tal.
+[Graphify](tools/07-graphify.md) provides a queryable graph of structure and relationships. Code extraction can be deterministic; document semantics use the authorized native integration when available. Treat an incomplete or outdated graph accordingly.
 
-Memória externa, como [Obsidian](tools/08-obsidian-memory.md), e o [sistema de memória Claude](tools/09-claude-memory-system.md) continuam opcionais. Comece com contexto curto e útil; não instale um sistema de memória inteiro apenas para uma aplicação vazia.
+External memory, such as [Obsidian](tools/08-obsidian-memory.md), and the [Claude memory system](tools/09-claude-memory-system.md) remain optional. Start with short, useful context; do not install an entire memory system for an empty application.
 
-## Skills Vercel
+## Vercel skills
 
-O [catálogo](tools/16-vercel-skills.md) identifica cada skill pelo nome instalável, define seu momento de uso e instala localmente as oito skills web mais `find-skills`. Composição e boas práticas React/Next apoiam implementação; UI e escrita apoiam revisão.
+The [Vercel catalog](tools/16-vercel-skills.md) identifies skills by installable names and defines local adoption. Composition and React/Next.js best practices support implementation; UI and writing support review. The [scope matrix](tools/README.md#select-by-scope) also routes Next.js runtime/bundle work, PostgreSQL, GitHub CI repair, differential security review, shadcn, and Sentry MCP.
 
-Transições, operação Vercel, deploy e otimização dependem de tarefa pertinente. A skill mobile entra para React Native/Expo. Disponibilidade de uma skill não exige criar a funcionalidade nem autoriza publicação.
+Transitions, Vercel operations, deployment, and optimization require a relevant task. The mobile skill applies to React Native/Expo. Skill availability neither requires creating functionality nor authorizes publishing.
 
-<a id="3-uma-camada-de-economia-de-tokens"></a>
-<a id="5-gates-de-qualidade-como-migração-rastreada"></a>
+<a id="3-a-token-saving-layer"></a>
+<a id="5-quality-gates-as-a-tracked-migration"></a>
 
-## Checks explícitos
+## Explicit checks
 
-[ESLint e quality gates](tools/06-eslint-biome-quality-gates.md) verificam código e contratos relevantes. O starter usa o perfil completo de ESLint: presets oficiais, teto de 350 linhas, logger, fronteira de dados e guardas Drizzle. O perfil leve continua disponível para adoção parcial.
+[ESLint and quality gates](tools/06-eslint-biome-quality-gates.md) check relevant code and contracts. The starter uses the full ESLint profile: official presets, a 350-line limit, logging, data boundaries, and Drizzle guards. The lightweight profile remains available for partial adoption.
 
-Lint, tipos, regras e build rodam por comandos canônicos. Testes cobrem comportamento relevante e regressões. O toolkit não instala bloqueios de push em `main`, nem exige branch/worktree, nem adiciona hooks de commit/push. Hooks próprios do cliente, como [RTK](tools/03-rtk-token-proxy.md), usam integrações suportadas sem duplicação.
+Lint, types, rules, and builds run through canonical commands. Tests cover relevant behavior and regressions. The toolkit does not install push blockers on `main`, require a branch/worktree, or add commit/push hooks. Client hooks, such as [RTK](tools/03-rtk-token-proxy.md), use supported integrations without duplication.
 
-## Global não precisa ser copiado
+## Global tools do not need copying
 
-Binários, plugins e autenticação existentes são reutilizados. Produto, instruções, skills Vercel, lint e exclusões do grafo ficam no projeto. Uma conexão MCP local só é acrescentada se faltar integração ativa.
+Reuse existing binaries, plugins, and authentication. Product, instructions, Vercel skills, lint, and graph exclusions belong in the project. Add a local MCP connection only when no active integration exists.
 
-O [manifesto global](../templates/environment-manifest.json.example) registra o ambiente da máquina. `docs/setup.md` no projeto registra revisão do toolkit, versões, escopos, validações e pendências. Arquivo instalado e integração testada são estados diferentes.
+The [global manifest](../templates/environment-manifest.json.example) records the machine environment. The project's `docs/setup.md` records the toolkit revision, versions, scopes, validations, and pending work. An installed file and a tested integration are different states.
 
-<a id="leitura-complementar-oficial"></a>
+<a id="official-further-reading"></a>
 
-## Próximo passo
+## Next step
 
-Use o [prompt curto de projeto](prompts/11-next-project-bootstrap.md) para começar Next, o [setup de projeto existente](prompts/12-existing-project-setup.md) para adotar/atualizar o conjunto ou o [prompt de ambiente](prompts/10-development-environment-setup.md) para preparar a máquina. O [playbook Claude](02-playbook-onboarding.md) e o [guia Codex](tools/15-codex-workflow.md) detalham os clientes.
+Use the [short project prompt](prompts/11-next-project-bootstrap.md) to start Next.js, the [existing-project setup](prompts/12-existing-project-setup.md) to adopt/update the toolkit, or the [environment prompt](prompts/10-development-environment-setup.md) to prepare the machine. The [Claude playbook](02-playbook-onboarding.md) and [Codex guide](tools/15-codex-workflow.md) explain each client.

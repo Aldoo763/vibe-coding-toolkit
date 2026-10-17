@@ -1,139 +1,150 @@
-# Setup da máquina: como usar o prompt completo
+# Machine setup: how to use the complete prompt
 
-Use o [prompt 10 — ambiente de desenvolvimento](prompts/10-development-environment-setup.md) para preparar uma máquina nova ou atualizar e corrigir um ambiente existente. Ele pede execução, backups, integração dos agentes e testes em novas sessões. Instalar os binários é apenas uma parte do trabalho.
+Use [prompt 10 — development environment](prompts/10-development-environment-setup.md) to prepare a new machine or update and fix an existing environment. It requests execution, backups, agent integration, and tests in new sessions. Installing binaries is only part of the work.
 
-O setup atua no ambiente global. Para **iniciar um projeto Next**, use depois o [bootstrap](04-project-bootstrap.md). Para adotar o fluxo num projeto existente, use o [playbook](02-playbook-onboarding.md) ou o [guia do Codex](tools/15-codex-workflow.md). Skills Vercel são instaladas no projeto, conforme o [catálogo](tools/16-vercel-skills.md).
+Setup targets the global environment. To **start a Next.js project**, use the [bootstrap](04-project-bootstrap.md) afterward. To adopt the workflow in an existing project, use the [playbook](02-playbook-onboarding.md) or [Codex guide](tools/15-codex-workflow.md). Vercel skills are installed in the project, following the [catalog](tools/16-vercel-skills.md).
 
-## 1. Escolha onde executar
+## 1. Choose where to run
 
-Use Codex ou Claude Code com acesso ao terminal e aos arquivos do computador que receberá o setup. Se a sessão estiver em um container, VM, WSL ou servidor remoto, é esse ambiente que ela consegue preparar. Declare o destino explicitamente quando houver mais de um.
+Use Codex or Claude Code with terminal and file access on the computer receiving setup. If the session runs in a container, VM, WSL, or remote server, that is the environment it can prepare. State the destination explicitly when there is more than one.
 
-Uma máquina sem nenhum agente precisa de uma primeira instalação para receber o prompt. Escolha **um** agente para começar; o prompt instala o outro durante o setup. Os exemplos abaixo vêm das [instruções oficiais do Codex CLI](https://learn.chatgpt.com/docs/codex/cli) e do [Claude Code](https://code.claude.com/docs/en/overview). Consulte essas páginas se o sistema ou método de instalação for diferente.
+A machine without an agent needs an initial installation to receive the prompt. Choose **one** agent to start; the prompt installs the other during setup. The examples below come from the [official Codex CLI instructions](https://learn.chatgpt.com/docs/codex/cli) and [Claude Code](https://code.claude.com/docs/en/overview). Consult those pages if your operating system or installation method differs.
 
-macOS, Linux ou WSL — escolha um dos comandos:
+macOS, Linux, or WSL — choose one command:
 
 ```bash
-# Codex: instalador nativo
+# Codex: native installer
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
 
-# Claude Code: instalador nativo
+# Claude Code: native installer
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-Windows nativo — escolha um dos comandos no PowerShell:
+Native Windows — choose one command in PowerShell:
 
 ```powershell
-# Codex: instalador nativo
+# Codex: native installer
 irm https://chatgpt.com/codex/install.ps1 | iex
 
-# Claude Code: instalador nativo
+# Claude Code: native installer
 irm https://claude.ai/install.ps1 | iex
 ```
 
-Esses instaladores não exigem Node.js como etapa anterior. Abra um novo terminal, rode `codex` ou `claude` e conclua a autenticação no fluxo oficial. Para o Codex, escolha login com ChatGPT conforme a preferência do prompt. Credenciais, códigos e senhas ficam no fluxo de login, nunca na conversa.
+These installers do not require Node.js beforehand. Open a new terminal, run `codex` or `claude`, and complete authentication through the official flow. For Codex, choose ChatGPT login as preferred by the prompt. Credentials, codes, and passwords stay in the login flow, never in the conversation.
 
-Se o agente já funciona, comece por ele. O prompt preserva o método existente quando suportado e evita uma segunda instalação concorrente.
+If an agent already works, start there. The prompt preserves the existing method where supported and avoids a second competing installation.
 
-## 2. Execute o prompt
+## 2. Run the prompt
 
-Abra o [prompt 10](prompts/10-development-environment-setup.md) e cole **o bloco inteiro da seção “Prompt”** na conversa do agente. O texto já autoriza a base obrigatória, atualizações globais de desenvolvimento e correções necessárias.
+Open [prompt 10](prompts/10-development-environment-setup.md) and paste **the entire “Prompt” section block** into the agent conversation. The text already authorizes the required foundation, global development updates, and necessary fixes.
 
-Com este repositório aberto no agente, use o atalho:
-
-```text
-Leia docs/prompts/10-development-environment-setup.md e execute integralmente o bloco da seção “Prompt” neste computador.
-Use templates/environment-manifest.json.example como formato inicial do manifesto e acrescente os componentes globais encontrados no inventário.
-Grave relatório, manifesto e backups em um diretório de setup do usuário, fora dos projetos. Informe os caminhos e como restaurar as configurações.
-```
-
-Se estiver trabalhando em outro diretório, forneça o caminho real do arquivo. O atalho por URL está na página do prompt e depende de esta versão já estar publicada na branch `main`. O arquivo local permite usar as mudanças antes da publicação.
-
-Antes de enviar, acrescente contexto que o agente não consegue descobrir sozinho, quando houver:
+With this repository open in the agent, use this shortcut:
 
 ```text
-Destino: [este computador / Windows nativo / WSL / servidor remoto identificado].
-Projetos cujas versões devem ser preservadas: [caminhos locais, sem credenciais].
-Manifesto anterior: [caminho, se existir].
-Restrições da organização ou do sistema: [descreva, se houver].
+Read docs/prompts/10-development-environment-setup.md and execute the entire “Prompt” section block on this computer.
+Use templates/environment-manifest.json.example as the initial manifest format and add global components found during inventory.
+Save the report, manifest, and backups in a user setup directory outside projects. State the paths and how to restore configurations.
 ```
 
-## 3. Entenda o que é obrigatório
+If you are working in another directory, provide the actual file path. The URL shortcut is on the prompt page and requires this version to be published on `main`. The local file lets you use changes before publication.
 
-O toolkit pode ser adotado por partes. **Neste prompt específico**, todos os itens da base são obrigatórios: o agente deve instalar os ausentes e configurar as integrações suportadas. Uma incompatibilidade precisa de justificativa e alternativa registradas.
+Before sending, add context the agent cannot discover itself, where applicable:
 
-| Grupo | Base exigida |
+```text
+Destination: [this computer / native Windows / WSL / identified remote server].
+Projects whose versions must be preserved: [local paths, without credentials].
+Previous manifest: [path, if any].
+Organization or system constraints: [describe, if any].
+```
+
+## 3. Understand what is required
+
+The toolkit supports partial adoption. **In this specific prompt**, every baseline item is required: the agent must install missing tools and configure supported integrations. An incompatibility requires a recorded reason and alternative.
+
+| Group | Required foundation |
 |---|---|
-| Sistema | Certificados, download, extração, compilação e gerenciador de pacotes adequado |
-| Desenvolvimento | Git, GitHub CLI, gerenciador de versões Node.js, Node.js LTS, npm, pnpm, ripgrep, fd e jq |
-| Containers | Cliente Docker, engine acessível, Compose v2 por `docker compose` e pré-requisitos do sistema |
-| Agentes | Codex CLI e Claude Code CLI, inicialização e autenticação verificadas |
-| Integrações | RTK, Ponytail `full`, Caveman, Superpowers, Context7 e Graphify em cada cliente compatível |
+| System | Certificates, downloads, extraction, compilation, and an appropriate package manager |
+| Development | Git, GitHub CLI, a Node.js version manager, Node.js LTS, npm, pnpm, ripgrep, fd, and jq |
+| Containers | Docker client, accessible engine, Compose v2 through `docker compose`, and system prerequisites |
+| Agents | Codex CLI and Claude Code CLI, with verified initialization and authentication |
+| Integrations | RTK, Ponytail `full`, Caveman, Superpowers, Context7, and Graphify in each compatible client |
 
-O gerenciador de Node.js preferido é [fnm](https://github.com/Schniz/fnm). A versão padrão deve ser a [LTS compatível na data da execução](https://nodejs.org/en/about/previous-releases), preservando versões específicas dos projetos. O método de instalação de [pnpm](https://pnpm.io/installation) também deve ser conferido na execução; não presuma que toda versão do Node.js inclui Corepack.
+The preferred Node.js manager is [fnm](https://github.com/Schniz/fnm). The default version should be the [compatible LTS at execution time](https://nodejs.org/en/about/previous-releases), preserving project-specific versions. Check the [pnpm installation method](https://pnpm.io/installation) during execution as well; do not assume every Node.js version includes Corepack.
 
-Para [Docker](https://docs.docker.com/get-started/get-docker/), um cliente instalado sem engine acessível continua sendo uma pendência. A escolha de Desktop ou Engine depende do sistema, dos requisitos e da licença aplicável.
+For [Docker](https://docs.docker.com/get-started/get-docker/), an installed client without an accessible engine remains pending. The choice of Desktop or Engine depends on the system, requirements, and applicable license.
 
-### Origens das extensões
+### Extension sources
 
-Essas referências ajudam a evitar pacotes com nomes parecidos. Confirme a documentação e a compatibilidade atuais antes de instalar.
+These references help avoid similarly named packages and unsupported integrations:
 
-| Ferramenta | Origem | Integração a conferir |
+| Tool | Source | Integration to verify |
 |---|---|---|
-| RTK | [rtk-ai/rtk](https://github.com/rtk-ai/rtk) | CLI e hooks nativos por agente; sem reescrita dupla |
-| Ponytail | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | Plugin com hooks ou skill, conforme suporte do cliente |
-| Caveman | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Skills de comunicação; recursos de proxy e roteamento têm escopo próprio |
-| Superpowers | [obra/superpowers](https://github.com/obra/superpowers) | Plugin oficial do cliente ou mecanismo documentado de skills |
-| Context7 | [upstash/context7](https://github.com/upstash/context7) | Plugin ou MCP; um servidor lógico por cliente |
-| Graphify | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | Pacote `graphifyy`, CLI `graphify` e skill descoberta pelo agente |
+| RTK | [rtk-ai/rtk](https://github.com/rtk-ai/rtk) | CLI and native hooks per agent; no double rewriting |
+| Ponytail | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) | Plugin with hooks or skill, according to client support |
+| Caveman | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Communication skills; proxy and routing features have their own scope |
+| Superpowers | [obra/superpowers](https://github.com/obra/superpowers) | Official client plugin or documented skill mechanism |
+| Context7 | [upstash/context7](https://github.com/upstash/context7) | Plugin or MCP; one logical server per client |
+| Graphify | [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | `graphifyy` package, `graphify` CLI, and a skill discovered by the agent |
 
-Para Caveman, comunicação concisa não exige ativar proxy, Cloud ou troca automática de modelos. Para trabalhos com LLM de Caveman e Graphify, preserve cliente nativo, autenticação e modelo autorizados na sessão. No Codex, mantenha login ChatGPT quando utilizado; no Claude, a modalidade vigente. Não deduza autorização para outro provedor a partir de uma opção disponível na ferramenta.
+For Caveman, concise communication does not require enabling a proxy, Cloud, or automatic model switching. For LLM work in Caveman and Graphify, preserve the native client, authentication, and model authorized in the session. In Codex, retain ChatGPT login when used; in Claude, retain the current authentication method. Do not infer authorization for another provider from an available tool option.
 
-## 4. Acompanhe intervenções e retomadas
+## 4. Track interventions and resumption
 
-Você pode precisar concluir login no navegador, digitar senha no sistema, conceder uma permissão do sistema operacional, iniciar Docker Desktop ou reiniciar uma sessão. O agente deve identificar a intervenção exata e continuar as etapas independentes.
+You may need to complete browser login, enter a system password, grant an operating system permission, start Docker Desktop, or restart a session. The agent should identify the exact intervention and continue independent steps.
 
-Extras novos, custos e migrações incompatíveis dependem da sua escolha. Instalações obrigatórias e atualizações globais já autorizadas continuam fazendo parte do trabalho.
+New extras, costs, and incompatible migrations depend on your choice. Required installations and already authorized global updates remain part of the work.
 
-Se a sessão terminar antes da validação, use:
-
-```text
-Retome o setup do prompt 10 a partir de [caminho do relatório] e [caminho do manifesto].
-Confira o estado atual, continue as pendências e revalide em novas sessões.
-Preserve os backups existentes e evite duplicar instalações, configurações e hooks.
-```
-
-Uma mudança em arquivo de configuração não altera necessariamente as permissões da sessão aberta. CLI, aplicativo desktop, sistema operacional e políticas da organização precisam de verificações próprias. Veja os detalhes no [guia do Codex](tools/15-codex-workflow.md).
-
-## 5. Confira a entrega
-
-O relatório deve cobrir todos os itens da seção 12 do prompt, com versões anteriores e finais, caminhos, fontes, integrações por cliente, limpeza, backups e restauração. Cada teste deve registrar o comando, o resultado e a sessão usada, com dados sensíveis removidos.
-
-Para Docker, procure evidência dos sete passos da seção 11: cliente e servidor em `docker version`, `docker info`, versão do Compose, `hello-world`, projeto temporário funcionando e encerramento apenas dos recursos do teste. Para os agentes, procure carregamento real das skills e uma consulta ao Context7; presença no disco ou na configuração não prova funcionamento.
-
-O [template de manifesto](../templates/environment-manifest.json.example) é JSON, sem instalador embutido. Ele começa com `template: true`, versões e caminhos `null` e status `pending`, porque ainda não representa um ambiente validado. Ao preenchê-lo:
-
-- Use `ready` somente depois de instalação, configuração e validação; use `blocked` ou `unsupported` com motivo em `notes` quando necessário.
-- Registre versão ou revisão, caminho observado, escopo, método de instalação e atualização de cada componente. Acrescente dependências necessárias e todas as ferramentas globais descobertas.
-- Detalhe integrações em `integrations`: cliente, escopo, arquivo, comportamento e status. Se um plugin não funcionar em um cliente, registre esse cliente separadamente.
-- Registre em `configuration` as definições necessárias de shell, PATH, runtime e permissões. Em `validation`, guarde evidências resumidas e sem segredos.
-- Preencha `generated_at`, identifique o ambiente e mude `template` para `false`. Isso identifica um inventário preenchido, sem esconder itens ainda bloqueados.
-- Mantenha caminhos de backups e instruções de restauração no relatório local. Na cópia compartilhável, normalize diretórios pessoais como `${USER_HOME}` e remova nomes privados, repositórios privados e dados de autenticação.
-
-## 6. Reproduza em outra máquina
-
-Leve o manifesto sanitizado junto do prompt completo e informe:
+If the session ends before validation, use:
 
 ```text
-Execute o prompt 10 neste computador usando [caminho do manifesto] como inventário de origem.
-Reproduza a base obrigatória e os demais componentes registrados, adaptando sistema operacional, arquitetura, shell, caminhos e métodos de instalação.
-Respeite as versões exigidas pelos projetos e registre divergências de compatibilidade.
-Gere um novo relatório e um novo manifesto do destino. Não reutilize credenciais da origem.
+Resume prompt 10 setup from [report path] and [manifest path].
+Check the current state, continue pending work, and revalidate in new sessions.
+Preserve existing backups and avoid duplicate installations, configurations, and hooks.
 ```
 
-As versões registradas são evidência do ambiente de origem. O prompt ainda pede versões estáveis compatíveis na data da execução; qualquer necessidade de manter uma revisão exata deve ser informada explicitamente. Um manifesto não transporta sessões, segredos, dados Docker ou ferramentas que não foram inventariadas.
+A configuration file change does not necessarily change the open session's permissions. CLI, desktop application, operating system, and organization policies need separate checks. See details in the [Codex guide](tools/15-codex-workflow.md).
 
-## Depois da base
+## 5. Check the delivery
 
-Para configurar ou atualizar um projeto já existente com o conjunto aplicável, use o [prompt 12](prompts/12-existing-project-setup.md). Ele reutiliza o ambiente preparado e mantém o escopo do projeto separado do setup da máquina.
+The report should cover every item in section 12 of the prompt, including previous and final versions, paths, sources, integrations per client, cleanup, backups, and restoration. Each test should record the command, result, and session used, with sensitive data removed.
 
-Escolha extras pelo problema que resolvem. Para automação de fluxos no navegador, veja [agent-browser](tools/11-agent-browser.md); para investigar console, rede e desempenho, veja [Chrome DevTools MCP](tools/14-chrome-devtools-mcp.md). Para qualidade no projeto, use os [quality gates](tools/06-eslint-biome-quality-gates.md). Nenhum desses extras novos deve ser instalado automaticamente por aparecer como recomendação.
+For Docker, look for evidence of section 11's seven steps: client and server in `docker version`, `docker info`, Compose version, `hello-world`, a working temporary project, and cleanup of only test resources. For agents, look for actual skill loading and a Context7 query; presence on disk or in configuration does not prove operation.
+
+The [manifest template](../templates/environment-manifest.json.example) is JSON without an embedded installer. It starts with `template: true`, `null` versions and paths, and `pending` statuses because it does not yet represent a validated environment. When filling it in:
+
+- Use `ready` only after installation, configuration, and validation; use `blocked` or `unsupported` with a reason in `notes` when needed.
+- Record the version or revision, observed path, scope, installation method, and update method of each component. Add required dependencies and every global tool discovered.
+- Detail integrations in `integrations`: client, scope, file, behavior, and status. If a plugin does not work in one client, record that client separately.
+- Record required shell, PATH, runtime, and permission settings in `configuration`. Keep concise evidence without secrets in `validation`.
+- Fill `generated_at`, identify the environment, and change `template` to `false`. This identifies a completed inventory without hiding items that remain blocked.
+- Keep backup paths and restoration instructions in the local report. In the shareable copy, normalize personal directories as `${USER_HOME}` and remove private names, private repositories, and authentication data.
+
+## 6. Reproduce on another machine
+
+Bring the sanitized manifest with the complete prompt and specify:
+
+```text
+Execute prompt 10 on this computer using [manifest path] as the source inventory.
+Reproduce the required foundation and other recorded components, adapting the operating system, architecture, shell, paths, and installation methods.
+Respect project-required versions and record compatibility differences.
+Generate a new report and a new destination manifest. Do not reuse source credentials.
+```
+
+Recorded versions are evidence of the source environment. The prompt still requests compatible stable versions at execution time; explicitly state any requirement to retain an exact revision. A manifest does not transport sessions, secrets, Docker data, or tools absent from the inventory.
+
+## Prepare project capabilities
+
+The toolkit has two scopes: this guide configures the **machine**; project recipes configure **individual codebases**. Evaluate the [capability matrix](tools/README.md#select-by-scope) against the intended work:
+
+- For compatible Next.js development, prepare [agent-browser](tools/11-agent-browser.md) and its browser runtime for [next-dev-loop](tools/17-nextjs-runtime-and-performance.md). Check the current skill's version/bundler requirements. The application and its local skills remain project-scoped.
+- For GitHub Actions work, prepare the [GitHub CLI and account access](tools/19-github-ci-repair.md). For security review, ensure Git/history and supported agent tools are available.
+- PostgreSQL guidance, bundle analysis, and shadcn instructions belong in the project; machine setup does not choose a database host or UI library.
+- For a chosen Sentry service, verify client MCP/OAuth support and authorized access. Configure a [scoped connection](tools/22-sentry-mcp.md) at the intended client/project scope; without an account/project, record the capability as not selected or pending.
+
+Record every selected prerequisite and per-client integration in the manifest, with source, observed version/revision, scope, update method, and evidence. Optional entries start with `required: false`; do not mark them ready until the relevant checks pass. Do not globally install all project skills as a consequence of this inventory.
+
+## After the foundation
+
+To configure or update an existing project with the applicable components, use [prompt 12](prompts/12-existing-project-setup.md). It reuses the prepared environment and keeps project scope separate from machine setup.
+
+Choose extras by the problem they solve. For browser flow automation, see [agent-browser](tools/11-agent-browser.md); to investigate console, networking, and performance, see [Chrome DevTools MCP](tools/14-chrome-devtools-mcp.md). For project quality, use the [quality gates](tools/06-eslint-biome-quality-gates.md). None of these new extras should be installed automatically merely because they appear as recommendations.

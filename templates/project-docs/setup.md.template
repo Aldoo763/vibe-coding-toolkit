@@ -1,35 +1,37 @@
-# Setup e evidências
+# Setup and evidence
 
-## Origem e contexto
+## Source and context
 
-[Data da verificação, revisão única do toolkit, produto, cliente e runtime. Preserve a autenticação e o modelo principal; registre a política autorizada de subagentes e os modelos/esforços observáveis, sem inventar custos. Não inclua caminhos pessoais ou credenciais.]
+[Verification date, single toolkit revision, product, client, and runtime. Preserve authentication and the main model; record the authorized subagent policy and observable models/effort levels, without inventing costs. Do not include personal paths or credentials.]
 
-## Decisões e fontes
+## Decisions and sources
 
-[Default adotado ou adaptado, motivo, documentação oficial/Context7 consultado e data. Diferencie canal estável de exemplo de prerelease. Registre exceções e critérios para revisitar.]
+[Default adopted or adapted, reason, official documentation/Context7 consulted, and date. Distinguish the stable channel from prerelease examples. Record exceptions and criteria for revisiting.]
 
-## Componentes
+## Components
 
-[Versões efetivas, gerenciador, lockfile, escopos local/global, origem e nomes das skills. Diferencie plugin instalado, arquivo presente e descoberta pelo host.]
+[Actual versions, package manager, lockfile, local/global scopes, skill sources, and names. Distinguish an installed plugin, a present file, and host discovery.]
 
-| Componente | Ação e motivo | Escopo | Estado e evidência |
+| Component | Action and reason | Scope | State and evidence |
 |---|---|---|---|
-| [Peça avaliada do catálogo atual] | [Instalar, atualizar, integrar, reaproveitar equivalente ou justificar inaplicabilidade/bloqueio] | [Projeto, cliente ou usuário] | [Resultado observado e pendência, se houver] |
+| [Component assessed from the current catalog] | [Install, update, integrate, reuse an equivalent, or explain inapplicability/blocker] | [Project, client, or user] | [Observed result and pending work, if any] |
 
-## Documentação criada
+Evaluate Next.js runtime/bundle skills, PostgreSQL guidance, GitHub CI repair, differential security review, shadcn, and Sentry MCP alongside the existing catalog. Record actual applicability and compatibility; preserve the project's stack and services. For adopted capabilities, include source/revision, frontmatter name, client, scope, install/update method, installation result, discovery result, live checks, and pending prerequisites. Account-dependent work stays pending until access and execution are observed.
 
-[Confirme PRODUCT.md, README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, docs/design.md, docs/onboarding.md e docs/quality.md com conteúdo do projeto. Registre preservação/consolidação de arquivos anteriores.]
+## Documentation created
 
-## Verificações
+[Confirm PRODUCT.md, README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, docs/design.md, docs/onboarding.md, and docs/quality.md contain project-specific content. Record preservation/consolidation of previous files.]
 
-| Item | Estado | Evidência |
+## Checks
+
+| Item | State | Evidence |
 |---|---|---|
-| [Check, integração ou recurso] | [Validado / configurado sem execução / pendente] | [Comando, resultado observado ou motivo e próximo passo] |
+| [Check, integration, or resource] | [Validated / configured without execution / pending] | [Command, observed result, or reason and next step] |
 
-Registre lint, tipos, testes, regras, build, auditorias, HTTP, geração SQL e banco quando aplicável. Identifique recursos temporários criados e seu encerramento. Não apresente uma simulação como teste de um serviço real.
+Record lint, types, tests, rules, builds, audits, HTTP, SQL generation, and database checks where applicable. Identify temporary resources created and their cleanup. Do not present a simulation as a test of a real service.
 
-Em projeto existente, compare os checks antes/depois, distinguindo falhas preexistentes de regressões. Registre verificação de reexecução sem duplicação e o que recebeu somente revisão estática.
+For existing projects, compare before/after checks, distinguishing pre-existing failures from regressions. Record rerun verification without duplication and what received only static review.
 
-## Pendências e próxima entrega
+## Pending work and next delivery
 
-[Decisões externas, riscos conhecidos, próximo passo e menor tarefa do MVP. Indique manutenção/reexecução, quantidade sugerida de 3 a 8 ciclos posteriores de code review, motivo, focos e prompt de continuação com checks reais. Publicação e serviços externos dependem de autorização pertinente.]
+[External decisions, known risks, next step, and the smallest MVP task. State maintenance/rerun guidance, the suggested count of 3 to 8 subsequent code review cycles, reason, focuses, and continuation prompt with actual checks. Publishing and external services require relevant authorization.]

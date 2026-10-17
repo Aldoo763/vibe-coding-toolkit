@@ -1,149 +1,149 @@
-# Quality Gates de Lint: ESLint + Biome
+# Lint Quality Gates: ESLint + Biome
 
-Dois linters, dois papéis — de propósito, sem sobreposição. Um roda um
-conjunto pequeno e cuidadosamente escolhido de regras, mirando um punhado de
-anti-padrões bem específicos. O outro carrega o grosso da cobertura: regras
-que precisam da informação completa de tipos do TypeScript, mais as regras
-específicas do framework que o projeto usa. Rodar os dois ao mesmo tempo não
-é redundância — é deixar cada ferramenta cobrir a parte em que ela é rápida
-e precisa, em vez de escolher uma só e pedir pra ela fazer o trabalho
-inteiro sozinha.
+Two linters, two roles — deliberately, without overlap. One runs a
+small, carefully selected set of rules targeting a handful of
+specific anti-patterns. The other carries most of the coverage: rules
+that need complete TypeScript type information, plus rules
+specific to the framework the project uses. Running both at once is not
+redundant — it lets each tool cover the area where it is fast
+and precise, instead of choosing one and asking it to do the entire
+job alone.
 
-Esse guia primeiro explica o raciocínio por trás dessa divisão — por que
-duas ferramentas, por que um conjunto curado de regras em vez do pacote
-"recomendado" inteiro, por que um aviso de lint pode ser uma ferramenta de
-migração e não só um estado passageiro. Depois, um tutorial passo a passo
-mostra como montar esse esquema do zero, num projeto novo. Por fim, cinco
-exemplos de código mostram as pegadinhas mais surpreendentes desse esquema
-na prática — o tipo de coisa que só aparece depois que você já bateu de
-cara com ela uma vez.
+This guide first explains the reasoning behind that split — why
+two tools, why a curated set of rules instead of the entire
+"recommended" package, and why a lint warning can be a migration tool
+rather than just a temporary state. Then a step-by-step tutorial
+shows how to build this setup from scratch in a new project. Finally, five
+code examples show the setup's most surprising pitfalls
+in practice — the kind of thing that only becomes apparent after you have
+run into it once.
 
-## Antes de começar: o que é linter, o que é formatter
+## Before you begin: what a linter is, what a formatter is
 
-Se você nunca configurou nada disso, comece por aqui — o resto do texto
-assume que você conhece a diferença entre as duas coisas.
+If you have never configured any of this, start here — the rest of the text
+assumes you know the difference between the two.
 
-Um **linter** é um programa que lê seu código sem executá-lo e aponta
-problemas: uma variável declarada e nunca usada, um padrão que costuma
-esconder bugs, um trecho que quebra uma convenção do time. Cada problema que
-ele sabe detectar é uma **regra** (rule), e cada regra tem uma
-**severidade**: `"off"` (desligada), `"warn"` (aviso — aparece no terminal
-ou no editor, mas não impede nada) ou `"error"` (erro — pode travar o
-build, o commit, ou a esteira de CI, dependendo de como você conectar o
-linter ao resto do fluxo de trabalho).
+A **linter** is a program that reads your code without running it and flags
+problems: a variable declared but never used, a pattern that often
+hides bugs, a snippet that breaks a team convention. Each problem it
+can detect is a **rule**, and each rule has a
+**severity**: `"off"` (disabled), `"warn"` (a warning — appears in the terminal
+or editor but does not block anything), or `"error"` (an error — can block a
+build, commit, or CI pipeline, depending on how you connect the
+linter to the rest of the workflow).
 
-Um **formatter** é uma ferramenta diferente, com um trabalho mais estreito:
-ele só cuida da aparência do código — indentação, aspas simples ou duplas,
-onde quebrar uma linha longa. Ele não tem opinião nenhuma sobre lógica, só
-sobre estilo visual, e normalmente reescreve o arquivo sozinho pra aplicar
-o padrão escolhido.
+A **formatter** is a different tool with a narrower job:
+it only handles code appearance — indentation, single or double quotes,
+where to wrap a long line. It has no opinion about logic, only
+visual style, and usually rewrites the file itself to apply
+the chosen standard.
 
-ESLint e Biome, cada um, sabem fazer as duas coisas — lintar e formatar.
-Este guia é sobre uma decisão específica: usar cada ferramenta só pra parte
-do trabalho em que ela compensa mais, em vez de escolher uma delas e pedir
-pra ela cuidar de tudo sozinha.
+ESLint and Biome can each do both — lint and format.
+This guide covers a specific decision: use each tool only for the part
+of the work where it offers the most value, instead of choosing one and asking
+it to handle everything alone.
 
-## Por que dois linters, e não um só
+## Why two linters instead of one
 
-O preset "recommended" de qualquer linter é um pacote fechado, pensado pra
-agradar o maior número possível de projetos ao mesmo tempo — o que, na
-prática, significa que ele erra pros dois lados: traz regras que não fazem
-sentido no seu contexto específico, e ainda assim deixa de fora regras que
-o seu projeto realmente precisava. Dividir o trabalho entre duas ferramentas
-deixa cada uma cobrir o que ela faz de melhor, e transforma "o que está
-ligado, e por quê" numa escolha explícita e defensável — registrada como
-comentário na própria configuração — em vez de uma lista herdada de um
-padrão de mercado que ninguém no time escolheu de fato.
+Any linter's "recommended" preset is a fixed package designed to
+suit as many projects as possible at once — which, in
+practice, means it misses in both directions: it includes rules that make no
+sense in your specific context and still leaves out rules your
+project actually needs. Splitting work between two tools
+lets each cover what it does best and turns "what is enabled,
+and why" into an explicit, defensible choice — recorded as
+comments in the configuration itself — instead of a list inherited from an
+industry default nobody on the team actually chose.
 
-## Regras curadas no Biome, cobertura pesada no ESLint
+## Curated Biome rules, heavy coverage in ESLint
 
-O Biome é rápido — rápido o bastante (é escrito em Rust, o que explica boa
-parte disso) pra rodar um conjunto pequeno de regras escolhidas a dedo, em
-vez do preset "recommended" completo que ele traz de fábrica (algo em torno
-de 200 regras). Optar por cinco ou seis regras específicas, em vez de
-duzentas genéricas, é uma escolha legítima por si só — e o motivo de cada
-escolha deveria morar como comentário bem ao lado da configuração que
-aplica a regra, não num documento separado que ninguém mais vai lembrar de
-manter atualizado junto:
+Biome is fast — fast enough (it is written in Rust, which explains much
+of that) to run a small set of handpicked rules instead of
+the full "recommended" preset it ships with (around
+200 rules). Choosing five or six specific rules over
+two hundred generic ones is a legitimate choice in itself — and the reason for each
+choice should live in a comment right beside the configuration
+applying the rule, not in a separate document nobody will remember to
+keep updated alongside it:
 
 ```jsonc
 // biome.jsonc
 {
-  // De propósito, NÃO estamos usando o preset "recommended" do Biome
-  // (~200 regras). Aqui o Biome cobre um punhado de anti-padrões
-  // específicos; o ESLint (com regras conscientes de tipos e regras
-  // específicas do framework) cobre o resto. Ter cobertura sobreposta
-  // entre dois linters só significa dois lugares pra manter a mesma
-  // regra em dia.
+  // We deliberately do NOT use Biome's "recommended" preset
+  // (~200 rules). Here Biome covers a handful of specific
+  // anti-patterns; ESLint (with type-aware and framework-specific
+  // rules) covers the rest. Overlapping coverage
+  // between two linters just means maintaining the same
+  // rule in two places.
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": false,
       "correctness": {
-        // Uma variável declarada e nunca usada quase sempre é import
-        // esquecido ou código morto — vale travar isso como erro.
+        // A variable declared but never used is almost always a
+        // forgotten import or dead code — worth blocking as an error.
         "noUnusedVariables": "error"
       },
       "suspicious": {
-        // "any" explícito não é proibido, mas merece ficar visível:
-        // é o ponto exato onde o TypeScript para de checar tipo por
-        // você. Fica em "warn", não em "error" — às vezes é a saída
-        // certa, mas precisa ser uma escolha visível, não um hábito.
+        // Explicit "any" is not forbidden, but deserves visibility:
+        // this is precisely where TypeScript stops checking types
+        // for you. Keep it at "warn", not "error" — sometimes it is
+        // the right solution, but must be a visible choice, not a habit.
         "noExplicitAny": "warn"
       }
-      // ...mais um punhado de regras, cada uma escolhida por um motivo
-      // específico — nunca "porque vieram no pacote".
+      // ...a handful of additional rules, each chosen for a specific
+      // reason — never "because they came in the package".
     }
   }
 }
 ```
 
-O ESLint entra pra cobrir o resto: regras conscientes de tipos (voltamos
-nisso mais adiante) que precisam da informação completa que só o compilador
-do TypeScript tem, regras específicas de framework (hooks do React,
-acessibilidade, convenções de rotas), e qualquer anti-padrão que o conjunto
-curado do Biome deixa de fora de propósito. Normalmente isso vem do pacote
-`typescript-eslint`, que junta o parser de TypeScript com as regras que
-sabem usar informação de tipo, mais o plugin do framework que o projeto
-usa.
+ESLint covers the rest: type-aware rules (more on those
+later) that need the complete information only the TypeScript
+compiler has, framework-specific rules (React hooks,
+accessibility, route conventions), and any anti-pattern the curated
+Biome set deliberately leaves out. This normally comes from the
+`typescript-eslint` package, combining the TypeScript parser with rules
+that know how to use type information, plus the plugin for the framework
+the project uses.
 
-## O formatador desligado, de propósito
+## The formatter, deliberately disabled
 
-Ligar um formatter automático pela primeira vez numa base de código grande,
-que nunca passou por um, produz uma parede de diffs — milhares de linhas
-mudadas em cada arquivo que ele toca, sem nenhuma relação com um bug real.
-Isso enterra qualquer revisão de verdade que devesse estar acontecendo: o
-revisor não consegue distinguir "o Biome trocou aspas simples por duplas"
-de "essa linha mudou porque corrigiu um bug de verdade". Numa base assim,
-deixar o formatter desligado — e documentar o porquê, no próprio arquivo de
-configuração — é uma escolha legítima. Não é uma lacuna que precisa de
-desculpa.
+Enabling an automatic formatter for the first time in a large codebase
+that has never used one creates a wall of diffs — thousands of changed
+lines across the files it touches, unrelated to any real bug.
+This buries any actual review that should be happening: a
+reviewer cannot distinguish "Biome changed single quotes to double quotes"
+from "this line changed to fix a real bug." In such a codebase,
+keeping the formatter disabled — and documenting why in the configuration
+file itself — is a legitimate choice. It is not a gap that needs
+an excuse.
 
 ```jsonc
 // biome.jsonc
 {
-  // Desligado de propósito: essa base de código é anterior à adoção do
-  // Biome e nunca passou por um formatter automático. Rodar um
-  // formatter pela primeira vez em milhares de arquivos nunca tocados
-  // geraria uma parede de diffs só de formatação, sem nenhuma relação
-  // com bugs reais — pior do que deixar desligado e explicar o porquê,
-  // bem aqui.
+  // Deliberately disabled: this codebase predates Biome adoption
+  // and has never used an automatic formatter. Running a
+  // formatter for the first time across thousands of untouched files
+  // would create a wall of formatting-only diffs unrelated
+  // to real bugs — worse than leaving it disabled and explaining why,
+  // right here.
   "formatter": {
     "enabled": false
   }
 }
 ```
 
-Repare que esse raciocínio vale especificamente pra base de código **já
-existente e grande**. Se você está começando um projeto do zero — o
-cenário do tutorial mais adiante — não existe "parede de diffs" pra evitar,
-porque não existe histórico de arquivos nunca formatados. Nesse caso, ligar
-o formatter desde o primeiro commit é o caminho mais simples: você nunca
-paga o custo de formatar tudo de uma vez, porque cada arquivo já nasce
-formatado.
+Notice that this reasoning applies specifically to a **large, existing**
+codebase. If you are starting a project from scratch — the
+scenario in the tutorial below — there is no "wall of diffs" to avoid,
+because there is no history of never-formatted files. In that case, enabling
+the formatter from the first commit is the simplest path: you never
+pay the cost of formatting everything at once, because every file starts
+formatted.
 
 ```jsonc
-// biome.jsonc — projeto novo, sem legado de formatação pra herdar
+// biome.jsonc — new project, no legacy formatting to inherit
 {
   "formatter": {
     "enabled": true
@@ -151,141 +151,140 @@ formatado.
 }
 ```
 
-## De aviso a erro: a promoção como ferramenta de migração
+## From warning to error: promotion as a migration tool
 
-Uma regra nova não nasce bloqueando ninguém. Ela entra em `"warn"` (aviso)
-em toda a base de código primeiro — o que deixa toda violação já existente
-visível, sem quebrar o build de ninguém. A partir daí, a contagem de avisos
-é um número real e rastreável, não um comentário do tipo "depois a gente
-aperta isso" que ninguém nunca mais revisita. Só quando essa contagem chega
-a zero é que a regra vira `"error"` — e fica assim.
+A new rule does not start by blocking anyone. It first enters as `"warn"`
+across the entire codebase — making every existing violation
+visible without breaking anyone's build. From there, the warning count
+is a real, trackable number, not a "we'll tighten this
+later" comment nobody ever revisits. Only when that count reaches
+zero does the rule become `"error"` — and stay that way.
 
 ```js
-// eslint.config.js (trecho)
+// eslint.config.js (excerpt)
 export default [
   {
     rules: {
-      // Regra nova, introduzida em "warn" pra deixar a contagem de
-      // violações visível sem travar ninguém agora. Vira "error"
-      // quando a contagem chegar a zero.
+      // New rule, introduced at "warn" to make the violation count
+      // visible without blocking anyone now. Becomes "error"
+      // when the count reaches zero.
       complexity: ["warn", 10],
     },
   },
 ];
 ```
 
-`complexity` é uma regra do próprio ESLint que mede a **complexidade
-ciclomática** de uma função: começa em 1 (o corpo da função, sem nenhum
-desvio de fluxo) e soma mais um ponto a cada desvio — cada `if`/`else if`,
-`case` de um `switch`, `&&`, `||`, `??`, laço (`for`/`while`) e operador
-ternário (`? :`). O `10` no exemplo é o teto total, base já incluída: a
-partir de 11 pontos, a função dispara a regra. Guarda esse número — ele
-volta no Exemplo 2, mais adiante, com uma das pegadinhas mais surpreendentes
-desse esquema todo.
+`complexity` is a built-in ESLint rule that measures a function's **cyclomatic
+complexity**: it starts at 1 (the function body with no
+control-flow branches) and adds a point for each branch — each `if`/`else if`,
+`case` in a `switch`, `&&`, `||`, `??`, loop (`for`/`while`), and ternary
+operator (`? :`). The `10` in this example is the total ceiling, including the base:
+at 11 points, the function triggers the rule. Remember that number — it
+returns in Example 2 below, with one of the most surprising pitfalls
+in this entire setup.
 
-Esse fluxo warn → error transforma uma promessa vaga numa migração com
-critério de sucesso verificável por comando — exatamente o processo
-detalhado em [ESLint warning burndown](../prompts/02-eslint-warning-burndown.md),
-que descreve como planejar e executar a zeragem de uma contagem de avisos
-sem introduzir mudanças silenciosas de comportamento pelo caminho.
+This warn → error workflow turns a vague promise into a migration with
+command-verifiable success criteria — exactly the process
+detailed in [ESLint warning burndown](../prompts/02-eslint-warning-burndown.md),
+which describes planning and executing a warning-count reduction to zero
+without introducing silent behavioral changes along the way.
 
-## Fronteiras de arquitetura: barrando importações entre camadas
+## Architecture boundaries: blocking imports between layers
 
-Regras de restrição de importação impedem que uma camada específica do
-código importe outra camada específica diretamente. Dois exemplos comuns:
-impedir que código de UI (telas, componentes) acesse um cliente de banco de
-dados direto, sem passar pela camada que deveria orquestrar isso; ou
-impedir que qualquer camada pule a camada de domínio e vá direto numa
-camada de infraestrutura de baixo nível. A ideia central: a dependência
-entre camadas só pode andar numa direção combinada — nunca na direção
-oposta, mesmo que tecnicamente desse pra escrever o import e ele
-funcionasse.
+Import-restriction rules prevent one specific code layer
+from directly importing another. Two common examples:
+preventing UI code (screens, components) from accessing a database
+client directly without going through the layer meant to orchestrate it; or
+preventing any layer from skipping the domain layer to reach
+low-level infrastructure directly. The central idea: dependencies
+between layers may only flow in an agreed direction — never in the
+opposite direction, even if the import could technically be written and
+work.
 
-Um truque útil quando parte dessas violações já existe espalhada pela base
-de código: registrar a **mesma** regra de restrição duas vezes, sob dois
-nomes diferentes, cada um com uma severidade diferente. Uma cópia fica em
-`"error"` — fronteiras que o time se comprometeu a nunca mais cruzar. A
-outra cópia, apontando pro mesmo tipo de violação, mas num conjunto
-diferente e já conhecido de arquivos antigos, fica em `"warn"` — visível,
-rastreada como dívida, sem travar a build inteira agora.
+A useful trick when some violations already exist throughout the
+codebase: register the **same** restriction rule twice under two
+different names, each with a different severity. One copy stays at
+`"error"` — boundaries the team has committed never to cross again. The
+other copy, targeting the same kind of violation but a different,
+already known set of old files, stays at `"warn"` — visible,
+tracked as debt, without blocking the entire build now.
 
-Isso funciona porque, no arquivo de configuração do ESLint, o bloco de
-regras é só um objeto chave-valor: você não pode escrever a mesma chave
-`"local/no-cross-layer-import"` duas vezes no mesmo bloco com severidades
-diferentes — a segunda simplesmente sobrescreveria a primeira. A saída é
-registrar a mesma função de regra sob dois nomes diferentes dentro do seu
-plugin local, e então usar cada nome com sua própria severidade:
+This works because, in ESLint's configuration file, the rules block
+is just a key-value object: you cannot write the same key
+`"local/no-cross-layer-import"` twice in one block with different
+severities — the second would simply overwrite the first. The solution is
+to register the same rule function under two different names in your
+local plugin, then use each name with its own severity:
 
 ```js
-// eslint-plugin-local/index.js — uma implementação, dois IDs de regra
+// eslint-plugin-local/index.js — one implementation, two rule IDs
 import noCrossLayerImport from "./rules/no-cross-layer-import.js";
 
 export default {
   rules: {
-    "no-cross-layer-import": noCrossLayerImport, // usada em "error"
-    "no-cross-layer-import-legacy": noCrossLayerImport, // usada em "warn"
+    "no-cross-layer-import": noCrossLayerImport, // used at "error"
+    "no-cross-layer-import-legacy": noCrossLayerImport, // used at "warn"
   },
 };
 ```
 
 ```js
-// eslint.config.js (trecho)
+// eslint.config.js (excerpt)
 import local from "./eslint-plugin-local/index.js";
 
 export default [
   {
     plugins: { local },
     rules: {
-      // Fronteiras que o time se comprometeu a nunca mais cruzar.
+      // Boundaries the team has committed never to cross again.
       "local/no-cross-layer-import": ["error", { from: "ui", to: "database" }],
-      // Mesma regra, mesma lógica — um conjunto diferente e já
-      // conhecido de violações, ainda sendo pago aos poucos. Visível,
-      // sem travar a build.
+      // Same rule, same logic — a different, already known set
+      // of violations still being paid down gradually. Visible,
+      // without blocking the build.
       "local/no-cross-layer-import-legacy": ["warn", { from: "ui", to: "infra-adapters" }],
     },
   },
 ];
 ```
 
-`from` e `to` nesse exemplo são opções ilustrativas — uma implementação
-real desse tipo de regra normalmente inspeciona cada nó `ImportDeclaration`
-da AST (a árvore que representa a estrutura do código; explicamos isso com
-mais calma na próxima seção), confere se o arquivo atual bate com o padrão
-de `from` e se o caminho importado bate com o padrão de `to`, e só reporta
-quando os dois batem ao mesmo tempo.
+`from` and `to` are illustrative options in this example — a real
+implementation of this kind of rule usually inspects each `ImportDeclaration`
+node in the AST (the tree representing code structure; explained more
+fully in the next section), checks whether the current file matches the
+`from` pattern and the imported path matches the `to` pattern, and reports
+only when both match simultaneously.
 
-Antes de escrever essa regra do zero, vale checar se um plugin pronto já
-resolve: `eslint-plugin-boundaries` e a regra `import/no-restricted-paths`
-do `eslint-plugin-import` cobrem esse mesmo problema pra boa parte dos
-casos comuns. Escrever uma regra própria compensa quando o formato de
-camadas do seu projeto foge do que esses plugins esperam — o que nos leva
-à próxima seção.
+Before writing this rule from scratch, check whether an existing plugin
+solves it: `eslint-plugin-boundaries` and `eslint-plugin-import`'s
+`import/no-restricted-paths` rule cover this same problem for many
+common cases. Writing your own rule pays off when your project's layer
+structure differs from what these plugins expect — which brings us
+to the next section.
 
-## Regras de lint caseiras
+## Custom lint rules
 
-Regra da comunidade cobre o caso geral. Cedo ou tarde, toda base de código
-de verdade esbarra numa lacuna que nenhum plugin publicado cobre — algo
-específico demais pro seu domínio pra alguém já ter escrito uma regra
-genérica pra isso. Nesse ponto, escrever uma regra pequena e caseira
-compensa mais do que continuar sem nenhuma checagem automática pra aquele
-anti-padrão. Categorias comuns de regra caseira — como exemplos
-ilustrativos da categoria, não uma lista fechada nem algo tirado de um
-projeto real específico:
+Community rules cover the general case. Sooner or later, every real
+codebase hits a gap no published plugin covers — something
+too specific to your domain for someone to have already written a generic
+rule for it. At that point, writing a small custom rule
+pays off more than continuing without any automated check for that
+anti-pattern. Common categories of custom rules — illustrative
+examples of the category, not a closed list or anything taken from a
+specific real project:
 
-- um teto de tamanho de linhas por arquivo;
-- uma proibição de `console.*` solto em código de produção;
-- uma proibição de acessar um cliente ou recurso de baixo nível fora da
-  camada que deveria ser a única com acesso a ele;
-- uma proibição de aritmética de ponto flutuante pra valores monetários
-  (`0.1 + 0.2` não dá exatamente `0.3` em ponto flutuante — valor de
-  dinheiro pede um tipo decimal ou centavos como inteiro, não `number`
-  direto);
-- uma regra exigindo checagem de autenticação antes de qualquer mutação
-  numa rota de API;
-- uma regra exigindo um limite máximo de caracteres em todo campo de texto
-  que o usuário preenche.
+- a maximum line count per file;
+- a ban on unwrapped `console.*` in production code;
+- a ban on accessing a low-level client or resource outside the
+  layer that should be its sole accessor;
+- a ban on floating-point arithmetic for monetary values
+  (`0.1 + 0.2` is not exactly `0.3` in floating point — money
+  requires a decimal type or integer cents, not a plain `number`);
+- a rule requiring authentication checks before any mutation
+  in an API route;
+- a rule requiring a maximum character limit on every text field
+  users fill in.
 
-A forma mínima de uma delas:
+The minimal shape of one:
 
 ```js
 // rules/no-console-in-production.js
@@ -296,7 +295,7 @@ module.exports = {
       "CallExpression[callee.object.name='console']"(node) {
         context.report({
           node,
-          message: "Use o logger compartilhado, não console.*, em código de produção.",
+          message: "Use the shared logger, not console.*, in production code.",
         });
       },
     };
@@ -304,51 +303,51 @@ module.exports = {
 };
 ```
 
-Pra quem nunca escreveu uma regra de ESLint, cada parte desse arquivo:
+For anyone who has never written an ESLint rule, each part of this file:
 
-- **`meta.type`** classifica a regra pro ESLint e pras ferramentas que
-  geram documentação a partir dela — `"problem"` significa "isso
-  provavelmente é um bug", diferente de `"suggestion"` (estilo) ou
-  `"layout"` (espaçamento).
-- **`create(context)`** é o corpo da regra. Ele devolve um objeto cujas
-  chaves são **seletores de AST**. Pense numa AST (*Abstract Syntax Tree*,
-  ou árvore de sintaxe abstrata) como o código decomposto numa árvore de
-  nós: uma chamada de função é um nó, uma declaração de variável é outro,
-  um `if` é outro. Um seletor de AST funciona parecido com um seletor CSS,
-  só que em vez de escolher elementos HTML ele escolhe nós dessa árvore.
-- **`"CallExpression[callee.object.name='console']"`** lê-se: "qualquer nó
-  do tipo *chamada de função*, cujo alvo da chamada é uma propriedade de um
-  objeto chamado literalmente `console`" — ou seja, `console.log(...)`,
-  `console.error(...)`, `console.warn(...)`, qualquer `console.<o-que-for>(...)`.
-- **`context.report({...})`** é o que efetivamente gera o aviso ou erro,
-  com a mensagem que o desenvolvedor vai ver no terminal ou no editor.
+- **`meta.type`** classifies the rule for ESLint and tools that
+  generate documentation from it — `"problem"` means "this
+  is probably a bug," unlike `"suggestion"` (style) or
+  `"layout"` (spacing).
+- **`create(context)`** is the rule body. It returns an object whose
+  keys are **AST selectors**. Think of an AST (*Abstract Syntax Tree*)
+  as code broken into a tree of
+  nodes: a function call is one node, a variable declaration another,
+  an `if` another. An AST selector works like a CSS selector,
+  except it selects nodes in this tree rather than HTML elements.
+- **`"CallExpression[callee.object.name='console']"`** reads: "any
+  *function call* node whose call target is a property of an
+  object literally named `console`" — meaning `console.log(...)`,
+  `console.error(...)`, `console.warn(...)`, any `console.<anything>(...)`.
+- **`context.report({...})`** actually generates the warning or error,
+  with the message the developer sees in the terminal or editor.
 
-Isso é o suficiente pra cobrir a maioria das regras caseiras simples —
-qualquer coisa mais elaborada, como a regra de fronteira de arquitetura da
-seção anterior, segue a mesma forma, só com um seletor mais específico e
-um pouco mais de lógica de checagem dentro do `create`.
+This is enough to cover most simple custom rules —
+anything more elaborate, such as the architecture-boundary rule in the
+previous section, follows the same shape, just with a more specific selector and
+a little more checking logic inside `create`.
 
-## Lint consciente de tipos, fora do caminho rápido
+## Type-aware lint, outside the fast path
 
-Regras "conscientes de tipos" (*type-aware*) são as que precisam da
-informação completa que só o compilador do TypeScript enxerga — não
-apenas a sintaxe de um arquivo isolado, mas o tipo real de cada valor,
-inferido a partir do projeto inteiro. É o tipo de regra capaz de perceber
-que uma função `async` está sendo chamada em algum lugar sem `await`, ou
-que uma comparação está comparando dois tipos que nunca poderiam ser
-iguais. Pra isso, o ESLint precisa montar um programa TypeScript completo
-por trás dos panos — o mesmo trabalho pesado que o `tsc` faz — o que é
-ordens de grandeza mais lento do que uma regra puramente sintática, que só
-olha a árvore de um arquivo por vez.
+Type-aware rules need complete information
+that only the TypeScript compiler sees — not
+just the syntax of an isolated file, but each value's actual type,
+inferred from the entire project. These rules can notice
+an `async` function called somewhere without `await`, or
+a comparison between two types that could never be
+equal. For this, ESLint needs to build a complete TypeScript program
+behind the scenes — the same heavy work `tsc` does — which is
+orders of magnitude slower than a purely syntactic rule that only
+looks at one file's tree at a time.
 
-Numa base de código grande, vale manter esse nível de checagem **fora** do
-script de lint padrão e fora do pre-commit hook (o script que roda
-automaticamente antes de cada commit ser criado, podendo bloqueá-lo) de
-propósito — senão todo commit, até o mais trivial, paga o custo de montar
-o programa TypeScript inteiro. Em vez disso, esse nível roda como comando
-manual separado, ou só na esteira de CI (integração contínua — o pipeline
-que roda automaticamente a cada push ou pull request, numa máquina separada
-da sua):
+In a large codebase, deliberately keep this checking level **outside**
+the default lint script and pre-commit hook (the script that runs
+automatically before each commit is created and can block it) —
+otherwise every commit, even the most trivial, pays the cost of building
+the entire TypeScript program. Instead, this level runs as a separate
+manual command or only in CI (continuous integration — the pipeline
+that runs automatically on each push or pull request on a machine separate
+from yours):
 
 ```json
 {
@@ -359,63 +358,63 @@ da sua):
 }
 ```
 
-`lint` roda rápido e pode travar commit — é o que todo mundo roda o tempo
-todo, sem pensar duas vezes. `lint:types` roda na CI (ou por comando manual,
-quando alguém realmente precisa), não em todo commit. Essa diferença de
-propósito entre os dois scripts é o que faz o esquema funcionar sem virar
-atrito: o rápido bloqueia cedo, o lento roda em segundo plano.
+`lint` runs quickly and can block commits — everyone runs it constantly
+without a second thought. `lint:types` runs in CI (or manually,
+when someone actually needs it), not on every commit. This difference in
+purpose between the scripts makes the setup work without becoming
+friction: the fast check blocks early, the slow one runs in the background.
 
-## Tutorial: montando esse esquema do zero, no seu projeto
+## Tutorial: building this setup from scratch in your project
 
-O resto do texto explicou o raciocínio por trás de cada peça. Essa seção
-monta as peças, em ordem, num projeto TypeScript novo — ajuste nomes de
-pacote e regras pro seu próprio framework onde for o caso.
+The text above explained the reasoning behind each piece. This section
+assembles them in order in a new TypeScript project — adjust package
+names and rules for your own framework where appropriate.
 
-Se preferir delegar esse tutorial inteiro pra um agente de código,
-[`07-eslint-complete-setup.md`](../prompts/07-eslint-complete-setup.md) é
-a versão em formato de prompt — cobre a mesma filosofia, mais fronteiras
-de arquitetura, regras caseiras e o tier de lint consciente de tipo,
-prontos pra colar num agente e adaptar aos placeholders do seu projeto.
+If you prefer delegating this entire tutorial to a coding agent,
+[`07-eslint-complete-setup.md`](../prompts/07-eslint-complete-setup.md) is
+the prompt version — covering the same philosophy, plus architecture
+boundaries, custom rules, and the type-aware lint tier,
+ready to paste into an agent and adapt to your project's placeholders.
 
-### 1. Instalar as duas ferramentas
+### 1. Install both tools
 
 ```bash
 npm install --save-dev eslint typescript typescript-eslint
 npm install --save-dev --save-exact @biomejs/biome
 ```
 
-`typescript-eslint` traz, num pacote só, o parser que ensina o ESLint a
-entender sintaxe TypeScript e os conjuntos de regras (incluindo as
-conscientes de tipo) que vamos usar no passo 4. O `--save-exact` no Biome
-fixa a versão exata no `package.json`, em vez de um intervalo — evita que
-uma regra mude de comportamento sozinha num `npm install` de outra pessoa,
-num dia qualquer, sem ninguém decidir isso de propósito.
+`typescript-eslint` provides, in one package, the parser that teaches ESLint
+to understand TypeScript syntax and the rule sets (including
+type-aware ones) we will use in step 4. Biome's `--save-exact`
+pins the exact version in `package.json` instead of a range — preventing a
+rule from changing behavior by itself during someone else's `npm install`
+on an arbitrary day without anyone deliberately choosing it.
 
-### 2. Iniciar e curar a configuração do Biome
+### 2. Initialize and curate the Biome configuration
 
 ```bash
 npx @biomejs/biome init
 ```
 
-Isso cria um `biome.json` (troque a extensão pra `.jsonc` — e ajuste a
-referência no `package.json` — se quiser poder escrever comentários) com o
-preset `"recommended"` ligado. Troque pra `"recommended": false` e
-adicione, um por um, só os grupos e regras que você realmente decidiu
-usar — como no exemplo curado da seção "Regras curadas no Biome, cobertura
-pesada no ESLint", mais acima. Comece pequeno: duas ou três regras de
-correção óbvia (`noUnusedVariables` é um bom primeiro passo) já valem mais
-do que duzentas regras que ninguém vai revisar uma por uma.
+This creates a `biome.json` (change the extension to `.jsonc` — and adjust the
+reference in `package.json` — if you want comments) with the
+`"recommended"` preset enabled. Change it to `"recommended": false` and
+add only the groups and rules you actually decided to use,
+one by one — as in the curated example in "Curated Biome rules,
+heavy coverage in ESLint" above. Start small: two or three obvious
+correctness rules (`noUnusedVariables` is a good first step) are already worth more
+than two hundred rules nobody will review individually.
 
-### 3. Decidir sobre o formatter
+### 3. Decide on the formatter
 
-Projeto novo, começando do zero agora? Deixe o formatter do Biome ligado
-desde o primeiro commit — é a opção padrão depois do `init`, e não custa
-nada num projeto que ainda não tem arquivo nenhum fora do padrão. Só
-desligue e documente o porquê (seção "O formatador desligado, de
-propósito", mais acima) se você estiver **importando** uma base de código
-grande e já existente que nunca passou por formatter nenhum.
+New project, starting from scratch now? Keep Biome's formatter enabled
+from the first commit — it is the default after `init`, and costs
+nothing in a project that has no nonconforming files yet. Only
+disable it and document why ("The formatter, deliberately
+disabled" above) if you are **importing** a large existing codebase
+that has never used a formatter.
 
-### 4. Configurar o ESLint com TypeScript e regras conscientes de tipo
+### 4. Configure ESLint with TypeScript and type-aware rules
 
 ```js
 // eslint.config.js
@@ -433,31 +432,31 @@ export default tseslint.config(
       },
     },
     rules: {
-      // Regras próprias entram aqui, por cima do que os presets já
-      // trazem — os presets são o ponto de partida, não a palavra
-      // final.
+      // Custom rules go here, on top of what the presets already
+      // provide — presets are a starting point, not the final
+      // word.
     },
   },
 );
 ```
 
-`tseslint.configs.recommendedTypeChecked` já traz as regras conscientes de
-tipo mais estabelecidas do ecossistema TypeScript. `parserOptions.projectService: true`
-é o que liga o motor de checagem de tipo por trás das regras — sem essa
-linha, qualquer regra que precise de tipo simplesmente não roda.
-`tsconfigRootDir: import.meta.dirname` diz pro ESLint onde fica a raiz do
-projeto, pra ele achar o `tsconfig.json` certo. Esse é o nível mais pesado
-do lint — o passo 6 mostra como mantê-lo fora do caminho rápido.
+`tseslint.configs.recommendedTypeChecked` already includes the TypeScript
+ecosystem's most established type-aware rules. `parserOptions.projectService: true`
+enables the type-checking engine behind the rules — without this
+line, any rule requiring types simply does not run.
+`tsconfigRootDir: import.meta.dirname` tells ESLint where the project root
+is so it can find the right `tsconfig.json`. This is lint's heavier
+level — step 6 shows how to keep it off the fast path.
 
-### 5. Instalar o plugin do seu framework, se tiver um
+### 5. Install your framework's plugin, if it has one
 
-Se o projeto usa React, Vue, ou outro framework com convenções próprias
-(regras de hooks, acessibilidade, convenções de rotas), instale o plugin
-de ESLint dele agora e estenda o mesmo array de configuração do passo 4.
-Esse plugin entra por cima dos presets base — mesma lógica de "presets são
-ponto de partida, não palavra final".
+If the project uses React, Vue, or another framework with its own conventions
+(hook rules, accessibility, route conventions), install its ESLint
+plugin now and extend the same configuration array from step 4.
+This plugin goes on top of the base presets — the same "presets are a
+starting point, not the final word" logic.
 
-### 6. Separar o script rápido do script consciente de tipo
+### 6. Separate the fast script from the type-aware script
 
 ```json
 {
@@ -468,26 +467,26 @@ ponto de partida, não palavra final".
 }
 ```
 
-Se você colocou as regras conscientes de tipo direto no `eslint.config.js`
-principal (passo 4), pode manter só um script — mas aí todo
-`npm run lint` paga o custo pesado. Pra times que sentem esse custo, o
-padrão mais comum é separar num segundo arquivo de configuração
-(`eslint.type-aware.config.js`, estendendo o principal) e só rodar
-`lint:types` na CI ou por comando manual. Veja "Lint consciente de tipos,
-fora do caminho rápido", mais acima, pro raciocínio completo.
+If you put type-aware rules directly in the main `eslint.config.js`
+(step 4), you can keep just one script — but then every
+`npm run lint` pays the heavy cost. For teams feeling that cost, the
+most common pattern is to separate them into a second configuration file
+(`eslint.type-aware.config.js`, extending the main one) and run
+`lint:types` only in CI or manually. See "Type-aware lint,
+outside the fast path" above for the full reasoning.
 
-<a id="7-conectar-o-lint-rápido-a-um-pre-commit-hook"></a>
+<a id="7-connect-fast-lint-to-a-pre-commit-hook"></a>
 
-### 7. Manter checks explícitos
+### 7. Keep checks explicit
 
-Execute lint pelos scripts do projeto. Este setup não instala hooks Git, gerenciadores de hooks, bloqueios de branch ou travas de push.
+Run lint through project scripts. This setup does not install Git hooks, hook managers, branch blocks, or push restrictions.
 
-Preserve hooks existentes. Se o usuário solicitar especificamente essa integração, use o mecanismo já adotado pelo projeto e mantenha lint com tipos fora do caminho rápido. Não imponha um novo hook como pré-requisito da configuração ESLint.
+Preserve existing hooks. If the user specifically requests this integration, use the mechanism already adopted by the project and keep type-aware lint off the fast path. Do not impose a new hook as a prerequisite for ESLint configuration.
 
-### 8. Introduzir a primeira regra nova em modo aviso
+### 8. Introduce the first new rule in warning mode
 
 ```js
-// eslint.config.js (trecho)
+// eslint.config.js (excerpt)
 export default [
   {
     rules: {
@@ -497,67 +496,67 @@ export default [
 ];
 ```
 
-Rode `npm run lint` e anote a contagem de avisos atual — esse número é o
-ponto de partida da migração, não um detalhe descartável. A partir daqui,
-siga o processo de [ESLint warning burndown](../prompts/02-eslint-warning-burndown.md)
-pra planejar a zeragem antes de trocar `"warn"` por `"error"`.
+Run `npm run lint` and record the current warning count — this number is the
+migration's starting point, not a disposable detail. From here,
+follow [ESLint warning burndown](../prompts/02-eslint-warning-burndown.md)
+to plan the reduction to zero before changing `"warn"` to `"error"`.
 
-### 9. Aplicar fronteiras de arquitetura, se o projeto tiver camadas
+### 9. Apply architecture boundaries if the project has layers
 
-Se o seu projeto já separa camadas (UI, domínio, infraestrutura, o que
-for) e você quer impedir que uma pule direto pra outra, siga a técnica de
-dupla severidade da seção "Fronteiras de arquitetura", mais acima — ou
-comece pelos plugins prontos (`eslint-plugin-boundaries`,
-`import/no-restricted-paths`) antes de escrever uma regra própria.
+If your project already separates layers (UI, domain, infrastructure, or
+otherwise) and you want to prevent one from jumping directly to another, follow the
+dual-severity technique in "Architecture boundaries" above — or
+start with existing plugins (`eslint-plugin-boundaries`,
+`import/no-restricted-paths`) before writing your own rule.
 
-### 10. Escrever sua primeira regra caseira, só quando fizer falta de verdade
+### 10. Write your first custom rule only when truly needed
 
-Não comece por aqui. Regra caseira é o último recurso da lista, depois de
-confirmar que nenhuma regra do Biome, do ESLint, ou de um plugin de
-comunidade já cobre o anti-padrão que você quer travar. Quando chegar essa
-hora, a seção "Regras de lint caseiras", mais acima, tem o formato mínimo
-de uma.
+Do not start here. A custom rule is the last resort, after
+confirming that no Biome, ESLint, or community plugin rule
+already covers the anti-pattern you want to block. When that time
+comes, "Custom lint rules" above shows the minimal
+shape of one.
 
-## Exemplos concretos: as pegadinhas na prática
+## Concrete examples: pitfalls in practice
 
-As cinco pegadinhas mais surpreendentes desse esquema de dois linters, uma
-por uma — o código que dispara o problema, o que está por trás do que o
-linter reporta, e como resolver de verdade, não só calar o aviso.
+The five most surprising pitfalls of this two-linter setup, one
+by one — the code triggering the problem, what lies behind the
+linter's report, and how to actually resolve it instead of merely silencing the warning.
 
-### Exemplo 1 — a regex "seguramente insegura"
+### Example 1 — the "safely unsafe" regex
 
-Uma regra de segurança comum tenta detectar regex vulnerável a **ReDoS**
-(*Regular Expression Denial of Service* — uma expressão regular que, pra
-certas entradas, trava exponencialmente mais tempo pra processar quanto
-maior a entrada). O jeito mais simples de implementar essa detecção é uma
-heurística: procurar por dois ou mais grupos de quantificador (`+`, `*`,
-`{n,m}`) na mesma expressão regular. Implementações desse tipo — a regra
-`security/detect-unsafe-regex`, do pacote `eslint-plugin-security`, é um
-exemplo conhecido — historicamente disparam nesse padrão mesmo quando cada
-quantificador já está bem delimitado.
+A common security rule tries to detect regexes vulnerable to **ReDoS**
+(*Regular Expression Denial of Service* — a regular expression that, for
+certain inputs, takes exponentially longer to process as the
+input grows). The simplest way to implement this detection is a
+heuristic: look for two or more quantifier groups (`+`, `*`,
+`{n,m}`) in the same regular expression. Implementations of this kind —
+`eslint-plugin-security`'s `security/detect-unsafe-regex` rule is a
+well-known example — historically trigger on this pattern even when each
+quantifier is already tightly bounded.
 
 ```js
-// Pode disparar a regra "regex insegura" mesmo sendo inofensiva: dois
-// grupos de quantificador em sequência na mesma expressão, cada um já
-// com um teto de repetição.
+// May trigger the "unsafe regex" rule despite being harmless: two
+// sequential quantifier groups in the same expression, each already
+// with a repetition ceiling.
 const CODE_PATTERN = /^[A-Z]{2,4}-[0-9]{1,6}$/;
 ```
 
-`{2,4}` e `{1,6}` já são limitados — não tem como essa regex reprocessar o
-mesmo trecho de string de forma exponencial, porque cada grupo tem um teto
-fixo de repetições. Mesmo assim, a heurística olha só pra forma sintática
-("quantificador em sequência com outro quantificador"), não pro tamanho
-real dos tetos, e marca como suspeita.
+`{2,4}` and `{1,6}` are already bounded — this regex cannot reprocess the
+same string segment exponentially because each group has a fixed
+repetition ceiling. Even so, the heuristic only looks at the syntactic shape
+("a quantifier followed by another quantifier"), not the actual
+size of the ceilings, and flags it as suspicious.
 
-O conserto que parece óbvio — apertar ainda mais os limites, trocando
-`{1,6}` por `{1,4}`, por exemplo — não resolve nada, porque a heurística
-nunca olhou pro tamanho do teto, só pra presença de dois grupos em
-sequência. O conserto de verdade é reestruturar em expressões separadas,
-cada uma com um único quantificador, e compor o resultado em código comum:
+The seemingly obvious fix — tightening the limits further, replacing
+`{1,6}` with `{1,4}`, for example — solves nothing, because the heuristic
+never looked at the ceiling's size, only at the presence of two sequential
+groups. The actual fix is restructuring into separate expressions,
+each with a single quantifier, and composing the result in ordinary code:
 
 ```js
-// Resolve de verdade: cada regex tem só um quantificador; a checagem
-// composta acontece em código comum, não numa regex só.
+// Actual fix: each regex has just one quantifier; the combined
+// check happens in ordinary code, not in a single regex.
 const PREFIX_PATTERN = /^[A-Z]{2,4}$/;
 const SUFFIX_PATTERN = /^[0-9]{1,6}$/;
 
@@ -569,20 +568,20 @@ function isValidCode(value) {
 }
 ```
 
-### Exemplo 2 — complexidade ciclomática inflada por encadeamento opcional
+### Example 2 — cyclomatic complexity inflated by optional chaining
 
-Regras de complexidade ciclomática, incluindo a `complexity` do ESLint
-usada no exemplo do warn → error mais acima, costumam contar encadeamento
-opcional (`?.`) como um ponto de ramificação completo — o mesmo peso de um
-`&&`, um `||`, ou um ternário. Faz sentido tecnicamente (`a?.b` é, por
-baixo dos panos, bem parecido com `a && a.b`), mas na prática pega gente de
-surpresa: uma função com vários acessos opcionais encadeados bate no teto
-de complexidade bem antes do que qualquer contagem visual de `if`/`else`
-sugeriria.
+Cyclomatic complexity rules, including ESLint's `complexity`
+used in the warn → error example above, often count optional
+chaining (`?.`) as a full branching point — the same weight as an
+`&&`, `||`, or ternary. This technically makes sense (`a?.b` is,
+under the hood, fairly similar to `a && a.b`), but in practice catches people
+by surprise: a function with several chained optional accesses reaches the
+complexity ceiling well before any visual count of `if`/`else`
+would suggest.
 
 ```js
-// Só tem UM "if" de verdade — mas, pra maioria dessas regras, cada
-// "?." e cada "??" também soma um ponto de ramificação.
+// There is only ONE actual "if" — but for most of these rules, each
+// "?." and each "??" also adds a branching point.
 function getShippingCity(order) {
   if (!order) return null;
 
@@ -590,71 +589,71 @@ function getShippingCity(order) {
     order.customer?.address?.city ??
     order.customer?.billingAddress?.city ??
     order.warehouse?.address?.city ??
-    "desconhecida"
+    "unknown"
   );
 }
 ```
 
-Contando do jeito que a maioria dessas regras conta — 1 de base pra função
-em si, mais 1 por desvio de fluxo —, essa função soma: 1 (base) + 1 (o
-`if`) + 6 (seis `?.`, dois por linha em três linhas) + 3 (três `??`, um por
-linha) = **11**. Isso já passa do teto de 10 configurado no exemplo do
-warn → error, lá em cima — a regra dispara nessa função, mesmo ela lendo
-como um `if` só, seguido de três alternativas de fallback.
+Counting the way most of these rules count — 1 base point for the function
+itself, plus 1 per control-flow branch — this function totals: 1 (base) + 1 (the
+`if`) + 6 (six `?.`, two per line on three lines) + 3 (three `??`, one per
+line) = **11**. That already exceeds the ceiling of 10 configured in the
+warn → error example above — the rule triggers on this function even though it reads
+like a single `if` followed by three fallback alternatives.
 
-A correção não é reescrever a lógica — é reconhecer que o teto de
-complexidade da regra precisa ser calibrado sabendo que `?.` e `??` também
-contam, e que uma função assim (fallback em cascata sobre campos
-opcionais) é candidata a virar uma pequena função utilitária testada à
-parte, em vez de uma corrente longa de `?.`/`??` dentro de um único
+The fix is not rewriting the logic — it is recognizing that the rule's
+complexity ceiling needs calibration with the knowledge that `?.` and `??` also
+count, and that such a function (cascading fallbacks over optional
+fields) is a candidate for a small utility function tested
+separately, instead of a long chain of `?.`/`??` in a single
 `return`.
 
-### Exemplo 3 — a extração que corrige um aviso e cria outro
+### Example 3 — the extraction that fixes one warning and creates another
 
-Um teto rígido de linhas por arquivo (por exemplo, 400 linhas) pode deixar
-vários arquivos sentados bem em cima do limite, sem nenhuma folga. Nesse
-cenário, uma extração de rotina — tirar um trecho de função e botar num
-arquivo separado pra resolver UM aviso de tamanho — pode empurrar o
-arquivo de destino da extração pra cima do próprio teto, criando uma
-violação nova, num arquivo que nem fazia parte do problema original.
+A strict line-count ceiling per file (for example, 400 lines) can leave
+several files sitting right at the limit without any headroom. In that
+scenario, a routine extraction — moving a function fragment into a
+separate file to resolve ONE size warning — can push the extraction's
+destination file above its own ceiling, creating a
+new violation in a file that was not even part of the original problem.
 
-- `arquivo-a.ts` — 399 linhas (1 linha de folga até o teto de 400)
-- `arquivo-b.ts` — 396 linhas (4 linhas de folga até o teto de 400)
+- `file-a.ts` — 399 lines (1 line of headroom under the 400 ceiling)
+- `file-b.ts` — 396 lines (4 lines of headroom under the 400 ceiling)
 
-Uma extração ingênua — mover uma função de `arquivo-a.ts` pra
-`arquivo-b.ts`, junto com um `import` novo, uma linha de export e uma
-linha em branco — pode tirar `arquivo-a.ts` do vermelho e empurrar
-`arquivo-b.ts` pra 401, 402 linhas. O aviso original some; um aviso novo
-aparece num arquivo que, até ali, nem estava na sua lista. Por isso a
-única forma confiável de saber se uma refatoração resolveu (ou criou) um
-problema de tamanho é rodar o linter de novo, depois da mudança — nunca
-contar linha manualmente, nem confiar numa estimativa de quanto a extração
-"deveria" render.
+A naive extraction — moving a function from `file-a.ts` to
+`file-b.ts`, together with a new `import`, an export line, and a
+blank line — can get `file-a.ts` out of the red and push
+`file-b.ts` to 401 or 402 lines. The original warning disappears; a new one
+appears in a file that was not even on your list. That is why the
+only reliable way to know whether a refactor solved (or created) a
+size problem is to rerun the linter after the change — never
+count lines manually or trust an estimate of how much the extraction
+"should" save.
 
-Quando o arquivo já está no teto, a ordem de preferência pra resolver, do
-mais barato pro mais caro:
+When a file is already at the ceiling, the order of preference, from
+cheapest to most expensive, is:
 
-1. **Um closure aninhado sem parâmetros** — uma função interna, declarada
-   dentro da que já existe, sem passar nada por parâmetro (ela já enxerga
-   tudo do escopo em volta). Custa poucas linhas e não mexe na assinatura
-   pública de nada.
-2. **Um closure de guarda** — extrair só a checagem de guarda
-   (`if (!condição) return`) pra uma função pequena, reduzindo repetição
-   sem tocar na lógica principal.
-3. **Compactar o código existente** — juntar linhas que só existem por
-   formatação (por exemplo, um `return` que podia estar na mesma linha da
-   condição), sem mudar nada de comportamento.
-4. **Dividir o arquivo em dois** — só como último recurso, porque cria um
-   arquivo novo, exige decidir um nome e um limite de responsabilidade
-   novos, e é o tipo de mudança que merece revisão própria, não um efeito
-   colateral de resolver um aviso de lint.
+1. **A nested closure with no parameters** — an inner function declared
+   inside the existing one without passing any parameters (it already sees
+   everything in the surrounding scope). Costs few lines and does not change
+   any public signature.
+2. **A guard closure** — extract only the guard check
+   (`if (!condition) return`) into a small function, reducing repetition
+   without touching the main logic.
+3. **Compact existing code** — combine lines that exist only for
+   formatting (for example, a `return` that could share the condition's
+   line), without changing any behavior.
+4. **Split the file in two** — only as a last resort, because it creates a
+   new file, requires a new name and responsibility
+   boundary, and is the kind of change deserving its own review, not a side
+   effect of fixing a lint warning.
 
-### Exemplo 4 — o tipo de retorno que muda sozinho ao extrair uma função
+### Example 4 — the return type that changes by itself when extracting a function
 
 ```ts
-// Escrito assim, inline, o TypeScript costuma inferir um tipo de
-// retorno bem preciso: a união discriminada por "status", sem "data"
-// nenhuma aparecendo (nem opcional) no branch de erro.
+// Written inline like this, TypeScript often infers a very precise
+// return type: the union discriminated by "status", with no "data"
+// appearing at all (not even optionally) in the error branch.
 const parseResult = (input: string) => {
   if (input.length === 0) {
     return { status: "error" as const };
@@ -662,17 +661,17 @@ const parseResult = (input: string) => {
   return { status: "ok" as const, data: input.trim() };
 };
 
-// Tipo inferido: (input: string) =>
+// Inferred type: (input: string) =>
 //   { status: "error" } | { status: "ok"; data: string }
 ```
 
-Quem chama essa função e faz `if (result.status === "ok")` ganha o
-estreitamento automático de tipo: dentro do `if`, o TypeScript sabe que
-`result.data` existe e é `string`, sem checagem extra nenhuma.
+A caller using `if (result.status === "ok")` gets automatic
+type narrowing: inside the `if`, TypeScript knows
+`result.data` exists and is a `string` without any extra check.
 
 ```ts
-// A MESMA lógica, extraída pra uma função nomeada separada — parece um
-// refactor puramente mecânico, sem risco.
+// The SAME logic, extracted into a separate named function — seems
+// like a purely mechanical, risk-free refactor.
 function parseInput(input: string) {
   if (input.length === 0) {
     return { status: "error" as const };
@@ -680,185 +679,185 @@ function parseInput(input: string) {
   return { status: "ok" as const, data: input.trim() };
 }
 
-// Em algumas situações, o tipo inferido perde a precisão por branch e
-// vira algo mais largo:
+// In some situations, the inferred type loses per-branch precision
+// and becomes broader:
 //   (input: string) => { status: "error" | "ok"; data?: string }
 ```
 
-O formato mudou de uma união discriminada de dois formatos distintos pra
-um formato único com um campo `data` opcional. Pro código que chama a
-função, isso é uma mudança silenciosa: `result.data` deixa de ser
-garantido dentro do `if (result.status === "ok")`, porque o TypeScript não
-tem mais dois formatos pra discriminar — tem um formato só, com um campo
-que pode ou não estar lá. Todo lugar que dependia do estreitamento
-automático ganha um erro de tipo — não no arquivo que você acabou de
-editar, mas em qualquer arquivo distante que chama essa função. Na hora da
-extração em si, nada acusa problema: o editor não sublinha nada, a própria
-função extraída compila limpo. O erro só aparece nos **call sites**
-(pontos de chamada), possivelmente em arquivos que você nem abriu.
+The shape changed from a discriminated union of two distinct shapes to
+a single shape with an optional `data` field. For calling code,
+this is a silent change: `result.data` is no longer
+guaranteed inside `if (result.status === "ok")`, because TypeScript no
+longer has two shapes to discriminate — it has one shape with a field
+that may or may not be there. Every place relying on automatic
+narrowing gets a type error — not in the file you just
+edited, but in any distant file calling that function. At the time of
+extraction itself, nothing flags a problem: the editor underlines nothing, and the
+extracted function compiles cleanly. The error appears only at **call sites**,
+possibly in files you never even opened.
 
-Isso não acontece sempre — depende de como cada função específica é
-escrita e de qual versão do compilador está em uso —, mas acontece com
-frequência suficiente pra virar hábito: antes de extrair uma função onde
-cada branch devolve um objeto literal com formato ligeiramente diferente,
-faça um grep por toda chamada dela primeiro, e depois da extração rode o
-typecheck do projeto inteiro — não só do arquivo que mudou — antes de
-considerar a extração pronta.
+This does not always happen — it depends on how each specific function is
+written and which compiler version is in use — but happens often
+enough to form a habit: before extracting a function where each
+branch returns an object literal with a slightly different shape,
+grep every caller first, and after extraction run the
+entire project's typecheck — not just the changed file — before
+considering the extraction complete.
 
-### Exemplo 5 — a propriedade abreviada que o script de análise não resolve
+### Example 5 — the shorthand property the analysis script cannot resolve
 
-Ferramentas customizadas que andam pela AST — por exemplo, um script feito
-em casa que varre o código procurando por um padrão específico usando a
-API do compilador do TypeScript ou o parser do ESLint — costumam tratar
-`{ x: valor }` (propriedade explícita) e `{ x }` (propriedade abreviada,
-quando o nome da propriedade é igual ao da variável) como se fossem
-estruturas diferentes na árvore, mesmo sendo semanticamente idênticas. Um
-script que sabe seguir o valor atribuído em `x: valor` mas não sabe que
-`{ x }` é exatamente a mesma coisa, só escrita de forma curta, vai deixar
-de detectar — ou de resolver o valor — em qualquer lugar que use a forma
-abreviada.
+Custom tools walking the AST — for example, a homemade script
+scanning code for a specific pattern using the
+TypeScript compiler API or ESLint parser — often treat
+`{ x: value }` (explicit property) and `{ x }` (shorthand property,
+when the property name matches the variable name) as
+different tree structures, even though they are semantically identical. A
+script that can follow the assigned value in `x: value` but does not know
+that `{ x }` is exactly the same thing, just written more briefly, will fail
+to detect — or resolve the value — anywhere using the shorthand
+form.
 
 ```js
 const port = 8080;
 
-// Um script de análise que só sabe ler a forma explícita encontra o
-// valor aqui sem problema:
-const configExplicito = { port: port };
+// An analysis script that only understands the explicit form finds
+// the value here without trouble:
+const explicitConfig = { port: port };
 
-// ...mas não resolve o valor aqui — mesmo sendo o MESMO "port", com o
-// MESMO valor, só escrito na forma abreviada:
-const configAbreviado = { port };
+// ...but cannot resolve the value here — despite being the SAME "port"
+// with the SAME value, just written in shorthand:
+const shorthandConfig = { port };
 ```
 
-Na AST, `{ port: port }` normalmente aparece como um nó `Property` com
-`key` e `value` sendo dois nós distintos (mesmo tendo o mesmo nome).
-`{ port }` também é um nó `Property`, mas com uma marcação
-`shorthand: true` — e um script escrito assumindo que sempre existe uma
-`key` e um `value` claramente separados pode não checar essa marcação, ou
-pode assumir, errado, que uma propriedade abreviada não carrega valor
-nenhum pra resolver. O resultado é uma ferramenta que passa nos testes que
-você escreveu (se todos usarem a forma explícita) e falha silenciosamente
-em produção, onde a forma abreviada é comum. Vale a pena escrever, de
-propósito, um caso de teste com propriedade abreviada em qualquer
-ferramenta de análise via API de compilador que você construir — não é um
-caso extremo raro, é a forma que a maioria dos desenvolvedores escreve por
-padrão quando o nome já bate.
+In the AST, `{ port: port }` normally appears as a `Property` node with
+`key` and `value` as two distinct nodes (even with the same name).
+`{ port }` is also a `Property` node, but with a
+`shorthand: true` marker — and a script written assuming clearly separate
+`key` and `value` nodes may not check this marker, or
+may wrongly assume a shorthand property carries no value
+to resolve. The result is a tool that passes the tests you
+wrote (if all use the explicit form) and fails silently
+in production, where shorthand is common. Deliberately write a
+test case with a shorthand property in any
+compiler-API analysis tool you build — this is not a
+rare edge case; it is the form most developers write by
+default when names already match.
 
-## Pegadinhas conhecidas (resumo rápido)
+## Known pitfalls (quick summary)
 
-Recapitulando os cinco exemplos acima, em formato de referência rápida —
-pra quando você já leu o raciocínio completo uma vez e só precisa lembrar
-o resumo.
+Recapping the five examples above as a quick reference —
+for when you have already read the full reasoning once and only need to recall
+the summary.
 
-- **Heurística de "regex insegura" pode disparar em qualquer expressão
-  regular com dois ou mais quantificadores em sequência**, mesmo quando
-  cada um já está bem delimitado. O conserto de verdade é reestruturar em
-  expressões separadas de quantificador único — apertar ainda mais os
-  limites não resolve nada, porque a heurística nunca olhou pro tamanho do
-  teto (Exemplo 1).
-- **Regra de complexidade ciclomática pode contar encadeamento opcional
-  (`?.`) como ponto de ramificação completo** — o mesmo peso de `&&`,
-  `||` ou um ternário. Uma função com vários `?.` encadeados bate no teto
-  de complexidade bem antes do que um "olhômetro" de `if`/`else`
-  sugeriria (Exemplo 2).
-- **Teto rígido de linhas por arquivo pode deixar arquivos exatamente no
-  limite, sem folga nenhuma.** Uma extração feita pra resolver um aviso
-  pode criar, sem querer, uma violação nova em outro arquivo. Sempre
-  reverifique com o linter de verdade depois de qualquer refatoração —
-  nunca contando linha manualmente. Ordem de preferência pra resolver:
-  closure aninhado sem parâmetro → closure de guarda → compactar código
-  existente → dividir o arquivo em dois, só como último recurso
-  (Exemplo 3).
-- **Função onde toda ramificação devolve um objeto literal pode ter o
-  tipo de retorno inferido mudando silenciosamente ao ser extraída pra uma
-  função nomeada separada.** Alguns cenários de inferência só preservam a
-  precisão por branch quando tudo fica inline, e perdem essa precisão numa
-  assinatura de função separada — quebrando o typecheck de quem chama,
-  longe do arquivo que você editou, sem nenhum aviso na hora da extração.
-  Sempre faça grep de todo ponto de chamada antes de extrair uma função
-  nesse formato (Exemplo 4).
-- **Script de análise via AST feito à mão pode não resolver valores
-  através de propriedades abreviadas de objeto** (`{ x }` vs. `{ x: x }`
-  explícito). Vale escrever um caso de teste dedicado pra isso em
-  qualquer ferramenta customizada via API de compilador que você
-  construir (Exemplo 5).
+- **An "unsafe regex" heuristic can trigger on any regular
+  expression with two or more sequential quantifiers**, even when
+  each is already tightly bounded. The actual fix is restructuring into
+  separate single-quantifier expressions — tightening the limits further
+  solves nothing because the heuristic never looked at the ceiling's
+  size (Example 1).
+- **A cyclomatic complexity rule may count optional chaining
+  (`?.`) as a full branching point** — the same weight as `&&`,
+  `||`, or a ternary. A function with several chained `?.` reaches the
+  complexity ceiling well before an eyeball count of `if`/`else`
+  suggests (Example 2).
+- **A strict per-file line ceiling can leave files exactly at the
+  limit without any headroom.** An extraction intended to fix a warning
+  can accidentally create a new violation in another file. Always
+  recheck with the actual linter after any refactor —
+  never by manually counting lines. Order of preference:
+  parameterless nested closure → guard closure → compact existing
+  code → split the file in two, only as a last resort
+  (Example 3).
+- **A function whose every branch returns an object literal may have its
+  inferred return type change silently when extracted into a
+  separate named function.** Some inference scenarios only preserve
+  per-branch precision inline and lose it in a separate
+  function signature — breaking callers' typechecks far
+  from your edited file, without any warning during extraction.
+  Always grep every call site before extracting a function
+  of this shape (Example 4).
+- **A handwritten AST analysis script may not resolve values
+  through shorthand object properties** (`{ x }` vs. explicit `{ x: x }`).
+  Write a dedicated test case for this in
+  any custom compiler-API tool you
+  build (Example 5).
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Preciso usar os dois linters, ou dá pra escolher só um?**
+**Do I need both linters, or can I choose just one?**
 
-Dá, tecnicamente — ESLint sozinho, com `typescript-eslint` e os plugins
-certos, cobre praticamente tudo que o Biome cobriria também. A divisão em
-duas ferramentas compensa principalmente pela velocidade: o Biome roda seu
-subconjunto pequeno de regras quase instantaneamente, o que faz sentido
-usar justamente nas checagens que você quer rodando o tempo inteiro, a
-cada salvamento de arquivo. Se seu projeto é pequeno, ou você prefere uma
-configuração só, ESLint sozinho funciona — você só abre mão do ganho de
-velocidade do Biome nas checagens mais frequentes.
+Technically, you can choose one — ESLint alone, with `typescript-eslint` and the right
+plugins, covers practically everything Biome would cover too. Splitting into
+two tools pays off mainly in speed: Biome runs its
+small rule subset almost instantly, making it suitable for
+checks you want running constantly on every
+file save. If your project is small or you prefer a single
+configuration, ESLint alone works — you only forgo Biome's speed
+advantage for the most frequent checks.
 
-**E se meu projeto for pequeno — vale a pena esse tanto de configuração?**
+**What if my project is small — is all this configuration worthwhile?**
 
-Pra um projeto pequeno, comece só com ESLint e um preset recomendado
-pronto (do próprio `typescript-eslint`, por exemplo) — sem curar regra por
-regra, sem separar tier consciente de tipo, sem regra caseira nenhuma.
-Essa divisão inteira em duas ferramentas com regras curadas resolve um
-problema de escala: muitos arquivos, muitos avisos, muito tempo de lint.
-Nenhum desses problemas existe ainda num projeto pequeno. Vale revisitar
-essa estrutura quando o `npm run lint` começar a demorar de verdade, ou
-quando o preset genérico começar a atrapalhar mais do que ajudar — não
-antes disso.
+For a small project, start with ESLint alone and an existing recommended
+preset (from `typescript-eslint`, for example) — no rule-by-rule
+curation, no separate type-aware tier, no custom rules.
+This entire split into two tools with curated rules solves a
+scale problem: many files, many warnings, long lint times.
+None of those problems exists yet in a small project. Revisit
+this structure when `npm run lint` starts taking significant time, or
+when the generic preset starts hindering more than helping — not
+before then.
 
-**Como decido se um anti-padrão vira regra customizada, ou se deixo sem
-checagem automática?**
+**How do I decide whether an anti-pattern needs a custom rule or can stay
+without an automated check?**
 
-Antes de escrever qualquer coisa: procure se um plugin de comunidade já
-cobre esse caso — pra fronteira de arquitetura, por exemplo,
-`eslint-plugin-boundaries` cobre boa parte antes de precisar de código
-próprio. Escreva uma regra caseira quando as três coisas forem verdade ao
-mesmo tempo: (1) nenhum plugin publicado cobre o caso; (2) o anti-padrão já
-causou um bug real, ou é específico o bastante do seu domínio (dinheiro,
-autenticação, um recurso de baixo nível) que vale travar antes que cause
-um; e (3) o padrão é mecânico o suficiente pra detectar via AST — se a
-checagem depende de julgamento humano ou de contexto de negócio que o
-código sozinho não expõe, uma regra de lint não é a ferramenta certa.
+Before writing anything, look for a community plugin that already
+covers the case — for architecture boundaries, for example,
+`eslint-plugin-boundaries` covers much of it before custom code
+is needed. Write a custom rule when all three conditions hold:
+(1) no published plugin covers the case; (2) the anti-pattern has already
+caused a real bug or is sufficiently specific to your domain (money,
+authentication, a low-level resource) to justify blocking it before it causes
+one; and (3) the pattern is mechanical enough to detect through an AST — if
+checking requires human judgment or business context the
+code alone does not expose, a lint rule is not the right tool.
 
-**Dá pra aplicar esse esquema todo de uma vez, num projeto grande que já
-existe?**
+**Can I apply this entire setup at once to a large existing
+project?**
 
-Não de uma vez — é basicamente o oposto do que esse documento defende. A
-sequência seria: primeiro, decidir sobre o formatter (ligar sofre o custo
-da parede de diffs; desligar e documentar é válido). Depois, instalar
-Biome e ESLint com um conjunto mínimo de regras que **já passam limpo**
-hoje — comece de onde a base de código realmente está, não de onde você
-gostaria que ela estivesse. Só então, uma regra nova de cada vez, sempre
-em `"warn"` primeiro, seguindo o processo de
-[ESLint warning burndown](../prompts/02-eslint-warning-burndown.md) até a
-contagem zerar, antes de promover pra `"error"`. Aplicar tudo de uma vez,
-incluindo regras que a base de código ainda viola em centenas de lugares,
-é a receita pra alguém desabilitar o linter inteiro na primeira
-sexta-feira de prazo apertado.
+Not all at once — that is essentially the opposite of what this document advocates. The
+sequence would be: first, decide on the formatter (enabling it pays the wall-of-diffs
+cost; disabling it with documentation is valid). Then install
+Biome and ESLint with a minimal set of rules that **already pass cleanly**
+today — start where the codebase actually is, not where you
+wish it were. Only then add one new rule at a time, always
+at `"warn"` first, following
+[ESLint warning burndown](../prompts/02-eslint-warning-burndown.md) until the
+count reaches zero before promoting to `"error"`. Applying everything at once,
+including rules the codebase still violates in hundreds of places,
+is a recipe for someone to disable the entire linter on the first
+Friday with a tight deadline.
 
-## O caminho executável: os arquivos prontos
+## The executable path: ready-made files
 
-Tudo acima é o raciocínio — por que duas ferramentas, por que aviso vira
-erro, por que a fronteira de arquitetura mora no lint. Se você quer o
-resultado sem reconstruir o raciocínio, os arquivos que rodam estão em
-[`templates/eslint/`](../../templates/eslint/): as três regras próprias já
-escritas e testadas (teto de tamanho de arquivo, console direto, acesso
-direto ao banco a partir da camada de apresentação), os dois esqueletos de
-configuração, e um verificador que prova que a cópia chegou íntegra.
+Everything above is the reasoning — why two tools, why warnings become
+errors, why architecture boundaries belong in lint. If you want the
+result without reconstructing the reasoning, the runnable files are in
+[`templates/eslint/`](../../templates/eslint/): the three custom rules already
+written and tested (file-size ceiling, direct console use, direct
+database access from the presentation layer), the two configuration
+skeletons, and a verifier proving the copy arrived intact.
 
-Você não precisa ler esses arquivos pra usá-los. Dois prompts fazem o
-trabalho, nessa ordem:
+You do not need to read these files to use them. Two prompts do the
+work in this order:
 
 1. [`08-eslint-quality-gates-install.md`](../prompts/08-eslint-quality-gates-install.md)
-   — o agente baixa as regras, adapta a configuração pra estrutura real do
-   seu projeto, roda o verificador e reporta quantas violações existem por
-   regra. Ele não conserta nada.
-2. [`09-file-size-refactor.md`](../prompts/09-file-size-refactor.md) — o
-   agente pega os arquivos que estouraram o teto de 350 linhas e os quebra
-   em módulos menores, um arquivo por vez, com testes rodando entre cada
-   um.
+   — the agent downloads the rules, adapts configuration to your
+   project's actual structure, runs the verifier, and reports violation counts per
+   rule. It does not fix anything.
+2. [`09-file-size-refactor.md`](../prompts/09-file-size-refactor.md) — the
+   agent takes files exceeding the 350-line ceiling and breaks them
+   into smaller modules, one file at a time, with tests running between
+   each.
 
-O primeiro instala a régua e mede; o segundo é o trabalho que a medição
-revelou.
+The first installs the measuring stick and measures; the second is the work that
+measurement revealed.

@@ -1,76 +1,76 @@
-# Skills Vercel por projeto
+# Vercel skills per project
 
-[agent-skills](https://github.com/vercel-labs/agent-skills) contém as skills. [skills](https://github.com/vercel-labs/skills) fornece a CLI `npx skills` e a skill `find-skills`. São funções diferentes; instalar a CLI não instala a coleção automaticamente.
+[agent-skills](https://github.com/vercel-labs/agent-skills) contains the skills. [skills](https://github.com/vercel-labs/skills) provides the `npx skills` CLI and `find-skills` skill. These serve different purposes; installing the CLI does not automatically install the collection.
 
-Catálogo conferido em **14 de outubro de 2026**, usando os `SKILL.md` e a listagem da CLI. Nomes abaixo são os campos `name`, que podem diferir dos nomes das pastas ou dos títulos do README. Confira novamente antes de atualizar.
+Names below are the `name` fields, which may differ from folder names or README titles. Discover the current upstream catalog before installation or updates; the [validation report](../05-toolkit-validation.md) records dated evidence.
 
-## Catálogo completo
+## Web and mobile catalog
 
-| Skill instalável | Uso e momento do fluxo | Bootstrap Next web |
+| Installable skill | Purpose and workflow stage | Next web bootstrap |
 |---|---|---|
-| [`vercel-react-best-practices`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md) | Ao escrever/revisar React e Next: dados, execução paralela, bundle, servidor e renderização | Instalar; aplicar desde a implementação |
-| [`vercel-composition-patterns`](https://github.com/vercel-labs/agent-skills/blob/main/skills/composition-patterns/SKILL.md) | Ao estruturar componentes e suas APIs; reutilizar composição quando existir necessidade concreta | Instalar; não criar biblioteca de componentes antecipadamente |
-| [`web-design-guidelines`](https://github.com/vercel-labs/agent-skills/blob/main/skills/web-design-guidelines/SKILL.md) | Revisão de interface: acessibilidade, teclado, foco, formulários, estados e desempenho | Instalar; revisar telas antes de concluir mudanças de UI |
-| [`writing-guidelines`](https://github.com/vercel-labs/agent-skills/blob/main/skills/writing-guidelines/SKILL.md) | Revisão de documentação e prosa conforme o handbook; ajustar ao idioma e ao público do projeto | Instalar; revisar documentação entregue |
-| [`vercel-react-view-transitions`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-view-transitions/SKILL.md) | Quando houver transições solicitadas; conferir versão React/Next e movimento reduzido | Instalar; não ativar API experimental ou animações automaticamente |
-| [`vercel-optimize`](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) | Após existir projeto Vercel e métricas: custo, cache, funções e desempenho | Instalar; executar auditoria quando houver acesso e tarefa pertinente |
-| [`deploy-to-vercel`](https://github.com/vercel-labs/agent-skills/blob/main/skills/deploy-to-vercel/SKILL.md) | Publicação ou preview solicitados pelo usuário; conferir método e conta de destino | Instalar; não executar durante o bootstrap |
-| [`vercel-cli-with-tokens`](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-cli-with-tokens/SKILL.md) | Operações Vercel que já utilizem autenticação por token | Instalar; usar apenas quando esse método for escolhido, sem gravar tokens no repo/chat |
-| [`vercel-react-native-skills`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-native-skills/SKILL.md) | React Native e Expo: listas, gestos, animação e APIs nativas | Opcional; instalar somente para plataforma mobile |
-| [`find-skills`](https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md) | Descobrir uma capacidade adicional quando a base instalada não atender a uma necessidade | Instalar; descoberta não autoriza instalar extras indiscriminadamente |
+| [`vercel-react-best-practices`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md) | When writing/reviewing React and Next: data, parallel execution, bundles, server, and rendering | Install; apply from implementation onward |
+| [`vercel-composition-patterns`](https://github.com/vercel-labs/agent-skills/blob/main/skills/composition-patterns/SKILL.md) | When structuring components and their APIs; reuse composition when there is a concrete need | Install; do not create a component library in advance |
+| [`web-design-guidelines`](https://github.com/vercel-labs/agent-skills/blob/main/skills/web-design-guidelines/SKILL.md) | Interface review: accessibility, keyboard, focus, forms, states, and performance | Install; review screens before completing UI changes |
+| [`writing-guidelines`](https://github.com/vercel-labs/agent-skills/blob/main/skills/writing-guidelines/SKILL.md) | Review documentation and prose against the handbook; adapt to project language and audience | Install; review delivered documentation |
+| [`vercel-react-view-transitions`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-view-transitions/SKILL.md) | When transitions are requested; check React/Next versions and reduced motion | Install; do not automatically enable experimental APIs or animations |
+| [`vercel-optimize`](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-optimize/SKILL.md) | Once a Vercel project and metrics exist: cost, caching, functions, and performance | Install; audit when access and a relevant task exist |
+| [`deploy-to-vercel`](https://github.com/vercel-labs/agent-skills/blob/main/skills/deploy-to-vercel/SKILL.md) | Publishing or previews requested by the user; check the method and target account | Install; do not run during bootstrap |
+| [`vercel-cli-with-tokens`](https://github.com/vercel-labs/agent-skills/blob/main/skills/vercel-cli-with-tokens/SKILL.md) | Vercel operations already using token authentication | Install; use only when this method is selected, without storing tokens in the repository/chat |
+| [`vercel-react-native-skills`](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-native-skills/SKILL.md) | React Native and Expo: lists, gestures, animation, and native APIs | Optional; install only for mobile platforms |
+| [`find-skills`](https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md) | Discover an additional capability when the installed foundation cannot meet a need | Install; discovery does not authorize indiscriminate extra installations |
 
-Este catálogo registra as **oito skills web de `agent-skills` mais `find-skills`** verificadas nesta revisão. Em cada bootstrap, confira o upstream: incorpore skills web oficiais novas pertinentes, ajuste nomes removidos/renomeados e registre a escolha. Não trate essa quantidade como contrato eterno. A skill mobile fica documentada, sem trazer recomendações de Expo para uma aplicação web. Skills de deploy ficam disponíveis para tarefas futuras; nenhum comando de publicação roda no setup.
+Check upstream during every bootstrap: incorporate relevant official web skills, reconcile removed/renamed names, and record the selection. The mobile skill applies to its platform. Deployment skills remain available for requested tasks; setup does not publish. The broader [tool catalog](README.md#select-by-scope) adds Next.js runtime/bundle workflows, PostgreSQL, CI repair, security review, shadcn, and Sentry according to project needs.
 
-## Instalação local
+## Local installation
 
-Na raiz do projeto, confira o catálogo atual:
+At the project root, check the current catalog:
 
 ```bash
 npx --yes skills@latest add vercel-labs/agent-skills --list
 npx --yes skills@latest add vercel-labs/skills --list
 ```
 
-Para um projeto utilizado com Claude Code e Codex:
+For a project used with Claude Code and Codex:
 
 ```bash
 npx --yes skills@latest add vercel-labs/agent-skills --skill vercel-react-best-practices vercel-composition-patterns web-design-guidelines writing-guidelines vercel-react-view-transitions vercel-optimize deploy-to-vercel vercel-cli-with-tokens --agent codex claude-code --yes
 npx --yes skills@latest add vercel-labs/skills --skill find-skills --agent codex claude-code --yes
 ```
 
-Sem `--global`/`-g`: instalação pertence ao projeto. `--agent` seleciona clientes, não modelos. Se usar apenas um cliente, selecione apenas ele; para outro agente suportado, use seu identificador documentado pela CLI. Evite `--all`, que também seleciona plataformas e clientes não necessários.
+Without `--global`/`-g`, installation belongs to the project. `--agent` selects clients, not models. If you use one client, select only that one; for another supported agent, use its CLI-documented identifier. Avoid `--all`, which also selects unnecessary platforms and clients.
 
-Adicional para projetos React Native/Expo:
+Additional installation for React Native/Expo projects:
 
 ```bash
 npx --yes skills@latest add vercel-labs/agent-skills --skill vercel-react-native-skills --agent codex claude-code --yes
 ```
 
-O layout padrão usa `.agents/skills/` como conteúdo canônico e links nos caminhos dos clientes quando necessário. Confira os caminhos efetivos da versão instalada. Versione conteúdo, links **relativos** e `skills-lock.json`; preserve atribuição/licenças dos arquivos. Não use links absolutos para caches do computador. No Windows, acrescente `--copy` aos comandos para evitar junctions com destinos absolutos; use o mesmo modo em clientes sem suporte a links. Registre essa escolha e atualize as cópias pela CLI.
+The default layout uses `.agents/skills/` for canonical content and links in client paths where needed. Check the actual paths for the installed version. Version content, **relative** links, and `skills-lock.json`; preserve attribution and licenses. Do not use absolute links to machine caches. On Windows, add `--copy` to avoid junctions with absolute targets; use the same mode for clients without link support. Record this choice and update copies through the CLI.
 
-Antes de instalar, inventarie skills e plugins locais/globais. Uma skill com o mesmo `name` pode aparecer duplicada; no Codex, arquivos homônimos não são mesclados. Resolva sobreposição no escopo do projeto, sem apagar preferências globais de outros projetos. Fonte: [descoberta oficial do Codex](https://learn.chatgpt.com/docs/build-skills).
+Before installing, inventory local/global skills and plugins. A skill with the same `name` can appear twice; Codex does not merge identically named files. Resolve overlap within the project scope without deleting global preferences used by other projects. Source: [official Codex discovery](https://learn.chatgpt.com/docs/build-skills).
 
-## Fluxo de uso
+## Usage workflow
 
-1. **Entender:** `PRODUCT.md`, Context7 para APIs atuais e Superpowers quando o pedido exigir design/plano.
-2. **Construir:** Ponytail mantém escopo; `vercel-react-best-practices` orienta Next/React; `vercel-composition-patterns` entra em decisões de componentes.
-3. **Revisar:** lint, tipos, testes pertinentes e build; `web-design-guidelines` para UI e `writing-guidelines` para documentação.
-4. **Refinar quando solicitado:** `vercel-react-view-transitions` para animações compatíveis; `find-skills` se faltar uma capacidade concreta.
-5. **Publicar quando solicitado:** `deploy-to-vercel` ou `vercel-cli-with-tokens`, conforme o método escolhido. Depois, `vercel-optimize` trabalha com métricas disponíveis.
+1. **Understand:** `PRODUCT.md`, Context7 for current APIs, and Superpowers when the request requires design/planning.
+2. **Build:** Ponytail maintains scope; `vercel-react-best-practices` guides Next/React; `vercel-composition-patterns` informs component decisions.
+3. **Review:** lint, types, relevant tests, and build; `web-design-guidelines` for UI and `writing-guidelines` for documentation.
+4. **Refine when requested:** `vercel-react-view-transitions` for compatible animations; `find-skills` when a concrete capability is missing.
+5. **Publish when requested:** `deploy-to-vercel` or `vercel-cli-with-tokens`, according to the chosen method. Afterward, `vercel-optimize` uses available metrics.
 
-Instruções explícitas do usuário prevalecem sobre padrões das skills. Nenhuma skill autoriza escolher outro modelo, exigir um agente específico, criar dependências preventivas ou publicar sem pedido.
+Explicit user instructions override skill defaults. No skill authorizes choosing another model, requiring a particular agent, adding preventive dependencies, or publishing without a request.
 
-## Verificar e atualizar
+## Verify and update
 
 ```bash
 npx --yes skills@latest list --agent codex claude-code
 ```
 
-Compare a lista com o catálogo, confira frontmatter e links, e registre o resultado em `docs/setup.md`. Abra uma nova sessão de cada cliente usado e confira descoberta quando o host permitir. Arquivos presentes comprovam instalação; não comprovam execução da skill pelo cliente.
+Compare the list with the catalog, check frontmatter and links, and record the result in `docs/setup.md`. Open a new session for each client used and check discovery when the host allows it. Files on disk prove installation, not skill execution by the client.
 
-Para uma atualização deliberada do projeto:
+For an intentional project update:
 
 ```bash
 npx --yes skills@latest update --project --yes
 ```
 
-Confira `--help` antes de usar opções em outra versão. Não presuma que comandos antigos, como `skills check`, existam na CLI atual. Revise diff e `skills-lock.json`, valide os fluxos afetados e mantenha a versão/revisão observada no relatório. Não atualize skills globais como efeito de uma atualização local.
+Check `--help` before using options in another version. Do not assume older commands, such as `skills check`, exist in the current CLI. Review the diff and `skills-lock.json`, validate affected workflows, and include the observed version/revision in the report. Do not update global skills as a side effect of a local update.

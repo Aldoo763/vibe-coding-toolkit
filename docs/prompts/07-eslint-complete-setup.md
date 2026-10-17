@@ -1,77 +1,68 @@
-# Setup completo de ESLint
+# Complete ESLint setup
 
-## Quando usar
+## When to use
 
-Use este prompt quando você precisa CONFIGURAR ESLint do zero, ou revisar
-e modernizar uma configuração existente aplicando uma filosofia opinativa
-e completa — não pra zerar avisos acumulados numa base que já tem lint
-configurado (isso é o [`02-eslint-warning-burndown.md`](02-eslint-warning-burndown.md),
-um prompt diferente, complementar a este). Três cenários típicos: um
-projeto novo que ainda não tem lint nenhum; um projeto com uma
-configuração antiga, herdada ou bagunçada, que precisa de uma reforma
-completa; ou você simplesmente quer adotar essa filosofia específica
-(`error` pra bug real ou coisa sempre insegura, `warn` pra pressão de
-refatoração, regras caseiras pra invariantes de domínio que nenhum
-plugin genérico cobre) no lugar da configuração que já existe.
+Use this prompt when you need to CONFIGURE ESLint from scratch, or review
+and modernize an existing configuration with a comprehensive, opinionated
+philosophy — not to clear accumulated warnings in a codebase with lint
+already configured (that is [`02-eslint-warning-burndown.md`](02-eslint-warning-burndown.md),
+a different, complementary prompt). Three typical scenarios: a new project
+with no lint yet; a project with an old, inherited or messy configuration
+needing a complete overhaul; or simply wanting this particular philosophy
+(`error` for real bugs or anything always unsafe, `warn` for refactoring
+pressure, custom rules for domain invariants no generic plugin covers) to
+replace the existing configuration.
 
 > [!TIP]
-> Se você quer o resultado em vez do raciocínio, existe um caminho mais
-> curto: o [`08-eslint-quality-gates-install.md`](08-eslint-quality-gates-install.md)
-> aponta o agente pras três regras próprias já escritas e testadas em
-> [`templates/eslint/`](../../templates/eslint/) — ele copia em vez de
-> escrever, então o resultado é sempre o mesmo código. Este prompt aqui
-> continua sendo o caminho certo quando você quer que o agente monte a
-> configuração raciocinando sobre a sua stack inteira, incluindo as regras
-> específicas de framework que o 08 deixa de fora de propósito.
+> If you want the result instead of the reasoning, there is a shorter path:
+> [`08-eslint-quality-gates-install.md`](08-eslint-quality-gates-install.md)
+> points the agent to three custom rules already written and tested in
+> [`templates/eslint/`](../../templates/eslint/) — it copies instead of
+> writing, so the result is always the same code. This prompt remains the
+> right path when you want the agent to build the configuration by reasoning
+> about your entire stack, including framework-specific rules that 08
+> deliberately leaves out.
 
-## Por que funciona
+## Why it works
 
-A filosofia central se resume a quatro decisões. Primeiro, só dois
-níveis de severidade existem: `error` pra tudo que é sempre bug ou
-sempre inseguro — nunca uma questão de gosto — e `warn` pra pressão de
-refatoração e heurísticas com uma taxa real de falso positivo, que
-nunca deveriam travar um commit ou derrubar a CI. Segundo, formatação
-fica inteiramente fora do ESLint — aspas, ponto e vírgula, quebra de
-linha são trabalho de um formatter separado (Prettier, Biome, dprint),
-nunca duplicado aqui. Terceiro, lint consciente de tipo (`type-aware`)
-vira um tier separado, só em `warn`, nunca bloqueante — é poderoso
-demais pro que custa: lento e consumidor de memória o bastante pra
-derrubar um runner de CI com heap limitado num projeto grande. Quarto,
-um pequeno número de regras caseiras cobre invariantes de arquitetura
-ou de domínio que nenhuma regra pronta de mercado expressa — sempre
-como último recurso, só depois de confirmar que nenhum plugin publicado
-já resolve o caso.
+The core philosophy comes down to four decisions. First, there are only two
+severity levels: `error` for anything always buggy or unsafe — never a
+matter of taste — and `warn` for refactoring pressure and heuristics with a
+real false-positive rate, which should never block a commit or fail CI.
+Second, formatting stays entirely outside ESLint — quotes, semicolons and
+line breaks belong to a separate formatter (Prettier, Biome, dprint), never
+duplicated here. Third, type-aware linting becomes a separate, `warn`-only,
+nonblocking tier — powerful but costly: slow and memory-hungry enough to
+crash a heap-constrained CI runner on a large project. Fourth, a small
+number of custom rules cover architecture or domain invariants that no
+off-the-shelf rule expresses — always as a last resort, only after
+confirming no published plugin already solves the case.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[BUILD_OUTPUT_DIRS]` / `[GENERATED_CODE_DIRS]` / `[AI_HARNESS_DIRS]`**
-  — pastas a ignorar, específicas do seu projeto: saída de build
-  (`.next/**`, `dist/**`...), código gerado (`drizzle/**`,
-  `prisma/generated/**`...), e a pasta de um harness de IA em-repo
-  (`.claude/**`), se houver.
-- **`[RAW_LIBRARY]` / `[YOUR_WRAPPER]`** — se o seu projeto baniu alguma
-  dependência crua em favor de um wrapper próprio (ex.: proibir importar
-  uma lib de datas diretamente porque o projeto tem seu próprio módulo
-  de datas), o nome da lib banida e do wrapper que a substitui.
-- **`[YOUR_DB_CLIENT_NAME]`** — o nome do seu cliente Drizzle, se o
-  projeto usa Drizzle (usado nas regras `enforce-delete-with-where` e
-  `enforce-update-with-where`).
-- **`[YOUR_REACT_MAJOR]`** — a versão major do React instalada no
-  projeto.
-- **`[BOOTSTRAP_FILES]`** — arquivos que são exceção deliberada de
-  alguma regra caseira, tipicamente o bootstrap de logging (o único
-  lugar com permissão de usar `console.*` direto).
-- **`[UI_LAYER_GLOB]` / `[DB_CLIENT_ENTRYPOINT]`** — se o seu projeto
-  tem fronteiras de arquitetura pra proteger (ex.: UI não pode importar
-  o cliente de banco direto), o glob da camada de UI e o caminho de
-  entrada do cliente de banco.
-- **`[YOUR_SWITCH_COMPONENT]`** — se o projeto usa um design system
-  próprio, o componente de switch/toggle dele (usado na regra
-  `jsx-a11y/label-has-associated-control`).
-- **`[FORMATTER]`** — qual formatter o projeto usa: `prettier`, `biome`
-  ou `dprint`.
+- **`[BUILD_OUTPUT_DIRS]` / `[GENERATED_CODE_DIRS]` / `[AI_HARNESS_DIRS]`** —
+  project-specific folders to ignore: build output (`.next/**`, `dist/**`...),
+  generated code (`drizzle/**`, `prisma/generated/**`...), and an in-repo AI
+  harness folder (`.claude/**`), if any.
+- **`[RAW_LIBRARY]` / `[YOUR_WRAPPER]`** — if your project bans a raw
+  dependency in favor of its own wrapper (e.g. banning direct imports of a
+  date library because the project has its own date module), the name of
+  the banned library and its replacement wrapper.
+- **`[YOUR_DB_CLIENT_NAME]`** — your Drizzle client name, if the project uses
+  Drizzle (used in `enforce-delete-with-where` and `enforce-update-with-where`).
+- **`[YOUR_REACT_MAJOR]`** — the React major version installed in the project.
+- **`[BOOTSTRAP_FILES]`** — files deliberately exempted from a custom rule,
+  typically the logging bootstrap (the only place allowed to use
+  `console.*` directly).
+- **`[UI_LAYER_GLOB]` / `[DB_CLIENT_ENTRYPOINT]`** — if your project has
+  architecture boundaries to protect (e.g. UI cannot import the database
+  client directly), the UI layer glob and the database client entry path.
+- **`[YOUR_SWITCH_COMPONENT]`** — if the project uses its own design system,
+  its switch/toggle component (used in `jsx-a11y/label-has-associated-control`).
+- **`[FORMATTER]`** — which formatter the project uses: `prettier`, `biome`
+  or `dprint`.
 
-## O prompt
+## The prompt
 
 ````
 # ESLint Setup Prompt — Portable
@@ -580,49 +571,43 @@ Run the lint command for real, read the actual output, and fix or consciously re
   non-default tier (§8), for the OOM/latency reasons stated there.
 ````
 
-## Exemplo de uso
+## Usage example
 
-Imagine um projeto novo em Next.js + TypeScript + Drizzle que nunca
-teve ESLint configurado — só o linter que vem de fábrica no
-`create-next-app`, nunca customizado. Você preencheria os placeholders
-mais ou menos assim:
+Imagine a new Next.js + TypeScript + Drizzle project that has never had
+ESLint configured — only the default linter from `create-next-app`, never
+customized. Fill in the placeholders roughly as follows:
 
 - `[BUILD_OUTPUT_DIRS]` → `.next/**`
 - `[GENERATED_CODE_DIRS]` → `drizzle/**`
 - `[YOUR_DB_CLIENT_NAME]` → `db`
 - `[YOUR_REACT_MAJOR]` → `19`
 - `[FORMATTER]` → `biome`
-- `[UI_LAYER_GLOB]` / `[DB_CLIENT_ENTRYPOINT]` → só preenche se o
-  projeto já separa camadas de UI e acesso a dados; senão, pula a §6
-  inteira
+- `[UI_LAYER_GLOB]` / `[DB_CLIENT_ENTRYPOINT]` → fill in only if the project
+  already separates UI and data-access layers; otherwise skip all of §6
 
-O agente detecta a stack (§0: TypeScript + React/Next.js + Drizzle,
-então mantém a camada `typescript-eslint`, os plugins de React/a11y e a
-regra de guarda do Drizzle), instala as dependências certas (§1), e
-monta um `eslint.config.mjs` completo seguindo o esqueleto do §2 — com
-a filosofia de dois níveis do §3, os ignores do §4, o orçamento de
-complexidade do §5, e as regras caseiras do §7 que fizerem sentido pro
-projeto (pelo menos a §7.1, o teto de linhas por arquivo, e a §7.2, a
-proibição de `console.log` direto). Como o projeto mexe com Drizzle mas
-ainda não tem fronteiras de camada nem componente de texto próprio, as
-§6 e §7.5 ficam de fora. O resultado esperado é um `eslint.config.mjs`
-rodável de verdade — não um esqueleto com `TODO` — mais,
-opcionalmente, um `eslint.typed.config.mjs` com as regras conscientes
-de tipo do §8, num script `lint:types` separado, nunca no caminho
-rápido. Por fim, o agente roda o comando de lint de verdade (§11) e
-reporta a saída real, em vez de assumir que funcionou.
+The agent detects the stack (§0: TypeScript + React/Next.js + Drizzle, so it
+keeps the `typescript-eslint` layer, React/a11y plugins and Drizzle guard
+rule), installs the right dependencies (§1), and builds a complete
+`eslint.config.mjs` following §2's skeleton — with §3's two-tier philosophy,
+§4's ignores, §5's complexity budget, and the custom rules in §7 that make
+sense for the project (at least §7.1, the per-file line ceiling, and §7.2,
+the direct `console.log` ban). Since the project uses Drizzle but has no
+layer boundaries or custom text component yet, §6 and §7.5 are left out.
+The expected result is an actually runnable `eslint.config.mjs` — not a
+skeleton with `TODO`s — plus, optionally, an `eslint.typed.config.mjs` with
+§8's type-aware rules in a separate `lint:types` script, never on the fast
+path. Finally, the agent actually runs lint (§11) and reports the real
+output rather than assuming it worked.
 
-## Dicas
+## Tips
 
-- Isso é ortogonal ao [prompt de burndown de avisos](02-eslint-warning-burndown.md)
-  — use este primeiro pra ter uma configuração boa desde o início, use
-  aquele depois, quando os avisos acumularem e for hora de zerar uma
-  regra específica.
-- A §0 ("Detect the stack first") existe pra evitar que o agente aplique
-  seções inteiras que não fazem sentido pro projeto — vale conferir que
-  ele realmente pulou o que devia antes de aceitar o resultado.
-- A seção final, "What's deliberately left out", não é um detalhe
-  menor: ela existe pra deixar claro que a ausência de `max-len` e de
-  regras de formatação é intencional, não esquecimento — útil de
-  apontar se alguém depois perguntar "cadê a regra de tamanho de
-  linha?".
+- This is orthogonal to the [warning burndown prompt](02-eslint-warning-burndown.md)
+  — use this first for a good configuration from the start, and that one
+  later, when warnings accumulate and it is time to clear a specific rule.
+- §0 ("Detect the stack first") prevents the agent from applying whole
+  sections that do not fit the project — check that it really skipped what
+  it should before accepting the result.
+- The final section, "What's deliberately left out", is not a minor detail:
+  it makes clear that omitting `max-len` and formatting rules is intentional,
+  not an oversight — useful to point to if someone later asks "where is the
+  line-length rule?".

@@ -1,51 +1,44 @@
 # Parallel wave dispatch
 
-## Quando usar
+## When to use
 
-Use este prompt quando você já tiver uma lista de tarefas — saída de um
-plano, de uma epic (conjunto maior de tarefas relacionadas), ou só um
-lote de correções independentes — e quiser transformar isso em ondas de
-execução paralela seguras (grupos de tarefas que rodam ao mesmo tempo) em
-vez de um agente único mastigando tarefa por tarefa em série. É a versão
-"preencha os espaços" do mesmo padrão descrito em [orquestração de
-subagentes](../tools/02-subagent-orchestration.md) e no [template de
-regra de dispatch
-paralelo](../../templates/rules/parallel-subagent-driven-development.md).
+Use this prompt when you already have a task list — from a plan, an epic
+(a larger set of related tasks), or simply a batch of independent fixes —
+and want to turn it into safe parallel execution waves (groups of tasks
+running at the same time) instead of a single agent working through tasks
+sequentially. It is the "fill in the blanks" version of the same pattern
+in [subagent orchestration](../tools/02-subagent-orchestration.md) and the
+[parallel dispatch rule template](../../templates/rules/parallel-subagent-driven-development.md).
 
-## Por que funciona
+## Why it works
 
-As duas regras da Etapa 2 — nenhuma dependência entre as tarefas e
-nenhuma sobreposição de arquivo — são o que torna seguro rodar vários
-agentes ao mesmo tempo; quebrar qualquer uma das duas gera conflito
-silencioso (dois agentes escrevendo por cima um do outro no mesmo
-arquivo) ou uma **onda** que na verdade não era independente. Quando fica
-incerto se essas condições valem pra uma tarefa, o prompt manda tratar
-essa tarefa como dependente de tudo que já foi listado — ou seja, o
-padrão seguro é degradar pra execução em série, nunca arriscar um falso
-paralelismo. Do lado dos commits, cada implementador só edita e reporta o
-que mudou; quem orquestra é o único que faz commit, um de cada vez, em
-ordem fixa, sempre capturando o HEAD (a referência pro commit mais
-recente do branch) na hora, nunca reaproveitando um HEAD capturado antes
-— isso elimina qualquer corrida entre agentes tentando commitar ao mesmo
-tempo.
+The two rules in Step 2 — no dependencies between tasks and no file overlap —
+make it safe to run multiple agents at once; breaking either causes silent
+conflicts (two agents overwriting each other in the same file) or a **wave**
+that was not actually independent. When these conditions are uncertain for
+a task, the prompt says to treat it as depending on everything already
+listed — the safe default degrades to sequential execution rather than
+risking false parallelism. For commits, each implementer only edits and
+reports changes; the orchestrator alone commits, one at a time, in a fixed
+order, always capturing HEAD (the reference to the branch's latest commit)
+at that moment, never reusing an earlier HEAD — eliminating races between
+agents trying to commit simultaneously.
 
-## Como adaptar os placeholders
+## How to adapt the placeholders
 
-- **`[FEATURE/PLAN/TASK LIST]`** — aparece duas vezes: na primeira linha
-  (o que você quer quebrar em ondas) e na última ("Plan/task list:").
-  Cole ali a lista de tarefas, o plano ou a epic que você já tem em mãos;
-  se for longo, pode repetir só um nome ou resumo curto na segunda
-  ocorrência em vez do texto inteiro de novo.
-- **`[BACKEND_ROLE]`, `[FRONTEND_ROLE]`, `[DB_ROLE]`, `[TEST_ROLE]`** —
-  são só exemplos de papel/especialista pro campo `Owner:` de cada
-  tarefa. Troque pelos nomes reais dos agentes especialistas do seu
-  projeto (se você usa Claude Code com uma tabela de agentes no
-  `CLAUDE.md`, use exatamente os nomes de lá, pra que o campo `Owner:` já
-  aponte pro agente certo pra disparar). Pode adicionar ou remover
-  papéis à vontade — o próprio prompt avisa pra usar "whatever roles
-  this project defines".
+- **`[FEATURE/PLAN/TASK LIST]`** — appears twice: on the first line (what to
+  split into waves) and the last ("Plan/task list:"). Paste your task list,
+  plan or epic there; if it is long, repeat just a name or short summary
+  the second time instead of the entire text.
+- **`[BACKEND_ROLE]`, `[FRONTEND_ROLE]`, `[DB_ROLE]`, `[TEST_ROLE]`** — merely
+  example roles/specialists for each task's `Owner:` field. Replace them
+  with the actual specialist agent names in your project (if you use
+  Claude Code with an agent table in `CLAUDE.md`, use exactly those names
+  so `Owner:` already points to the right agent to dispatch). Add or remove
+  roles as needed — the prompt itself says to use "whatever roles this
+  project defines".
 
-## O prompt
+## The prompt
 
 ```
 Break [FEATURE/PLAN/TASK LIST] into parallel execution waves. Follow this
@@ -97,52 +90,46 @@ For every wave:
 Plan/task list: [FEATURE/PLAN/TASK LIST].
 ```
 
-## Exemplo de uso
+## Usage example
 
-Imagine um projeto pequeno com quatro tarefas na fila. O placeholder
-`[FEATURE/PLAN/TASK LIST]` vira essa lista, e os papéis genéricos
-(`[BACKEND_ROLE]`, `[FRONTEND_ROLE]`, `[DB_ROLE]`) viram os agentes reais
-do projeto:
+Imagine a small project with four queued tasks. The
+`[FEATURE/PLAN/TASK LIST]` placeholder becomes this list, and generic roles
+(`[BACKEND_ROLE]`, `[FRONTEND_ROLE]`, `[DB_ROLE]`) become actual project agents:
 
-- **T01** — criar a tabela `relatorios` no banco (migração). `Files:`
-  `src/db/schema/relatorios.ts`, `drizzle/*`. `Depends-on:` none.
+- **T01** — create the `reports` database table (migration). `Files:`
+  `src/db/schema/reports.ts`, `drizzle/*`. `Depends-on:` none.
   `Owner:` database-architect.
-- **T02** — endpoint que exporta relatórios em CSV, lendo da tabela
-  `relatorios`. `Files:` `src/app/api/relatorios/export/route.ts`.
+- **T02** — endpoint exporting reports as CSV, reading the `reports` table.
+  `Files:` `src/app/api/reports/export/route.ts`.
   `Depends-on:` T01. `Owner:` backend-specialist.
-- **T03** — botão "Exportar CSV" na tela de relatórios, chamando o
-  endpoint novo. `Files:` `src/components/relatorios/BotaoExportar.tsx`.
+- **T03** — "Export CSV" button on the reports screen calling the new
+  endpoint. `Files:` `src/components/reports/ExportButton.tsx`.
   `Depends-on:` T02. `Owner:` frontend-specialist.
-- **T04** — corrigir um typo no texto da tela de login, sem relação
-  nenhuma com as outras três. `Files:`
-  `src/components/auth/FormLogin.tsx`. `Depends-on:` none. `Owner:`
-  frontend-specialist.
+- **T04** — fix a typo in the login screen text, unrelated to the other
+  three. `Files:` `src/components/auth/LoginForm.tsx`. `Depends-on:` none.
+  `Owner:` frontend-specialist.
 
-Na Etapa 2, o agente monta a tabela de ondas: T01 e T04 caem na **mesma
-onda**, porque nenhuma depende da outra e os arquivos não se cruzam — a
-regra olha só pra dependência e arquivo, não pra quem é o owner. T02 só
-pode entrar numa onda depois que T01 for commitado (onda 2), e T03 só
-depois de T02 (onda 3) — mesmo T03 e T04 não tendo nenhum arquivo em
-comum, T03 não entra na onda 1 porque depende de T02, que ainda nem
-existe.
+In Step 2, the agent builds the waves table: T01 and T04 belong in the
+**same wave**, because neither depends on the other and their files do not
+overlap — the rule considers only dependencies and files, not the owner.
+T02 can only enter a wave after T01 is committed (wave 2), and T03 only
+after T02 (wave 3) — even though T03 and T04 share no files, T03 cannot enter
+wave 1 because it depends on T02, which does not yet exist.
 
-Na Etapa 3: a onda 1 dispara os implementadores de T01 e T04 juntos, num
-único lote; nenhum dos dois faz commit sozinho, eles só reportam o que
-mudou. Quem orquestra commita T01 e depois T04 (ordem fixa), capturando o
-HEAD de novo antes de cada commit. Os revisores de T01 e T04 rodam juntos
-em seguida. Só então a onda 2 (só T02) começa — e por fim a onda 3 (só
-T03).
+In Step 3, wave 1 dispatches the T01 and T04 implementers together in one
+batch; neither commits on their own, they only report changes. The
+orchestrator commits T01 and then T04 (fixed order), capturing HEAD again
+before each commit. T01 and T04 reviewers then run together. Only afterward
+does wave 2 (T02 alone) start — followed finally by wave 3 (T03 alone).
 
-## Dicas
+## Tips
 
-- Na dúvida, use `Depends-on: everything already listed` ("depende de
-  tudo que já foi listado") — na pior das hipóteses você perde um pouco
-  de paralelismo, nunca ganha uma condição de corrida.
-- Ordem de commit fixa por onda (não "quem terminar primeiro") mantém o
-  HEAD fácil de acompanhar — capture-o bem antes do commit daquela
-  tarefa específica, nunca antes disso.
-- Quando duas tarefas genuinamente não conseguem evitar tocar nos mesmos
-  arquivos, trate isso como sinal pra juntar as duas numa tarefa só ou
-  isolar cada uma num worktree separado (uma cópia paralela do
-  repositório, em outra pasta, isolada da principal) — não force as duas
-  pra mesma onda.
+- When in doubt, use `Depends-on: everything already listed` — at worst,
+  you lose some parallelism, never gain a race condition.
+- A fixed commit order per wave (not "whoever finishes first") keeps HEAD
+  easy to track — capture it immediately before that specific task's
+  commit, never earlier.
+- When two tasks genuinely cannot avoid touching the same files, take it
+  as a signal to combine them into one task or isolate each in a separate
+  worktree (a parallel repository copy in another folder, isolated from
+  the main one) — do not force both into the same wave.

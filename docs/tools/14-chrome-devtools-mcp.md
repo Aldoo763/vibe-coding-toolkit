@@ -1,46 +1,46 @@
 # Chrome DevTools MCP
 
-## O que é
+## What it is
 
-Chrome DevTools MCP é um servidor MCP (*Model Context Protocol* — o protocolo que conecta um agente de IA a ferramentas externas, expondo cada uma como uma operação com nome e parâmetros bem definidos) mantido oficialmente pelo próprio time do Chrome DevTools, dentro do Google. O repositório é [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp) — por volta de **49 mil estrelas e 3.400 forks** no GitHub (o número sobe rápido: segundo levantamentos de terceiros, estava por volta de 31 mil no início de 2026 e já tinha passado de 43 mil em meados do mesmo ano — vale conferir o repositório direto pra um número atualizado). O anúncio saiu no blog oficial do [Chrome for Developers](https://developer.chrome.com/blog/chrome-devtools-mcp), com preview público lançado em 23 de setembro de 2025, sob licença Apache 2.0.
+Chrome DevTools MCP is an MCP server (*Model Context Protocol*, the protocol connecting an AI agent to external tools, exposing each as an operation with a defined name and parameters) officially maintained by Google's Chrome DevTools team. Its official repository is [`ChromeDevTools/chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp), licensed under Apache 2.0. Consult the [Chrome for Developers guide](https://developer.chrome.com/blog/chrome-devtools-mcp) and current source for supported capabilities and requirements.
 
-Ele dá ao agente acesso direto a uma sessão real e viva do Chrome — não uma simulação, não um navegador headless (sem interface gráfica) fingindo ser outra coisa: um Chrome de verdade, rodando, que o agente controla e inspeciona. As ferramentas cobrem console, inspeção de rede, performance trace (uma gravação detalhada do que o navegador fez durante um carregamento ou uma interação — onde o tempo foi gasto, o que bloqueou o quê), captura de tela, e depuração (*debugging*) de forma geral — pensadas pra responder "por que essa página está lenta" ou "por que esse request falhou" com dado real, não suposição.
+It gives the agent direct access to a real, live Chrome session: an actual running browser it controls and inspects, rather than a simulation or a headless browser (without a graphical interface) pretending to be something else. Tools cover the console, network inspection, performance traces (detailed recordings of browser activity during loading or interaction, showing where time went and what blocked what), screenshots, and general debugging. They answer “why is this page slow?” or “why did this request fail?” with real data rather than assumptions.
 
-O post oficial do blog do Chrome for Developers resume bem o problema que a ferramenta resolve: agentes de codificação não conseguem ver o que o código gerado por eles realmente faz depois de rodar no navegador — programam, nas palavras do próprio post, "com uma venda nos olhos" (*with a blindfold on*). Chrome DevTools MCP tira essa venda: o agente passa a enxergar o resultado de verdade, não só o código-fonte que escreveu.
+The official Chrome for Developers post captures the problem: coding agents cannot see what their generated code actually does in the browser. In the post's words, they code “with a blindfold on.” Chrome DevTools MCP removes that blindfold: the agent sees the actual result, beyond the source code it wrote.
 
-## Por que usar
+## Why use it
 
-**Diferença importante em relação ao [agent-browser](11-agent-browser.md) (já documentado neste toolkit): as duas ferramentas resolvem problemas diferentes, e não competem entre si.**
+**An important difference from [agent-browser](11-agent-browser.md), already documented in this toolkit: the tools solve different problems and complement each other.**
 
-- **agent-browser é automação** — faz o agente clicar, preencher formulário, navegar por um fluxo de usuário inteiro, do início ao fim. A pergunta que ele responde é "o que acontece se um usuário fizer X, Y, Z nessa página".
-- **Chrome DevTools MCP é diagnóstico** — inspeciona uma página que já está rodando, pra entender por que algo específico está errado ali: por que está lenta, por que um request de rede falhou, o que apareceu no console. A pergunta que ele responde é "o que está acontecendo, de verdade, nessa página agora".
+- **agent-browser provides automation**: the agent clicks, fills forms, and navigates a complete user flow. It answers “what happens if a user does X, Y, Z on this page?”
+- **Chrome DevTools MCP provides diagnosis**: it inspects a running page to understand a specific problem, such as slow loading, a failed network request, or console output. It answers “what is actually happening on this page right now?”
 
-Uma forma direta de pensar nisso, que aparece com frequência em comparações da comunidade contra ferramentas parecidas: uma ferramenta de automação existe pra **dirigir** o navegador (ação); o Chrome DevTools MCP existe pra **depurar** um navegador que já está rodando (observação). São complementares, não concorrentes — dá pra usar as duas juntas na mesma sessão: o agent-browser navega até o estado exato que você quer investigar (login feito, formulário preenchido, ação disparada), e o Chrome DevTools MCP entra depois, nesse mesmo Chrome, pra investigar o que está acontecendo ali.
+A straightforward distinction often found in community comparisons: automation tools **drive** the browser (action); Chrome DevTools MCP **debugs** an already-running browser (observation). They are complementary, and can work together in one session: agent-browser navigates to the precise state you want to investigate (logged in, form completed, action triggered), and Chrome DevTools MCP then inspects what is happening in that same Chrome instance.
 
-Sem essa ferramenta, o agente depurando um problema de frontend fica na mesma posição de um desenvolvedor sem as ferramentas de desenvolvedor do navegador abertas: só pode olhar o código-fonte e adivinhar. Com ela, o agente roda exatamente os mesmos tipos de investigação que uma pessoa rodaria manualmente — só que sem trocar de janela, copiar e colar valores, ou descrever pra você o que está vendo.
+Without this tool, an agent debugging frontend problems is like a developer without browser developer tools: limited to source code and guesses. With it, the agent performs the same investigations a person would manually, without switching windows, copying values, or describing observations to you.
 
-## Como instalar
+## How to install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o Chrome DevTools MCP pra mim: rode `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest`.
+> Install Chrome DevTools MCP for me: run `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest`.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda o comando e confirma que funcionou. Prefere fazer você mesmo? É o mesmo comando, direto no seu terminal.
+> Claude Code has terminal (Bash) access: it runs the command and confirms success. Prefer doing it yourself? Run the same command directly in your terminal.
 
-Requisitos, direto da documentação oficial: Node.js na versão LTS (*Long Term Support* — a versão de suporte de longo prazo, mais estável), npm, e o Chrome na versão estável atual ou mais nova. Sem Chrome instalado, não tem o que o servidor controlar.
+Requirements from the official documentation: Node.js LTS (*Long Term Support*, the more stable long-term support release), npm, and the current stable Chrome version or newer. Without Chrome installed, the server has nothing to control.
 
-Existe também um caminho por plugin, que soma as mesmas ferramentas MCP a skills prontas (arquivos de instrução carregados sob demanda, ensinando o agente a usar a ferramenta bem):
+A plugin installation path also combines the same MCP tools with ready-made skills (instruction files loaded on demand to teach the agent effective tool usage):
 
 ```bash
 /plugin marketplace add ChromeDevTools/chrome-devtools-mcp
 /plugin install chrome-devtools-mcp@chrome-devtools-plugins
 ```
 
-(Fonte de ambos os comandos acima: [README oficial do projeto](https://github.com/ChromeDevTools/chrome-devtools-mcp).) Se você já tinha uma instalação antiga desse mesmo MCP configurada de outro jeito, o próprio README recomenda remover a configuração antiga antes de instalar de novo, pra não deixar duas entradas conflitando.
+(Source for both commands: [official project README](https://github.com/ChromeDevTools/chrome-devtools-mcp).) If an older installation of this MCP is configured differently, the README recommends removing that old configuration before reinstalling to avoid conflicting entries.
 
-Por padrão, o servidor sobe sua própria instância nova do Chrome. Pra conectar numa janela do Chrome que você já tem aberta — com login e sessão preservados, por exemplo — existe a flag `--browser-url` (também aceita como `--browserUrl`), apontando pra porta de depuração remota do Chrome. Configuração manual, direto no arquivo de MCP servers (fonte: README oficial):
+By default, the server starts a new Chrome instance. To connect to an already-open Chrome window, preserving login and session state, use `--browser-url` (also accepted as `--browserUrl`) pointing to Chrome's remote debugging port. Manual configuration in the MCP servers file (source: official README):
 
 ```json
 {
@@ -56,122 +56,122 @@ Por padrão, o servidor sobe sua própria instância nova do Chrome. Pra conecta
 }
 ```
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-### 1. Instale
+### 1. Install
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Instale o Chrome DevTools MCP pra mim: rode `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest`.
+> Install Chrome DevTools MCP for me: run `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest`.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) — ele roda o comando e confirma que funcionou. Prefere fazer você mesmo? É o mesmo comando, direto no seu terminal.
+> Claude Code has terminal (Bash) access: it runs the command and confirms success. Prefer doing it yourself? Run the same command directly in your terminal.
 
-### 2. Descreva o sintoma, não a causa
+### 2. Describe the symptom, not the cause
 
-Peça o diagnóstico do jeito que você pediria pra um colega — pelo sintoma que você vê, não pela causa (que você ainda não sabe):
-
-```
-Essa página local (localhost:3000/painel) está demorando muito
-pra ficar interativa. Descobre o que está segurando o carregamento.
-```
-
-### 3. O agente abre a página e roda um trace de performance
+Request a diagnosis as you would from a colleague: describe the symptom you see, rather than the cause you do not yet know:
 
 ```
-navigate_page({ url: "http://localhost:3000/painel" })
+This local page (localhost:3000/dashboard) takes a long time
+to become interactive. Find what is holding up loading.
+```
+
+### 3. The agent opens the page and records a performance trace
+
+```
+navigate_page({ url: "http://localhost:3000/dashboard" })
 performance_start_trace({ reload: true })
 ```
 
-Formato típico de saída (resumo):
+Typical output (summary):
 
 ```
-Trace concluído — 4.2s até interativo.
-Maior contribuinte: LCP (Largest Contentful Paint, a métrica de
-  quando o maior elemento visível termina de carregar) em 3.8s,
-  causado por uma imagem de 2.4MB carregada sem otimização
+Trace completed — 4.2s until interactive.
+Largest contributor: LCP (Largest Contentful Paint, measuring
+  when the largest visible element finishes loading) at 3.8s,
+  caused by a 2.4MB image loaded without optimization
   (banner-hero.png, 3840x2160).
-Script bloqueante identificado: analytics.js (612ms, render-blocking).
+Blocking script identified: analytics.js (612ms, render-blocking).
 ```
 
-### 4. O agente lê o resultado e aponta a causa raiz
+### 4. The agent reads the result and identifies the root cause
 
-A resposta final cita o dado real da gravação — tamanho de arquivo, tempo exato, qual recurso especificamente segurou o carregamento — em vez de uma lista genérica de "boas práticas de performance" que talvez nem se apliquem a essa página.
+The final answer cites actual recorded data: file size, precise timing, and the specific resource delaying loading, rather than generic performance best practices that might not apply to this page.
 
-## Exemplos concretos
+## Concrete examples
 
-### Exemplo 1 — performance trace
+### Example 1 — performance trace
 
-**Pedido:** "Por que essa página está lenta pra carregar?"
+**Request:** “Why is this page slow to load?”
 
-O agente navega até a página, dispara uma gravação de performance, e lê o resultado:
-
-```
-performance_start_trace({ url: "https://exemplo.com/produtos", reload: true })
-```
-
-Formato típico de saída:
+The agent navigates to the page, starts a performance recording, and reads the result:
 
 ```
-LCP: 4.1s (ruim — ideal é abaixo de 2.5s)
-  Elemento: <img class="produto-destaque">
-  Causa: imagem servida em tamanho original (1920x1080),
-         exibida em 400x225 — sem redimensionamento nem lazy-load.
-
-Recomendação: servir a imagem já no tamanho de exibição, ou usar
-  `loading="lazy"` pra imagens fora da primeira tela.
+performance_start_trace({ url: "https://example.com/products", reload: true })
 ```
 
-A resposta do agente aponta o elemento exato, a métrica exata, e a causa exata — porque veio de uma gravação real da página, não de uma suposição genérica sobre "imagem grande deixa página lenta".
+Typical output:
 
-### Exemplo 2 — erro de console e de rede
+```
+LCP: 4.1s (poor — ideally below 2.5s)
+  Element: <img class="featured-product">
+  Cause: image served at original size (1920x1080),
+         displayed at 400x225, without resizing or lazy loading.
 
-**Pedido:** "Tem um botão que não funciona nessa página, o clique não faz nada. Descobre por quê."
+Recommendation: serve the image at its display size, or use
+  `loading="lazy"` for images below the first screen.
+```
+
+The answer identifies the exact element, metric, and cause, because it comes from an actual recording of the page rather than a generic assumption that large images make pages slow.
+
+### Example 2 — console and network errors
+
+**Request:** “A button on this page does nothing when clicked. Find out why.”
 
 ```
 navigate_page({ url: "http://localhost:3000/checkout" })
-click(seletor_do_botao)
+click(button_selector)
 list_console_messages()
 list_network_requests()
 ```
 
-Formato típico de saída:
+Typical output:
 
 ```
 Console:
   [error] Uncaught TypeError: Cannot read properties of undefined
     (reading 'total') at checkout.js:142
 
-Rede:
-  POST /api/carrinho/finalizar → 404 Not Found
-    (endpoint chamado não existe nessa versão da API)
+Network:
+  POST /api/cart/checkout → 404 Not Found
+    (the requested endpoint does not exist in this API version)
 ```
 
-Duas pistas concretas de uma vez: o erro de JavaScript que trava o clique, e a chamada de rede que devolve 404 — provavelmente a causa raiz por trás do erro no console. Sem essas duas informações, o diagnóstico seria só "o botão não funciona", sem nenhuma pista de por quê.
+Two concrete clues at once: the JavaScript error blocking the click and the network call returning 404, likely the root cause behind the console error. Without both, the diagnosis would remain “the button does not work,” without a clue why.
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-**Precisa de um Chrome de verdade rodando.** Não é uma simulação leve — o servidor sobe (ou se conecta a) uma instância real do navegador, com o consumo de memória e CPU que isso implica. Em ambientes sem interface gráfica (alguns containers, por exemplo), pode ser necessário configurar um modo headless explicitamente.
+**It needs a real running Chrome browser.** This is not a lightweight simulation: the server starts or connects to a real browser instance, with the associated memory and CPU usage. Environments without a graphical interface, such as some containers, may require explicit headless configuration.
 
-**`--browser-url` reaproveita sua sessão já logada.** Em vez de o agente precisar fazer login de novo numa página protegida por autenticação, você abre o Chrome manualmente, loga, e aponta o servidor pra essa mesma janela via porta de depuração remota — útil justamente pra páginas que exigem sessão.
+**`--browser-url` reuses your authenticated session.** Instead of making the agent log in again on an authenticated page, open Chrome manually, log in, and point the server at that window through its remote debugging port. This is especially useful for pages requiring a session.
 
-**Uma instalação antiga pode conflitar com a nova.** O próprio README avisa: se você já tinha o Chrome DevTools MCP configurado antes, remova a configuração antiga primeiro. Duas entradas apontando pro mesmo servidor, de jeitos diferentes, tende a confundir mais do que ajudar.
+**An old installation can conflict with a new one.** The README warns that an existing Chrome DevTools MCP configuration should be removed first. Two differently configured entries pointing at the same server tend to confuse rather than help.
 
-**A superfície de ferramentas é grande.** São dezenas de ferramentas, divididas em categorias como automação de input, navegação, emulação, performance, rede, debugging, memória, extensões e PWA (aplicativos web progressivos). Pedir um diagnóstico amplo demais ("revisa a página inteira") tende a fazer o agente chamar ferramenta demais, gastando mais contexto do que pedir por um sintoma específico.
+**The tool surface is large.** Dozens of tools cover input automation, navigation, emulation, performance, networking, debugging, memory, extensions, and PWA (progressive web apps). An overly broad request (“review the whole page”) tends to trigger more tool calls and consume more context than a specific symptom.
 
-**É sobre uma página por vez, não um fluxo inteiro.** Pra diagnosticar depois de navegar por várias telas — login, carrinho, checkout — combine com o [agent-browser](11-agent-browser.md): ele leva a página até o estado certo, o Chrome DevTools MCP investiga o que está acontecendo naquele estado.
+**It focuses on one page at a time, rather than a complete flow.** To diagnose a state reached after multiple screens, such as login, cart, and checkout, combine it with [agent-browser](11-agent-browser.md): that tool reaches the right state, and Chrome DevTools MCP investigates it.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Precisa do Chrome instalado?**
-Sim — a documentação oficial pede a versão estável atual do Chrome ou mais nova. O servidor controla um Chrome de verdade, seja subindo uma instância nova, seja conectando numa que você já tem aberta via `--browser-url`.
+**Must Chrome be installed?**
+Yes: the official documentation requires the current stable Chrome version or newer. The server controls actual Chrome, either starting a new instance or connecting to an existing window through `--browser-url`.
 
-**Funciona em produção ou só em localhost?**
-Funciona com qualquer URL que o navegador conseguir abrir — local, de homologação, ou de produção — porque, no fim, é só um navegador de verdade sendo controlado; ele não faz ideia se a página é local ou pública. Os próprios exemplos da documentação oficial usam uma URL de produção real. A única parte tipicamente local é o endereço da porta de depuração remota (`--browser-url`, geralmente `127.0.0.1`) quando você conecta numa janela do Chrome que já está aberta na sua máquina — mas a página carregada *dentro* dessa janela pode ser qualquer URL.
+**Does it work in production or only on localhost?**
+It works with any URL the browser can open: local, staging, or production. It is a real controlled browser and does not distinguish local from public pages. Official documentation examples use a real production URL. The typically local part is the remote debugging address (`--browser-url`, usually `127.0.0.1`) when connecting to an already-open Chrome window on your computer, but the page loaded *inside* that window can be any URL.
 
-**É a mesma coisa que o Playwright MCP?**
-Não. São MCPs de propósitos diferentes, e a diferença é bem definida na comunidade: Playwright MCP existe pra **dirigir** o navegador — automação repetível, multi-navegador (Chrome, Firefox, WebKit), pensada pra fluxos de teste. Chrome DevTools MCP existe pra **depurar** um Chrome específico que já está rodando — performance trace, console, rede, só nesse navegador. Se o problema é "esse fluxo de usuário funciona de ponta a ponta", Playwright MCP (ou o [agent-browser](11-agent-browser.md) deste toolkit) é a ferramenta certa. Se o problema é "por que essa página específica está lenta ou quebrada", Chrome DevTools MCP tem a resposta mais direta.
+**Is this the same as Playwright MCP?**
+No. Their purposes differ, a distinction clearly drawn by the community: Playwright MCP **drives** browsers through repeatable, cross-browser automation (Chrome, Firefox, WebKit) for testing workflows. Chrome DevTools MCP **debugs** a particular running Chrome instance through performance traces, console, and network inspection. For “does this user flow work end to end?”, choose Playwright MCP or this toolkit's [agent-browser](11-agent-browser.md). For “why is this particular page slow or broken?”, Chrome DevTools MCP provides a more direct answer.
 
-**Dá pra usar junto com o agent-browser deste toolkit?**
-Dá, e é exatamente o uso combinado que faz mais sentido: o agent-browser navega até o estado que você quer investigar, o Chrome DevTools MCP investiga o que está acontecendo ali — descrito em detalhe na seção "Por que usar", acima.
+**Can it work with this toolkit's agent-browser?**
+Yes, this is a useful combination: agent-browser navigates to the state to investigate, and Chrome DevTools MCP inspects what is happening there, as detailed under “Why use it” above.

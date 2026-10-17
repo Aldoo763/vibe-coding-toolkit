@@ -1,213 +1,213 @@
 # Caveman
 
-## O que é
+## What it is
 
-Caveman é um plugin — um pacote que estende o comportamento do agente
-dentro do Claude Code — de compressão de comunicação: ele corta palavras de
-enchimento, cautela retórica (frases como "talvez", "pode ser que",
-"possivelmente", que suavizam uma resposta sem acrescentar informação nova)
-e formalidades excessivas da própria prosa do agente. Não mexe no código que
-o agente escreve, só em como ele fala sobre esse código.
+Caveman is a plugin — a package that extends the agent's behavior
+inside Claude Code — for communication compression: it cuts filler
+words, rhetorical hedging (phrases such as "maybe," "it could be,"
+"possibly," which soften an answer without adding new information),
+and excessive formality from the agent's own prose. It does not change the code
+the agent writes, only how it talks about that code.
 
-É independente e combinável com [Ponytail](04-ponytail.md): Ponytail rege o
-que é construído; Caveman rege como o agente fala sobre isso. Dá para usar
-um sem o outro, ou os dois juntos. Fonte: [`JuliusBrussee/caveman`](https://github.com/JuliusBrussee/caveman).
+It is independent of and combinable with [Ponytail](04-ponytail.md): Ponytail governs
+what gets built; Caveman governs how the agent talks about it. You can use
+either alone or both together. Source: [`JuliusBrussee/caveman`](https://github.com/JuliusBrussee/caveman).
 
-## Por que usar
+## Why use it
 
-Por padrão, a prosa de um agente tende a vir preenchida com frases como "Vou
-seguir em frente e...", "Parece que isso pode potencialmente...", "Ótima
-pergunta!" — nenhuma delas muda o que foi de fato feito. Isso custa tempo de
-leitura e tokens (as unidades que medem quanto texto entra e sai do modelo,
-normalmente com custo associado) sem entregar nada a mais. O próprio
-repositório do plugin reivindica um corte de até 65% no uso de tokens de uma
-conversa só com essa compressão de estilo.
+By default, agent prose tends to be padded with phrases like "I'll
+go ahead and...", "It seems this could potentially...", "Great
+question!" — none changes what was actually done. This costs reading
+time and tokens (the units measuring how much text enters and leaves the model,
+usually with an associated cost) without delivering anything extra. The
+plugin's own repository claims a reduction of up to 65% in a conversation's
+token usage through this style compression alone.
 
-Caveman remove esse preenchimento sem remover informação: números, unidades,
-código e o texto exato de mensagens de erro atravessam sem alteração. A
-compressão é no estilo, nunca no conteúdo.
+Caveman removes padding without removing information: numbers, units,
+code, and exact error-message text pass through unchanged. The
+compression is in style, never content.
 
-## Como instalar/ativar
+## How to install/activate
 
-Dentro de uma sessão do Claude Code:
+Inside a Claude Code session:
 
 ```bash
 /plugin marketplace add JuliusBrussee/caveman
 /plugin install caveman@caveman
 ```
 
-O primeiro comando registra o repositório do GitHub como fonte de plugins; o
-segundo instala o plugin `caveman` a partir dela.
+The first command registers the GitHub repository as a plugin source; the
+second installs the `caveman` plugin from it.
 
-Depois de instalado, a intensidade pode ser ajustada com `/caveman` no Claude Code ou pela skill correspondente no cliente. No Codex, use `$caveman` ou o nome descoberto na lista de skills. Para persistir a preferência, incorpore a regra ao `AGENTS.md` ou `CLAUDE.md`, sem substituir instruções existentes.
+Once installed, intensity can be adjusted with `/caveman` in Claude Code or the corresponding skill in the client. In Codex, use `$caveman` or the name discovered in the skill list. To persist the preference, incorporate the rule into `AGENTS.md` or `CLAUDE.md` without replacing existing instructions.
 
-O [projeto oficial](https://github.com/JuliusBrussee/caveman) também distribui CLI, proxy e recursos de Cloud. As skills de comunicação podem ser usadas separadamente. No setup deste toolkit, preserve cliente nativo, modelo e autenticação da sessão para trabalhos com LLM de Caveman. No Codex, mantenha login ChatGPT quando utilizado; no Claude, preserve sua modalidade. Não ative roteamento, outro provedor ou cobrança por API como efeito da instalação.
+The [official project](https://github.com/JuliusBrussee/caveman) also distributes a CLI, proxy, and Cloud features. Communication skills can be used separately. In this toolkit's setup, preserve the session's native client, model, and authentication for Caveman LLM work. In Codex, keep ChatGPT login when used; in Claude, preserve its authentication mode. Do not enable routing, another provider, or API billing as a side effect of installation.
 
-Para descoberta de skills e plugins no Codex, veja o [guia do cliente](15-codex-workflow.md). Configure cada agente separadamente e evite copiar skills já fornecidas por outra distribuição.
+For skill and plugin discovery in Codex, see the [client guide](15-codex-workflow.md). Configure each agent separately and avoid copying skills already provided by another distribution.
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-### 1. O que é cortado
+### 1. What gets cut
 
-Palavras de enchimento, cautela retórica e formalidades — a parte de uma
-resposta que existe para soar educada ou cuidadosa, mas não carrega nenhuma
-informação que não estivesse lá sem ela. Exemplos: "vou verificar isso para
-você", "parece que talvez", "sem problemas!", "excelente observação".
+Filler words, rhetorical hedging, and formality — the part of an
+answer that exists to sound polite or cautious but carries no
+information that would be missing without it. Examples: "I'll check that for
+you," "it seems that maybe," "no problem!", "excellent observation."
 
-### 2. O que nunca é tocado
+### 2. What is never touched
 
-Quatro categorias ficam fora da compressão, sempre:
+Four categories always stay outside compression:
 
-- **Palavras de negação** — não, nunca, nenhum, só, exceto. Cortar uma
-  dessas inverteria o sentido real da frase, então a compressão nem tenta.
-- **Números e unidades.**
-- **Código e texto exato de erro.**
-- **O idioma que o usuário está usando.** Caveman comprime o estilo, nunca o
-  idioma — se a conversa é em português, a resposta comprimida continua em
-  português.
+- **Negation and restriction words** — not, never, none, only, except. Cutting one
+  would reverse the sentence's actual meaning, so compression does not even try.
+- **Numbers and units.**
+- **Code and exact error text.**
+- **The language the user is using.** Caveman compresses style, never
+  language — if the conversation is in Portuguese, the compressed answer stays in
+  Portuguese.
 
-Texto persistido fora da conversa também deve ter redação normal: documentação, comentários de código, commits e descrições de PR. Quando o usuário pedir uma explicação completa, clareza e completude prevalecem sobre a compressão.
+Text persisted outside the conversation must also use normal wording: documentation, code comments, commits, and PR descriptions. When the user requests a full explanation, clarity and completeness take precedence over compression.
 
-### 3. A sobreposição de clareza automática
+### 3. The automatic clarity override
 
-A compressão desliga sozinha em três situações, porque nelas clareza vale
-mais que brevidade:
+Compression turns itself off in three situations, because clarity matters
+more than brevity there:
 
-- avisos de segurança;
-- confirmações antes de ações irreversíveis;
-- qualquer lugar onde comprimir a frase criaria ambiguidade técnica.
+- safety warnings;
+- confirmations before irreversible actions;
+- anywhere compressing a sentence would create technical ambiguity.
 
-Isso não é uma exceção manual para lembrar — é automático, embutido no
-próprio plugin.
+This is not a manual exception to remember — it is automatic, built into
+the plugin itself.
 
-### 4. Ajustando a intensidade e deixando a regra fixa no repositório
+### 4. Adjusting intensity and persisting the rule in the repository
 
-`/caveman` troca o nível de compressão para a sessão atual, de forma
-independente do comando equivalente do Ponytail (`/ponytail
-lite|full|ultra`) — cada plugin tem seu próprio controle de intensidade.
-Para a ativação sobreviver além da sessão atual, incorpore ao arquivo de instruções carregado pelo cliente:
+`/caveman` changes the compression level for the current session,
+independently of Ponytail's equivalent command (`/ponytail
+lite|full|ultra`) — each plugin has its own intensity control.
+To keep activation beyond the current session, incorporate this into the instruction file loaded by the client:
 
 ```markdown
-- Caveman ativo por padrão: conversa concisa em português, preservando clareza.
-- Explicações completas quando solicitadas; código, documentação e commits com redação normal.
-- “stop caveman” desativa o estilo nesta conversa.
+- Caveman active by default: concise conversation in the user's requested language, preserving clarity.
+- Full explanations when requested; normal wording for code, documentation, and commits.
+- “stop caveman” disables the style in this conversation.
 ```
 
-Use o [template de `AGENTS.md`](../../templates/AGENTS.md.template) como ponto de partida. Não dependa de um comando de inicialização ausente na versão instalada.
+Use the [`AGENTS.md` template](../../templates/AGENTS.md.template) as a starting point. Do not depend on an initialization command absent from the installed version.
 
-### 5. Comandos complementares
+### 5. Complementary commands
 
-- **`/caveman-commit`** — gera uma mensagem de commit direta, sem
-  preenchimento.
-- **`/caveman-review`** — comentários de revisão de código em uma linha
-  cada.
-- **`/caveman-stats`** — contadores observados da sessão, quando disponíveis. Não prova quanto o Caveman economizou; medições do runtime devem ser identificadas separadamente.
+- **`/caveman-commit`** — generates a direct commit message without
+  filler.
+- **`/caveman-review`** — code review comments in one line
+  each.
+- **`/caveman-stats`** — observed session counters, when available. This does not prove how much Caveman saved; runtime measurements must be identified separately.
 
-Os nomes acima são comandos/skills do cliente, não executáveis do shell. No Codex, use a skill descoberta com `$nome`, que pode incluir namespace.
+The names above are client commands/skills, not shell executables. In Codex, use the discovered skill with `$name`, which may include a namespace.
 
-### 6. Meça uso sem inventar economia
+### 6. Measure usage without inventing savings
 
-No Codex nativo, use contadores da sessão atual quando expostos pelo cliente. Se não estiverem disponíveis, informe essa limitação; não escolha o log de outra sessão por ser o mais recente.
+In native Codex, use current-session counters when the client exposes them. If they are unavailable, report that limitation; do not choose another session's log because it is the newest.
 
-Separe uso observado, redução de texto por ferramenta e economia medida contra uma execução comparável. Contadores acumulados não devem ser somados a cada atualização. Percentuais de divulgação não medem sua sessão, e tokens de uma assinatura ChatGPT não equivalem automaticamente a cobranças em dólares.
+Distinguish observed usage, per-tool text reduction, and savings measured against a comparable run. Cumulative counters must not be added again at each update. Promotional percentages do not measure your session, and tokens on a ChatGPT subscription do not automatically equate to dollar charges.
 
-## Exemplos concretos
+## Concrete examples
 
-### Exemplo 1 — prosa do dia a dia
+### Example 1 — everyday prose
 
-**Pedido do usuário:** "Por que esse teste está falhando?"
+**User request:** "Why is this test failing?"
 
-**Sem Caveman:**
+**Without Caveman:**
 
-> Ótima pergunta! Deixa eu dar uma olhada nisso para você. Parece que pode
-> ser porque, possivelmente, o mock não está retornando o valor esperado
-> nesse cenário específico. Vou verificar com mais calma e te aviso o que
-> encontrar.
+> Great question! Let me take a look at that for you. It seems it could
+> be because, possibly, the mock is not returning the expected value
+> in this particular scenario. I'll look more closely and let you know what
+> I find.
 
-**Com Caveman ativo:**
+**With Caveman active:**
 
-> Mock retorna `undefined`; teste espera `42`.
+> Mock returns `undefined`; test expects `42`.
 
-Mesma causa, zero palavra de preenchimento — e o valor exato (`42`) e o
-termo técnico (`undefined`) atravessam intactos, porque números e código
-nunca são comprimidos.
+Same cause, zero filler words — and the exact value (`42`) and the
+technical term (`undefined`) pass through intact, because numbers and code
+are never compressed.
 
-### Exemplo 2 — por que a negação nunca é cortada
+### Example 2 — why negation is never cut
 
-**Pedido do usuário:** "Explica por que essa função não deve ser chamada
-duas vezes seguidas, exceto em testes."
+**User request:** "Explain why this function must not be called
+twice in a row, except in tests."
 
-**Sem Caveman:**
+**Without Caveman:**
 
-> Boa pergunta! Essa função, de modo geral, não deveria ser chamada duas
-> vezes seguidas — isso pode, em certas situações, causar um comportamento
-> inesperado. Dito isso, em testes, geralmente não tem problema.
+> Good question! This function, generally speaking, should not be called twice
+> in a row — this can, in certain situations, cause unexpected
+> behavior. That said, in tests, it is usually fine.
 
-**Com Caveman ativo:**
+**With Caveman active:**
 
-> Não chame duas vezes seguidas — só é seguro em testes.
+> Do not call twice in a row — only safe in tests.
 
-"Não" e "só" sobrevivem intocados porque carregam o sentido inteiro da
-frase; cortar qualquer um dos dois inverteria a regra em vez de só
-encurtá-la. Tudo ao redor — "boa pergunta", "de modo geral", "dito isso,
-geralmente" — é enchimento e some.
+"Not" and "only" survive untouched because they carry the sentence's entire
+meaning; cutting either would reverse the rule instead of merely
+shortening it. Everything around them — "good question," "generally speaking," "that said,
+usually" — is filler and disappears.
 
-### Exemplo 3 — quando a compressão desliga sozinha
+### Example 3 — when compression turns itself off
 
-**Pedido do usuário:** "Apaga a tabela `pedidos` do banco de dados."
+**User request:** "Delete the `orders` table from the database."
 
-Apagar uma tabela é irreversível — a sobreposição de clareza automática
-entra em ação, e a confirmação continua completa mesmo com Caveman em
-intensidade alta:
+Deleting a table is irreversible — the automatic clarity override
+kicks in, and the confirmation stays complete even with Caveman at
+high intensity:
 
-**Com Caveman ativo:**
+**With Caveman active:**
 
-> Isso vai apagar permanentemente a tabela `pedidos` e todos os dados nela —
-> não é possível desfazer. Confirma que quer continuar?
+> This will permanently delete the `orders` table and all its data —
+> it cannot be undone. Do you confirm you want to continue?
 
-Não vira "Apaga pedidos, sem volta, confirma?". A mensagem fica explícita
-porque essa é justamente a categoria — confirmação antes de ação
-irreversível — em que Caveman decide que clareza importa mais que economia
-de palavras.
+It does not become "Delete orders, no undo, confirm?" The message stays explicit
+because this is precisely the category — confirmation before an
+irreversible action — where Caveman decides clarity matters more than saving
+words.
 
-## Dicas e pegadinhas
+## Tips and pitfalls
 
-- **Resposta "curta demais" numa confirmação irreversível ou aviso de
-  segurança não é o comportamento esperado.** Se isso acontecer, é sinal de
-  bug — a sobreposição de clareza deveria ter mantido a frase completa.
-- **Números, código e texto de erro que mudam entre a versão "crua" e a
-  comprimida também são bug, não estilo.** Esses elementos são garantidos
-  intactos, sempre.
-- **Combina com [Ponytail](04-ponytail.md), mas resolve um problema
-  diferente.** Ponytail decide quanto código é escrito; Caveman decide
-  quantas palavras descrevem esse código. Usar os dois juntos comprime nos
-  dois eixos sem criar ambiguidade em nenhum.
-- **Persistência depende de instruções carregadas.** Uma preferência no `AGENTS.md` ou `CLAUDE.md` deve ser conferida em uma nova sessão. Instalação do plugin e configuração persistente são verificações diferentes.
-- **Idioma nunca muda com o nível de intensidade.** Aumentar a compressão
-  não troca o idioma da resposta — só corta o que sobra ao redor da
-  informação.
+- **An answer that is "too short" in an irreversible-action confirmation or safety
+  warning is not expected behavior.** If it happens, it indicates a
+  bug — the clarity override should have kept the sentence complete.
+- **Numbers, code, and error text that change between the "raw" and
+  compressed versions are also bugs, not style.** These elements are guaranteed
+  to stay intact, always.
+- **It combines with [Ponytail](04-ponytail.md), but solves a different
+  problem.** Ponytail decides how much code is written; Caveman decides
+  how many words describe it. Using both compresses along
+  both axes without creating ambiguity in either.
+- **Persistence depends on loaded instructions.** A preference in `AGENTS.md` or `CLAUDE.md` must be checked in a new session. Plugin installation and persistent configuration are separate checks.
+- **Language never changes with intensity level.** Increasing compression
+  does not change the answer's language — it only cuts excess around the
+  information.
 
-## Perguntas frequentes
+## Frequently asked questions
 
-**Caveman faz o agente responder em inglês mesmo se eu escrever em
-português?**
-Não — ele comprime o estilo, nunca troca o idioma. A resposta continua no
-idioma que você está usando.
+**Does Caveman make the agent answer in English even if I write in
+Portuguese?**
+No — it compresses style, never changes language. The answer stays in the
+language you are using.
 
-**Vou perder números, código ou texto de erro por causa da compressão?**
-Não. Esses elementos atravessam sem alteração, em qualquer nível de
-intensidade.
+**Will I lose numbers, code, or error text because of compression?**
+No. These elements pass through unchanged at every intensity
+level.
 
-**E se eu pedir uma confirmação antes de uma ação que não dá para
-desfazer?**
-A sobreposição de clareza automática desliga a compressão nesse caso
-específico — a mensagem continua completa e sem ambiguidade.
+**What if I request confirmation before an action that cannot be
+undone?**
+The automatic clarity override turns off compression in that specific
+case — the message stays complete and unambiguous.
 
-**Caveman e Ponytail fazem a mesma coisa?**
-Não. [Ponytail](04-ponytail.md) decide o que é construído; Caveman decide
-como o agente fala sobre o que foi construído. São plugins independentes que
-se combinam.
+**Do Caveman and Ponytail do the same thing?**
+No. [Ponytail](04-ponytail.md) decides what gets built; Caveman decides
+how the agent talks about what was built. They are independent plugins that
+combine.
 
-**Preciso escolher um nível toda sessão?**
-Não. `/caveman` ajusta quando quiser, e o nível vale para a sessão atual;
-para deixar ativo por padrão no repositório, registre a preferência no arquivo de instruções carregado pelo cliente e confira em nova sessão.
+**Do I need to choose a level every session?**
+No. `/caveman` adjusts it whenever you want, and the level applies to the current session;
+to keep it active by default in the repository, record the preference in the instruction file loaded by the client and check it in a new session.

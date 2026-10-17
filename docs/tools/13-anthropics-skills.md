@@ -1,115 +1,115 @@
-# Skills oficiais da Anthropic
+# Official Anthropic skills
 
-## O que é
+## What it is
 
-Uma **Agent Skill** ("skill" — habilidade: uma capacidade nova que o agente ganha) é uma pasta com um arquivo de instruções — `SKILL.md` — e, opcionalmente, scripts e outros recursos (modelos, exemplos, referências) que ensinam um agente de IA a fazer bem uma tarefa específica e repetível: gerar um documento seguindo um padrão visual, seguir um fluxo de análise de dados específico do seu time, ou automatizar uma tarefa pessoal recorrente. A diferença central pra uma instrução qualquer colada no meio de uma conversa é que uma skill fica **carregada sob demanda**: só entra na janela de contexto (o quanto de texto o modelo consegue "ver" de uma vez, que você paga a cada mensagem) quando o pedido do usuário realmente bate com ela — nunca fica sempre ativa ocupando espaço à toa, mesmo quando ninguém está usando aquela capacidade naquele momento.
+An **Agent Skill** (a new capability the agent gains) is a folder containing an instruction file, `SKILL.md`, and optionally scripts and other resources (templates, examples, references) that teach an AI agent to perform a specific, repeatable task well: generating a document with a visual standard, following your team's data analysis workflow, or automating a recurring personal task. The key difference from an instruction pasted into a conversation is **on-demand loading**: a skill only enters the context window (the amount of text the model can “see” at once, which you pay for with each message) when the user's request matches it. It does not remain active unnecessarily when nobody needs that capability.
 
-[`anthropics/skills`](https://github.com/anthropics/skills) é o repositório público e oficial da Anthropic com esse tipo de pacote — mantido pela própria empresa por trás do Claude, não por terceiros. No momento em que este documento foi escrito, o repositório tinha **169.519 estrelas e 20.179 forks** no GitHub — [confira o número atual](https://github.com/anthropics/skills) — um dos totais mais altos entre repositórios de IA, sinal de quanta gente já usa ou pelo menos acompanha esse projeto de perto.
+[`anthropics/skills`](https://github.com/anthropics/skills) is Anthropic's official public repository for these packages. Evaluate the source, license, host support, and usefulness for your task; popularity is not an installation or compatibility criterion.
 
-### Skill, plugin e servidor MCP não são a mesma coisa
+### Skills, plugins, and MCP servers are different things
 
-Os três aparecem juntos com frequência no vocabulário do Claude Code, mas resolvem problemas diferentes:
+All three frequently appear together in Claude Code's vocabulary, but solve different problems:
 
-| Conceito | O que é | Onde roda |
+| Concept | What it is | Where it runs |
 |---|---|---|
-| **Skill** | Uma pasta de instruções (+ scripts/recursos opcionais), carregada só quando o pedido do usuário bate com ela | Dentro do próprio agente — usa as ferramentas que ele já tem (terminal, leitura/escrita de arquivo...), sem processo externo nenhum |
-| **Plugin** | Um pacote instalável que pode empacotar **várias** skills, comandos de barra ("/") e hooks (scripts que rodam automaticamente antes/depois de uma ação do agente) juntos, numa instalação só | Registrado uma vez no Claude Code; ativa tudo que ele empacota de uma vez |
-| **Servidor MCP** (*Model Context Protocol* — um protocolo padronizado que expõe ferramentas e dados de fora pra um agente de IA) | Um programa **externo e separado**, que dá acesso a uma ferramenta ou fonte de dados de fora — um servidor do GitHub, de documentação de biblioteca, de um banco de dados | Fora do agente, como um processo à parte — o agente se conecta a ele pelo protocolo, nunca roda o código dele diretamente |
+| **Skill** | An instruction folder (+ optional scripts/resources), loaded only when the user's request matches | Inside the agent, using its existing tools (terminal, file reading/writing...), with no external process |
+| **Plugin** | An installable package that can bundle **multiple** skills, slash commands (“/”), and hooks (scripts running automatically before/after an agent action) into one installation | Registered once in Claude Code; activates everything it bundles together |
+| **MCP server** (*Model Context Protocol*, a standardized protocol exposing external tools and data to an AI agent) | A **separate external** program providing access to an external tool or data source: a GitHub server, library documentation, or database | Outside the agent, as a separate process; the agent connects through the protocol and never runs its code directly |
 
-Na prática, este próprio repositório mistura os dois primeiros conceitos: cada skill individual (`docx`, `skill-creator`, e por aí vai) é só uma pasta com um `SKILL.md`, mas pra instalar no Claude Code elas vêm agrupadas dentro de **plugins** — cada plugin empacotando várias skills relacionadas de uma vez (detalhes na seção "Como instalar/ativar" abaixo).
+In practice, this repository combines the first two concepts: each individual skill (`docx`, `skill-creator`, and so on) is simply a folder with a `SKILL.md`, but installation in Claude Code groups them into **plugins**, each bundling several related skills (details under “How to install/activate” below).
 
-### O repositório que documenta o próprio formato
+### The repository documenting the format itself
 
-Além de trazer skills prontas, `anthropics/skills` é a referência do formato **`SKILL.md`** em si — a mesma estrutura de arquivo que já sustenta outras skills vendorizadas (copiadas pra dentro do próprio projeto) documentadas neste toolkit: o [Graphify](07-graphify.md) traz uma em `.claude/skills/graphify/SKILL.md`, o [agent-browser](11-agent-browser.md) traz outra em `.claude/skills/agent-browser/SKILL.md`. `SKILL.md` segue um **padrão aberto** (*open standard* — uma especificação pública, não amarrada a uma ferramenta só), documentado em [agentskills.io](https://agentskills.io) e usável por qualquer agente de IA compatível, não só o Claude Code — confirmado na [documentação oficial do Claude Code](https://code.claude.com/docs/en/skills), que usa exatamente esse padrão como base e adiciona recursos próprios em cima dele.
+Alongside ready-made skills, `anthropics/skills` is a reference for the **`SKILL.md`** format itself, the same file structure used by other vendored skills (copied into the project) documented in this toolkit: [Graphify](07-graphify.md) provides `.claude/skills/graphify/SKILL.md`, and [agent-browser](11-agent-browser.md) provides `.claude/skills/agent-browser/SKILL.md`. `SKILL.md` follows an **open standard** (a public specification not tied to one tool), documented at [agentskills.io](https://agentskills.io) and usable by any compatible AI agent, beyond Claude Code. The [official Claude Code documentation](https://code.claude.com/docs/en/skills) confirms it uses this standard as a foundation and adds its own features.
 
-O formato mínimo de um `SKILL.md` tem só dois campos de fato relevantes num bloco de metadados (*frontmatter*) em YAML — um formato de dados legível, comum em arquivo de configuração — entre `---`: `name` (identificador da skill) e `description` (o que ela faz e quando usar — o texto que o agente lê pra decidir se aquela skill bate com o pedido atual). Depois do frontmatter vem o corpo em Markdown, com as instruções de verdade:
+The minimum `SKILL.md` format has just two essential fields in a YAML metadata block (*frontmatter*, a readable data format common in configuration files), between `---`: `name` (the skill identifier) and `description` (what it does and when to use it, which the agent reads to decide whether the skill matches the current request). The Markdown body follows the frontmatter and contains the actual instructions:
 
 ```yaml
 ---
-name: nome-da-skill
-description: O que essa skill faz e quando o agente deve usá-la.
+name: skill-name
+description: What this skill does and when the agent should use it.
 ---
 
-Instruções, exemplos e boas práticas que o agente segue quando a skill está ativa.
+Instructions, examples, and best practices the agent follows while the skill is active.
 ```
 
-## Por que usar
+## Why use it
 
-Instalar esse repositório especificamente — em vez de uma skill qualquer encontrada solta por aí — resolve três coisas de uma vez:
+Installing this particular repository, instead of a random standalone skill, addresses three things at once:
 
-1. **Fonte oficial, mantida pela própria Anthropic.** Não é uma coleção de terceiros tentando adivinhar o formato certo — é quem define o padrão, então serve como referência confiável de "como fazer direito" antes de escrever suas próprias skills.
-2. **As skills de documento Office cobrem um buraco real do dia a dia.** `docx`, `pdf`, `pptx` e `xlsx` geram e editam esses formatos de verdade — não um substituto simplificado em texto puro — então servem pra quem usa um agente de IA pra montar relatório, apresentação ou planilha e hoje precisa converter manualmente o que a IA devolve em texto solto.
-3. **Duas skills "meta" ensinam a estender o próprio ecossistema.** `skill-creator` guia a criação das suas próprias skills; `mcp-builder` guia a construção do seu próprio servidor MCP (a peça externa da tabela acima). Isso fecha o ciclo: em vez de só consumir skills prontas, o repositório também ensina a fazer as suas.
+1. **An official source maintained by Anthropic itself.** This is not a third-party collection guessing the correct format: it comes from those defining the standard, making it a reliable reference for doing things correctly before writing your own skills.
+2. **Office document skills address a real everyday gap.** `docx`, `pdf`, `pptx`, and `xlsx` generate and edit these actual formats, rather than simplified plain-text substitutes. They help anyone using an AI agent to assemble reports, presentations, or spreadsheets who currently has to convert its text manually.
+3. **Two “meta” skills teach you to extend the ecosystem itself.** `skill-creator` guides the creation of your own skills; `mcp-builder` guides the construction of your own MCP server (the external component in the table above). This completes the cycle: beyond consuming ready-made skills, the repository teaches you to create your own.
 
-Uma ressalva antes de instalar: **não existe uma licença única cobrindo o repositório inteiro** — mais detalhe em "Dicas e pegadinhas", mais abaixo.
+One caveat before installation: **no single license covers the entire repository**. See “Tips and pitfalls” below for details.
 
-## O que tem dentro do repositório
+## What the repository contains
 
-No total são 17 skills, divididas em três pacotes instaláveis (a divisão exata vem do [`.claude-plugin/marketplace.json`](https://github.com/anthropics/skills/blob/main/.claude-plugin/marketplace.json) do próprio repositório):
+The table illustrates the repository's plugin families. Read the current [marketplace manifest](https://github.com/anthropics/skills/blob/main/.claude-plugin/marketplace.json) and each skill's frontmatter before selecting packages; names and grouping can change:
 
-| Plugin (dentro do marketplace `anthropic-agent-skills`) | O que empacota | Skills incluídas |
+| Plugin (in the `anthropic-agent-skills` marketplace) | What it bundles | Included skills |
 |---|---|---|
-| `document-skills` | As quatro skills de documento Office | `xlsx`, `docx`, `pptx`, `pdf` |
-| `example-skills` | Skills de exemplo — criativas, técnicas e corporativas | `algorithmic-art`, `brand-guidelines`, `canvas-design`, `doc-coauthoring`, `frontend-design`, `internal-comms`, `mcp-builder`, `skill-creator`, `slack-gif-creator`, `theme-factory`, `web-artifacts-builder`, `webapp-testing` |
-| `claude-api` | Documentação da API/SDK da Claude, pra construir aplicações com LLM (*Large Language Model*, modelo de linguagem grande — o tipo de IA por trás do Claude) | `claude-api` |
+| `document-skills` | Document workflows | `xlsx`, `docx`, `pptx`, `pdf` |
+| `example-skills` | Creative, technical, and corporate example skills | `algorithmic-art`, `brand-guidelines`, `canvas-design`, `doc-coauthoring`, `frontend-design`, `internal-comms`, `mcp-builder`, `skill-creator`, `slack-gif-creator`, `theme-factory`, `web-artifacts-builder`, `webapp-testing` |
+| `claude-api` | Claude API/SDK documentation for building LLM applications (*Large Language Model*, the type of AI behind Claude) | `claude-api` |
 
-Dentro de `example-skills`, vale destacar por nome as mais citadas fora do contexto de documento:
+Within `example-skills`, the most commonly mentioned skills beyond document work include:
 
-- **`skill-creator`** — cria, edita e otimiza suas próprias skills (ver Exemplo 2 mais abaixo).
-- **`mcp-builder`** — guia a construção de um servidor MCP do zero, em TypeScript ou Python (ver Exemplo 3 mais abaixo).
-- **`web-artifacts-builder`** — monta Artifacts (páginas HTML renderizadas dentro do Claude/Claude.ai) mais elaborados, com React, TypeScript, Tailwind e shadcn/ui (uma coleção de componentes de interface prontos, usada em cima do Tailwind) — incluindo orientação de design pra fugir do visual genérico de IA (layout sempre centralizado, gradiente roxo, cantos todos arredondados igual).
-- **`webapp-testing`** — testa aplicação web local com Playwright (framework de automação de navegador): funcionalidade de frontend, captura de tela, log do navegador.
-- **`frontend-design`, `canvas-design`, `algorithmic-art`, `theme-factory`** — skills criativas e de design visual.
-- **`brand-guidelines`, `internal-comms`, `doc-coauthoring`, `slack-gif-creator`** — skills voltadas a fluxo corporativo e comunicação.
+- **`skill-creator`** creates, edits, and optimizes your own skills (see Example 2 below).
+- **`mcp-builder`** guides building an MCP server from scratch in TypeScript or Python (see Example 3 below).
+- **`web-artifacts-builder`** builds more elaborate Artifacts (HTML pages rendered inside Claude/Claude.ai) with React, TypeScript, Tailwind, and shadcn/ui (a ready-made UI component collection used with Tailwind), including design guidance to avoid generic AI visuals: always-centered layouts, purple gradients, and identically rounded corners.
+- **`webapp-testing`** tests local web applications with Playwright (a browser automation framework): frontend functionality, screenshots, and browser logs.
+- **`frontend-design`, `canvas-design`, `algorithmic-art`, `theme-factory`** cover creativity and visual design.
+- **`brand-guidelines`, `internal-comms`, `doc-coauthoring`, `slack-gif-creator`** target corporate workflows and communication.
 
-Repare que o nome real é **`web-artifacts-builder`**, com o prefixo `web-` — não `artifacts-builder` sozinho.
+Notice the actual name is **`web-artifacts-builder`**, with the `web-` prefix, rather than just `artifacts-builder`.
 
-## Como instalar/ativar
+## How to install/activate
 
-Dentro de uma sessão do Claude Code, registre o repositório como marketplace (a fonte de onde plugins podem ser instalados) e depois instale o pacote que interessa:
+Inside a Claude Code session, register the repository as a marketplace (a source for installing plugins), then install the package you need:
 
 ```bash
 /plugin marketplace add anthropics/skills
 /plugin install document-skills@anthropic-agent-skills
 ```
 
-O primeiro comando registra o repositório do GitHub como marketplace instalável; o segundo instala o pacote `document-skills` — as quatro skills de documento Office de uma vez. Repita o `/plugin install` pra qualquer um dos outros dois pacotes, se quiser:
+The first command registers the GitHub repository as an installable marketplace; the second installs `document-skills`, all four Office document skills together. Repeat `/plugin install` for either of the other packages if desired:
 
 ```bash
 /plugin install example-skills@anthropic-agent-skills
 /plugin install claude-api@anthropic-agent-skills
 ```
 
-Também dá pra instalar pela interface, sem digitar o nome do pacote de cabeça: depois do `/plugin marketplace add`, escolha **Browse and install plugins** → **anthropic-agent-skills** → o pacote desejado → **Install now**.
+You can also install through the interface without memorizing package names: after `/plugin marketplace add`, choose **Browse and install plugins** → **anthropic-agent-skills** → your package → **Install now**.
 
-Confirme o que ficou disponível na sessão atual:
+Confirm what is available in the current session:
 
 ```bash
 /skills
 ```
 
-Depois de instalado, não existe um comando específico pra "ativar" uma skill — é só pedir a tarefa normalmente, descrevendo o que você quer. O próprio Claude Code decide, pela `description` de cada skill, qual delas bate com o pedido:
+After installation, there is no specific command to “activate” a skill: ask for the task normally and describe what you want. Claude Code uses each skill's `description` to decide which matches the request:
 
 ```
-Use a skill de PDF pra extrair os campos de formulário de relatorio.pdf.
+Use the PDF skill to extract the form fields from report.pdf.
 ```
 
-Também dá pra chamar uma skill específica direto pelo nome, no formato `/nome-do-plugin:nome-da-skill` — por exemplo, `/document-skills:docx` —, em vez de descrever a tarefa e deixar o Claude Code escolher sozinho. Esse formato com dois-pontos (plugin:skill) é como o Claude Code evita que skills de plugins diferentes colidam pelo mesmo nome.
+You can also invoke a specific skill directly by name using `/plugin-name:skill-name`, for example `/document-skills:docx`, instead of describing the task and letting Claude Code choose. The colon format (plugin:skill) prevents name collisions between skills from different plugins.
 
-### Instalar só uma skill específica, sem o pacote inteiro
+### Install a single skill without the entire package
 
-`example-skills` traz 12 skills de uma vez — se você só quer `skill-creator`, por exemplo, sem as outras 11, dá pra vendorizar (copiar pra dentro do seu próprio projeto) só a pasta daquela skill, em vez de instalar o plugin inteiro. É o mesmo padrão já usado neste toolkit pro [Graphify](07-graphify.md) e pro [agent-browser](11-agent-browser.md), só que copiando a pasta em vez de rodar um instalador:
+`example-skills` includes 12 skills. If you only want `skill-creator`, for example, without the other 11, you can vendor (copy into your project) just that skill's folder instead of installing the entire plugin. This is the pattern already used in this toolkit for [Graphify](07-graphify.md) and [agent-browser](11-agent-browser.md), except you copy a folder instead of running an installer:
 
-> 💬 **Peça pro seu agente instalar:**
+> 💬 **Ask your agent to install it:**
 >
 > ```
-> Baixe a skill skill-creator do repositório anthropics/skills e instale no
-> meu projeto: clone https://github.com/anthropics/skills.git de forma rasa
-> (--depth 1) numa pasta temporária, copie só a subpasta skills/skill-creator
-> para .claude/skills/skill-creator/, e apague a pasta temporária depois.
+> Download skill-creator from anthropics/skills and install it in
+> my project: shallow-clone https://github.com/anthropics/skills.git
+> (--depth 1) into a temporary folder, copy only skills/skill-creator
+> to .claude/skills/skill-creator/, then remove the temporary folder.
 > ```
 >
-> O Claude Code tem acesso a terminal (Bash) e a escrita de arquivo — ele roda o clone, copia só a pasta que interessa, e confirma que funcionou. Prefere fazer você mesmo? É exatamente isto:
+> Claude Code has terminal (Bash) and file-writing access: it clones, copies the relevant folder, and confirms success. Prefer doing it yourself? Here are the exact commands:
 
 ```bash
 git clone --depth 1 https://github.com/anthropics/skills.git /tmp/anthropics-skills
@@ -118,108 +118,108 @@ cp -r /tmp/anthropics-skills/skills/skill-creator .claude/skills/skill-creator
 rm -rf /tmp/anthropics-skills
 ```
 
-Uma skill de projeto (`.claude/skills/<nome>/`) é versionada com o resto do repositório — todo mundo no time que usa Claude Code nesse projeto ganha ela automaticamente. Uma ressalva: se `.claude/skills/` não existia na sua pasta antes dessa sessão do Claude Code começar, reinicie a sessão depois de criá-la — só uma pasta de skills que já existia no início da sessão é observada em tempo real; uma pasta nova, só depois de reiniciar ([fonte](https://code.claude.com/docs/en/skills)).
+A project skill (`.claude/skills/<name>/`) is versioned with the repository, so everyone on the team using Claude Code in that project gets it automatically. One caveat: if `.claude/skills/` did not exist before the current Claude Code session started, restart the session after creating it. Only skill folders present at session start are watched live; new folders require a restart ([source](https://code.claude.com/docs/en/skills)).
 
-## Tutorial passo a passo
+## Step-by-step tutorial
 
-Vamos instalar o pacote de documentos e gerar um relatório de verdade em `.docx`, do zero. O cenário aqui é genérico — um relatório trimestral qualquer — mas o fluxo vale pra qualquer conteúdo.
+Let's install the document package and generate a real `.docx` report from scratch. The example is generic, a quarterly report, but the workflow applies to any content.
 
-### 1. Instale o pacote de documentos
+### 1. Install the document package
 
 ```bash
 /plugin marketplace add anthropics/skills
 /plugin install document-skills@anthropic-agent-skills
 ```
 
-### 2. Peça o relatório, descrevendo o que ele precisa ter
+### 2. Request the report and describe its required content
 
-Dentro de um projeto qualquer, com dados à mão (uma tabela colada na conversa, uma planilha, um CSV):
-
-```
-Cria um relatório em Word (relatorio.docx) com: um sumário (TOC — table
-of contents, o índice clicável no início de um documento longo) logo no
-início, três seções com título de nível 1, uma tabela mostrando vendas
-por trimestre, e número de página no rodapé.
-```
-
-### 3. O que acontece por trás dos panos
-
-A `description` da skill `docx` cobre exatamente esse tipo de pedido — criar, ler, editar ou manipular documentos do Word — então o Claude Code carrega ela automaticamente, sem precisar chamar por nome. A partir daí, ela:
-
-1. Monta o `.docx` do zero usando a biblioteca `docx` (um pacote de código já pronto, do ecossistema `npm`/Node.js, que sabe montar a estrutura interna de um arquivo Word);
-2. Se o pedido fosse editar um documento já existente em vez de criar um novo, ela abriria o arquivo, mexeria direto no XML interno (`word/document.xml` — um `.docx`, por baixo dos panos, é só uma pasta de arquivos XML compactada em zip) e recompactaria;
-3. Renderiza o resultado em imagem (via `pdftoppm`) só pra conferir visualmente que ficou como o pedido descreveu, antes de devolver o arquivo final.
-
-Fonte: [`skills/docx/SKILL.md`](https://github.com/anthropics/skills/blob/main/skills/docx/SKILL.md).
-
-### 4. Confira o arquivo gerado
-
-Abra `relatorio.docx` num editor de verdade (Word, LibreOffice, Google Docs) e confira: sumário clicável, três seções, tabela com os números certos, número de página no rodapé. Se algo ficou errado, descreva o problema e peça o ajuste — isso vira uma edição sobre o mesmo arquivo, não uma regeneração do zero.
-
-## Exemplos
-
-### Exemplo 1 — planilha `.xlsx` com fórmulas, a partir de uma lista solta de dados
-
-Cenário: você tem uma lista crua de vendas por produto, colada de algum lugar, e quer uma planilha de verdade — com fórmula, não só número já calculado por fora.
+Inside any project, with data available (a table pasted into the conversation, a spreadsheet, or a CSV):
 
 ```
-Instalei o pacote document-skills. Aqui está uma lista de vendas por
-produto (colada abaixo). Monta uma planilha vendas.xlsx com uma aba de
-detalhe (uma linha por produto) e uma aba de resumo, com fórmulas de
-verdade (=SOMA, =MÉDIA) somando por categoria — não valores já
-calculados na mão.
+Create a Word report (report.docx) with a TOC (table of contents,
+ the clickable index at the beginning of a long document) at the
+start, three sections with level 1 headings, a table showing sales
+by quarter, and page numbers in the footer.
 ```
 
-A skill `xlsx` monta o arquivo com fórmulas nativas do Excel — abrindo depois no Excel ou no Google Sheets, clicar numa célula de total mostra a fórmula `=SOMA(...)`, não um número estático já resolvido.
+### 3. What happens behind the scenes
 
-### Exemplo 2 — criar sua própria skill com `skill-creator`
+The `docx` skill's `description` covers this exact kind of request: creating, reading, editing, or manipulating Word documents. Claude Code therefore loads it automatically without an explicit invocation. It then:
 
-Cenário: toda vez que você termina uma tarefa no seu projeto, você segue os mesmos passos manuais pra escrever a entrada de changelog (o arquivo que lista o que mudou em cada versão) — e quer transformar isso numa skill reutilizável, sua.
+1. Builds the `.docx` from scratch using the `docx` library (a ready-made npm/Node.js package that constructs the internal structure of a Word file);
+2. If editing an existing document instead, opens the file, directly modifies its internal XML (`word/document.xml`: underneath, a `.docx` is a folder of XML files compressed as a ZIP), and repackages it;
+3. Renders the result as images (through `pdftoppm`) to visually check it matches the request before returning the final file.
+
+Source: [`skills/docx/SKILL.md`](https://github.com/anthropics/skills/blob/main/skills/docx/SKILL.md).
+
+### 4. Check the generated file
+
+Open `report.docx` in a real editor (Word, LibreOffice, Google Docs) and check the clickable table of contents, three sections, table with correct numbers, and footer page numbers. If something is wrong, describe it and request a correction: this edits the same file rather than regenerating it from scratch.
+
+## Examples
+
+### Example 1 — an `.xlsx` spreadsheet with formulas from raw data
+
+Scenario: you have a raw list of product sales pasted from somewhere and want a real spreadsheet with formulas, rather than externally calculated numbers.
 
 ```
-Instalei o pacote example-skills. Usa a skill skill-creator pra criar
-uma skill nova: toda vez que eu terminar uma tarefa, ela deve ler o
-`git diff` das mudanças e escrever uma entrada de changelog seguindo o
-formato "### <data> — <resumo em uma linha>" + bullets do que mudou, no
-arquivo CHANGELOG.md.
+I installed document-skills. Here is a list of product sales
+(pasted below). Build sales.xlsx with a detail sheet (one row
+per product) and a summary sheet, using real formulas
+(=SUM, =AVERAGE) to aggregate by category, rather than manually
+precalculated values.
 ```
 
-Em vez de escrever o `SKILL.md` na mão, `skill-creator` conduz uma espécie de entrevista antes de gerar qualquer coisa: o que a skill deve fazer, quando ela deve disparar, qual é o formato de saída esperado. Só depois disso ela escreve a estrutura de pastas (`SKILL.md` e, se precisar de código auxiliar, uma pasta `scripts/`) e sugere alguns pedidos de teste pra validar se a skill dispara e se comporta como esperado antes de considerar pronta.
+The `xlsx` skill creates the file with native Excel formulas. When opening it in Excel or Google Sheets, clicking a total cell shows `=SUM(...)`, rather than an already-resolved static number.
 
-### Exemplo 3 — construir um servidor MCP com `mcp-builder`
+### Example 2 — create your own skill with `skill-creator`
 
-Cenário: você já tem uma API interna (de tarefas, de clientes, do que for) e quer expor as operações dela como ferramentas que qualquer agente de IA compatível com MCP consegue chamar — não só o Claude Code.
+Scenario: whenever you finish a task in your project, you follow the same manual steps to write a changelog entry (the file listing changes in each version), and want to turn this into your own reusable skill.
 
 ```
-Instalei o pacote example-skills. Usa a skill mcp-builder pra me ajudar
-a criar um servidor MCP em TypeScript que expõe minha API interna de
-tarefas (listar, criar, marcar como concluída) como ferramentas.
+I installed example-skills. Use skill-creator to create a new skill:
+whenever I finish a task, it should read the changes in `git diff`
+and write a changelog entry using the format
+"### <date> — <one-line summary>" plus bullets describing the changes,
+in CHANGELOG.md.
 ```
 
-`mcp-builder` guia isso em quatro fases: pesquisar e planejar o desenho da API antes de escrever qualquer código, implementar a infraestrutura e as ferramentas com formato de entrada/saída bem definido, revisar a qualidade e testar, e por fim criar *evals* (testes automatizados que checam se um LLM consegue usar aquela ferramenta corretamente) que comprovam que um agente de IA de fato consegue operar o servidor gerado.
+Instead of writing `SKILL.md` manually, `skill-creator` conducts an interview before generating anything: what the skill should do, when it should trigger, and the expected output format. Only then does it write the folder structure (`SKILL.md` and, if supporting code is needed, `scripts/`) and suggest test requests to validate its triggering and behavior before calling it ready.
 
-## Dicas e pegadinhas
+### Example 3 — build an MCP server with `mcp-builder`
 
-**Não existe uma licença única cobrindo o repositório inteiro.** Na raiz de `anthropics/skills` só existem um `README.md` e um `THIRD_PARTY_NOTICES.md` — nenhum arquivo `LICENSE` geral. Cada skill pode trazer a sua própria: as quatro skills de documento Office (`docx`, `pdf`, `pptx`, `xlsx`), por exemplo, vêm com um `LICENSE.txt` próprio, vinculado aos Termos de Serviço da Anthropic, que proíbe explicitamente extrair esses materiais pra fora dos serviços da Anthropic, copiá-los (fora de cópias temporárias geradas automaticamente durante o uso), ou criar obra derivada a partir deles. Antes de vendorizar qualquer skill deste repositório pro seu próprio projeto — principalmente as quatro de documento — vale abrir o `LICENSE.txt` daquela pasta específica primeiro. Isso não é parecer jurídico, só o que o próprio arquivo diz.
+Scenario: you have an internal API (for tasks, customers, or anything else) and want to expose its operations as tools any MCP-compatible AI agent can call, beyond Claude Code.
 
-**Nem todo campo do `SKILL.md` funciona fora do Claude Code.** O padrão aberto (`agentskills.io`) e o Claude.ai/API aceitam só seis campos no frontmatter: `name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`. O Claude Code aceita bem mais — `disable-model-invocation` (impede o agente de carregar a skill sozinho, só você chama por nome), `context: fork` (roda a skill num subagente isolado), `hooks`, `paths`, entre outros — como extensão própria dele em cima do padrão. Uma skill que só usa os seis campos do padrão funciona em qualquer lugar; uma que usa os campos extras do Claude Code é específica dele.
+```
+I installed example-skills. Use mcp-builder to help me create a
+TypeScript MCP server exposing my internal task API (list, create,
+mark complete) as tools.
+```
 
-**Uma vez carregada, a skill fica ocupando espaço até o fim da sessão.** O conteúdo inteiro do `SKILL.md` entra na conversa como uma mensagem só e não é descartado sozinho — ele só sai de circulação se a sessão passar por uma compactação de contexto (quando o histórico fica grande demais e é resumido). Isso reforça por que manter um `SKILL.md` enxuto — e mover referência grande pra arquivos separados, carregados só quando citados — importa: é o mesmo princípio do "esboço mínimo" que o [agent-browser](11-agent-browser.md) já usa neste toolkit.
+`mcp-builder` guides four phases: research and plan the API design before writing code, implement the infrastructure and tools with clearly defined input/output formats, review quality and test, then create *evals* (automated tests checking whether an LLM can use the tool correctly) proving that an AI agent can actually operate the generated server.
 
-**Uma pasta `.claude/skills/` nova só é observada depois de reiniciar.** Se a pasta já existia quando a sessão do Claude Code começou, uma skill adicionada, editada ou removida ali dentro é detectada na hora, sem reiniciar nada. Se a pasta em si não existia — por exemplo, seu projeto nunca teve skill de projeto antes —, é preciso reiniciar a sessão depois de criá-la.
+## Tips and pitfalls
 
-**As skills de documento verificam o próprio trabalho antes de devolver o arquivo.** A skill `docx`, por exemplo, renderiza o resultado em imagem antes de considerar a tarefa concluída — então não assuma que "terminou sem erro" quer dizer "ficou visualmente certo"; vale sempre abrir o arquivo final você mesmo, como no passo 4 do tutorial acima.
+**No single license covers the entire repository.** The root of `anthropics/skills` contains `README.md` and `THIRD_PARTY_NOTICES.md`, with no general `LICENSE` file. Individual skills can have their own: the four Office document skills (`docx`, `pdf`, `pptx`, `xlsx`), for example, include their own `LICENSE.txt` tied to Anthropic's Terms of Service, explicitly prohibiting extraction of these materials outside Anthropic services, copying them (except automatically generated temporary copies during use), or creating derivative works. Before vendoring any skill from this repository, especially the four document skills, read that folder's `LICENSE.txt`. This describes the file's contents, rather than providing legal advice.
 
-## Perguntas frequentes
+**Not every `SKILL.md` field works outside Claude Code.** The open standard (`agentskills.io`) and Claude.ai/API accept six frontmatter fields: `name`, `description`, `license`, `compatibility`, `metadata`, and `allowed-tools`. Claude Code accepts more, including `disable-model-invocation` (prevents automatic loading; only explicit invocation), `context: fork` (runs the skill in an isolated subagent), `hooks`, and `paths`, as its own extensions. A skill using only the six standard fields works everywhere; one using Claude Code's extra fields is specific to that client.
 
-**Isso substitui os plugins que eu já uso, tipo Superpowers ou Ponytail?**
-Não — são conceitos diferentes que coexistem sem conflito. Um plugin como o [Superpowers](01-superpowers.md) pode empacotar skills, comandos e hooks juntos; as skills deste repositório são só a parte "skill" desse tipo de pacote, sem comando de barra fixo nem hook. Instalar `document-skills` não desliga nem substitui nenhum plugin que você já tenha.
+**Once loaded, the skill occupies context until the session ends.** The entire `SKILL.md` enters the conversation as one message and is not automatically discarded. It only leaves circulation through context compaction, when an oversized history is summarized. This reinforces why `SKILL.md` should be concise and large references should live in separate files loaded only when referenced: the same “minimal stub” principle used by [agent-browser](11-agent-browser.md).
 
-**Preciso instalar as 17 de uma vez, ou dá pra escolher só o que eu quero?**
-Dá pra escolher. Os três pacotes (`document-skills`, `example-skills`, `claude-api`) podem ser instalados um de cada vez — e se você quiser só uma skill específica dentro de um pacote maior, sem as outras, dá pra vendorizar só aquela pasta manualmente, como mostrado em "Como instalar/ativar" mais acima.
+**A new `.claude/skills/` folder is only watched after a restart.** If the folder existed when the Claude Code session began, added, edited, or removed skills are detected immediately without restarting. If the folder itself did not exist, for example in a project with no previous project skills, restart the session after creating it.
 
-**Funciona só no Claude Code?**
-Não. O formato `SKILL.md` segue um padrão aberto usável por qualquer agente compatível. As skills deste repositório especificamente também já estão disponíveis nos planos pagos do Claude.ai, e dá pra usá-las — ou subir skills próprias — via API, com o Skills API Quickstart da própria Anthropic.
+**Document skills check their work before returning the file.** For example, `docx` renders the result as images before considering the task finished. Do not assume “completed without errors” means “looks correct”; always open the final file yourself, as in tutorial step 4 above.
 
-**As skills de documento (docx/pdf/pptx/xlsx) editam um arquivo já existente, ou só criam do zero?**
-Fazem as duas coisas. A skill `docx`, por exemplo, cobre tanto gerar um `.docx` novo do zero quanto editar um já existente — incluindo alterações rastreadas (*track changes*) e comentários, não só texto corrido.
+## Frequently asked questions
+
+**Does this replace plugins I already use, such as Superpowers or Ponytail?**
+No: these concepts coexist without conflict. A plugin such as [Superpowers](01-superpowers.md) can bundle skills, commands, and hooks; the skills in this repository are just the skill portion of such a package, with no fixed slash command or hook. Installing `document-skills` does not disable or replace any existing plugin.
+
+**Must I install all 17 at once, or can I choose?**
+You can choose. The three packages (`document-skills`, `example-skills`, `claude-api`) install separately. To get one skill from a larger package without the others, manually vendor that folder as shown under “How to install/activate” above.
+
+**Does it only work in Claude Code?**
+No. `SKILL.md` follows an open standard usable by any compatible agent. These particular skills are also available in paid Claude.ai plans, and you can use them or upload your own through the API using Anthropic's Skills API Quickstart.
+
+**Can document skills (docx/pdf/pptx/xlsx) edit existing files, or only create new ones?**
+Both. For example, `docx` covers both creating a new `.docx` and editing an existing one, including tracked changes and comments, beyond ordinary text.
