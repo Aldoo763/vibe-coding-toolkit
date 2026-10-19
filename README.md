@@ -268,6 +268,7 @@ Choose a task, open the prompt, and copy the indicated block. The [complete cata
 | **Evolve lint** | [07 · Complete ESLint](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Install rules, measure legacy code, and reduce violations |
 | **Review security** | [13 · Security review](docs/prompts/13-security-review.md) | Repository baseline or precise diff, evidence and private reporting |
 | **Evaluate the harness** | [14 · Harness evaluation](docs/prompts/14-harness-evaluation.md) | Verify behavior after setup or instruction/tool changes |
+| **Improve the harness** | [15 · Harness improvement](docs/prompts/15-harness-improvement.md) | Default native method inspired by Harness2 in new/existing setup; optional isolated official CLI lab |
 | **Review and coordinate** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Parallel waves](docs/prompts/05-parallel-wave-dispatch.md) | Specialist review and independent execution |
 | **Maintain context** | [06 · Memory](docs/prompts/06-memory-bootstrap.md) | Keep useful knowledge without bloating the session |
 
@@ -353,6 +354,7 @@ The [tool catalog](docs/tools/README.md) maintains the complete index, installat
 | [Differential security review](docs/tools/20-security-review.md) | A change affects sensitive data or trust boundaries |
 | [shadcn](docs/tools/21-shadcn-ui.md) | The project uses or selects shadcn/ui |
 | [Sentry MCP](docs/tools/22-sentry-mcp.md) | Investigating a chosen service's errors/performance with authorized access |
+| [Harness2](docs/tools/23-harness2.md) | Comparing harness changes with evidence while keeping native adaptation, official demo, and benchmark results distinct |
 
 Evaluate every option during setup; activate those that fit the project. Each guide covers requirements, installation, use, verification, and maintenance.
 

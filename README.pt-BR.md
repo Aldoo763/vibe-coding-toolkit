@@ -270,6 +270,7 @@ Escolha a tarefa, abra o prompt e copie o bloco indicado. O [catálogo completo]
 | **Evoluir o lint** | [07 · ESLint completo](docs/prompts/07-eslint-complete-setup.md) · [08 · Quality gates](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Warnings](docs/prompts/02-eslint-warning-burndown.md) | Instalar regras, medir legado e reduzir violações |
 | **Revisar segurança** | [13 · Revisão de segurança](docs/prompts/13-security-review.md) | Repositório ou diff exato, evidências e relatório privado |
 | **Avaliar o harness** | [14 · Avaliação do harness](docs/prompts/14-harness-evaluation.md) | Verificar comportamento após setup ou mudanças de instruções/ferramentas |
+| **Melhorar o harness** | [15 · Melhoria do harness](docs/prompts/15-harness-improvement.md) | Método nativo inspirado no Harness2 por padrão no setup novo/existente; laboratório isolado com CLI oficial opcional |
 | **Revisar e coordenar** | [03 · Code review](docs/prompts/03-multi-agent-code-review.md) · [05 · Ondas paralelas](docs/prompts/05-parallel-wave-dispatch.md) | Revisão especializada e execução independente |
 | **Manter contexto** | [06 · Memória](docs/prompts/06-memory-bootstrap.md) | Guardar conhecimento útil sem inflar a sessão |
 
@@ -355,6 +356,7 @@ O [catálogo de ferramentas](docs/tools/README.md) mantém o índice completo, o
 | [Revisão diferencial de segurança](docs/tools/20-security-review.md) | Mudança afeta dados sensíveis ou fronteiras de confiança |
 | [shadcn](docs/tools/21-shadcn-ui.md) | Projeto usa ou escolhe shadcn/ui |
 | [Sentry MCP](docs/tools/22-sentry-mcp.md) | Investigar erros e desempenho de um serviço escolhido, com acesso autorizado |
+| [Harness2](docs/tools/23-harness2.md) | Comparar mudanças no harness com evidências, distinguindo adaptação nativa, demo oficial e resultados de benchmarks |
 
 Avalie todas as opções no setup; ative as que atendem ao projeto. Cada guia cobre requisitos, instalação, uso, verificação e manutenção.
 

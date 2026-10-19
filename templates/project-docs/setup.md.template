@@ -18,6 +18,8 @@
 
 Evaluate Next.js runtime/bundle skills, PostgreSQL guidance, GitHub CI repair, differential security review, shadcn, and Sentry MCP alongside the existing catalog. Record actual applicability and compatibility; preserve the project's stack and services. For adopted capabilities, include source/revision, frontmatter name, client, scope, install/update method, installation result, discovery result, live checks, and pending prerequisites. Account-dependent work stays pending until access and execution are observed.
 
+Record the default Harness2-inspired native method adaptation separately from skills/MCPs, with reusable prompt invocation/source revision, initial smoke results, and any justified candidate comparison. Preserve session authentication and permissions. Record any separately selected official CLI lab outside the application; distinguish demo, benchmark, and project evidence, including pending authorization for costs or execution isolation. Reapplication preserves customizations and reuses applicable evidence; material changes require relevant checks again, without automatically repeating optimization trials.
+
 ## Documentation created
 
 [Confirm PRODUCT.md, README.md, AGENTS.md, CLAUDE.md, docs/architecture.md, docs/design.md, docs/onboarding.md, and docs/quality.md contain project-specific content. Record preservation/consolidation of previous files.]

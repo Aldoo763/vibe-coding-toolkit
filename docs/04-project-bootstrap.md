@@ -126,6 +126,7 @@ Evaluate the [scope matrix](tools/README.md#select-by-scope) as part of setup:
 | [differential-review](tools/20-security-review.md) | Select for security-sensitive development/review; configure the intended report location and range |
 | [shadcn](tools/21-shadcn-ui.md) | Install only when shadcn/ui is adopted or explicitly chosen; preserve other UI systems |
 | [Sentry MCP](tools/22-sentry-mcp.md) | Configure only for a chosen service and intended organization/project; OAuth and live checks remain explicit |
+| [Harness2](tools/23-harness2.md) | Establish the native method adaptation by default, with initial evaluation and a reusable procedure. Keep the optional official CLI in a separate lab with explicit benchmark/cost/isolation authorization |
 
 Record applicability and evidence for every row. Availability does not authorize upgrading an older Next.js project, changing its bundler, adopting a UI kit, or purchasing a service. A missing dependency blocks only its capability.
 
@@ -138,6 +139,8 @@ Fill the nine [manifest](../templates/project-docs/manifest.json) destinations w
 Preserve the scaffold's framework instructions and version-matched documentation pointers when merging `AGENTS.md`. Establish a portable [memory contract](tools/09-claude-memory-system.md#portable-storage-and-freshness): native memory or a short index into canonical documents, actual loading mechanism, source/evidence, last verification, and invalidation triggers. Record retrieval evidence in `docs/setup.md`. Reuse the optional [handoff template](../templates/task-handoff.md.template) only for unfinished multi-session work.
 
 Make the [security review prompt](prompts/13-security-review.md) available from `docs/quality.md`, with its source revision and update method. Copy its self-contained Prompt block into an existing project prompt directory when appropriate, adapting paths without weakening its limits; otherwise record a versioned source and invocation. Repository and diff reviews work without mandatory scanners or a paid service. Reports stay private by default; the optional `differential-review` skill supports change review.
+
+Make [prompt 15](prompts/15-harness-improvement.md) reusable in the same way as part of every bootstrap and record the native method adaptation in `docs/setup.md`. Run relevant initial harness smoke cases during verification. An observed failure may justify one disposable native comparison; otherwise retain working instructions and document the procedure. Do not add Harness2 to application dependencies, start optimization on every setup, or assume the optional official CLI inherits this session's login.
 
 Reuse working Ponytail `full`, Caveman, Superpowers, and RTK integrations. If a plugin is missing and the host supports project scope, prefer it. In Claude, check `claude plugin install --help`/`--scope project`; in Codex, check current support rather than inventing flags. Never copy caches to simulate installation. See [installation](01-installation.md).
 

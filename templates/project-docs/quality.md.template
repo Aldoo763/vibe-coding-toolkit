@@ -20,6 +20,8 @@
 
 [For typed lint, record the two focused async rules, severity, command, measured runner cost, and any legacy adoption plan. Run relevant harness smoke cases after instruction, memory, skill, or orchestration changes; identify the client/model and distinguish observed behavior from unrun cases.]
 
+[Record the default Harness2-inspired native method adaptation, reusable prompt source/invocation, and relevant initial smoke results. If an observed failure justifies a candidate comparison, keep baseline/candidate inputs and independent checks comparable, retain security/permission boundaries, and record adopted/rejected changes and evidence-supported lessons. Separate any optional official CLI demo/benchmark evidence from actual project behavior; one passing case does not establish general reliability.]
+
 ## Review after implementation or fixes
 
 Select review scope by risk and the actual diff. Use independent review for nontrivial work when available. Record the exact target, connected callers/contracts/tests, confirmed findings, and coverage. Add rounds for new evidence or unresolved risk; honor an explicitly requested count without inventing additional cycles.

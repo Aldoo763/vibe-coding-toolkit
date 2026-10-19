@@ -140,6 +140,7 @@ The toolkit has two scopes: this guide configures the **machine**; project recip
 - For GitHub Actions work, prepare the [GitHub CLI and account access](tools/19-github-ci-repair.md). For security review, ensure Git/history and supported agent tools are available.
 - PostgreSQL guidance, bundle analysis, and shadcn instructions belong in the project; machine setup does not choose a database host or UI library.
 - For a chosen Sentry service, verify client MCP/OAuth support and authorized access. Configure a [scoped connection](tools/22-sentry-mcp.md) at the intended client/project scope; without an account/project, record the capability as not selected or pending.
+- The default [Harness2-inspired workflow](tools/23-harness2.md) for new and existing projects reuses the current agent, with no additional machine installation. Only a selected official CLI lab needs Git, uv, and compatible Python in a dedicated environment. Record benchmark-specific dependencies separately; do not enable API billing, a bridge, or weaker client permissions as part of machine setup.
 
 Record every selected prerequisite and per-client integration in the manifest, with source, observed version/revision, scope, update method, and evidence. Optional entries start with `required: false`; do not mark them ready until the relevant checks pass. Do not globally install all project skills as a consequence of this inventory.
 

@@ -45,6 +45,8 @@ After implementation or a fix, the [review convention](tools/02-subagent-orchest
 
 [Harness evaluation](07-harness-evaluation.md) uses disposable tasks to check instructions, recovery, memory, and review behavior. Installation, passing application checks, and successful agent execution are separate evidence.
 
+[Harness2 adoption](tools/23-harness2.md) makes measured harness improvement a default part of new and existing project setup through [prompt 15](prompts/15-harness-improvement.md). Establish the native method adaptation, run relevant initial smoke cases, and make the procedure reusable while preserving the current client and authentication. Only observed failures need a candidate comparison. The optional official CLI belongs in a separate lab; its benchmark dependencies, model access, costs, and execution permissions are not enabled by ordinary setup.
+
 <a id="6-a-code-knowledge-graph"></a>
 <a id="7-a-two-layer-memory-system"></a>
 

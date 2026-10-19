@@ -111,6 +111,7 @@ This toolkit configures machines and individual projects. In this machine flow, 
 - Security review: check Git/history and compatible tools for differential-review; preserve the native session model/provider/authentication.
 - UI: shadcn instructions belong only to projects that adopt shadcn/ui. Do not globally initialize a design system.
 - Sentry: check client MCP/OAuth support when this service is selected. Configure the intended scope only with an authorized organization/project; missing access remains pending. Do not create accounts, install application SDKs or enable paid services as a side effect.
+- Harness2: docs/tools/23-harness2.md defines the default native harness workflow for new and existing project setup. It reuses the current agent and needs no additional machine installation. Prepare Git, uv, and compatible Python only for a selected official CLI lab outside projects; benchmark dependencies, model access, API costs, the optional bridge, and execution isolation require their own explicit selection. Do not install the CLI globally or change client permissions by default.
 
 Inventory optional capabilities with required: false until a selected workflow makes their prerequisites necessary. Record source/revision, scope, client, installation, discovery, live evidence and update method. Evaluate every item, without installing every project-specific option globally. Continue independent machine work when a capability is unavailable.
 

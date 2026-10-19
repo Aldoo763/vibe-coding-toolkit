@@ -4,6 +4,8 @@ A passing build tests the application. A harness evaluation checks whether the a
 
 Use [prompt 14](prompts/14-harness-evaluation.md) in a disposable environment. Keep the client, model, authentication, and permissions already authorized. Reuse native delegation or a new conversation; do not silently enable API billing. Record a fresh subagent context separately from a restarted client session.
 
+As part of every new and existing project setup, use [prompt 15](prompts/15-harness-improvement.md) and the [Harness2 guide](tools/23-harness2.md) to establish the default native method adaptation and run relevant initial smoke cases. An observed failure justifies one candidate comparison with independent checks; a passing setup needs no invented change. The optional official CLI lab is separate; its demo or benchmark results do not replace project-specific behavioral evidence.
+
 ## Prepare and run
 
 Copy [the fixture directory](../templates/harness-evaluation/) into a new temporary directory outside both the toolkit and the real project. Use a separate copy per case. The fixture deliberately contains an authorization bug; do not deploy it or copy it into an application. Its code executes locally without services or credentials.

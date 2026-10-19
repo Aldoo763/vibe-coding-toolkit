@@ -270,6 +270,7 @@ Elige una tarea, abre el prompt y copia el bloque indicado. El [catálogo comple
 | **Mejorar el lint** | [07 · ESLint completo](docs/prompts/07-eslint-complete-setup.md) · [08 · Controles de calidad](docs/prompts/08-eslint-quality-gates-install.md) · [02 · Advertencias](docs/prompts/02-eslint-warning-burndown.md) | Instalar reglas, medir código heredado y reducir infracciones |
 | **Revisar seguridad** | [13 · Revisión de seguridad](docs/prompts/13-security-review.md) | Repositorio o diff exacto, evidencias e informe privado |
 | **Evaluar el harness** | [14 · Evaluación del harness](docs/prompts/14-harness-evaluation.md) | Verificar comportamiento tras configurar o cambiar instrucciones/herramientas |
+| **Mejorar el harness** | [15 · Mejora del harness](docs/prompts/15-harness-improvement.md) | Método nativo inspirado en Harness2 por defecto al configurar proyectos nuevos/existentes; laboratorio aislado con CLI oficial opcional |
 | **Revisar y coordinar** | [03 · Revisión de código](docs/prompts/03-multi-agent-code-review.md) · [05 · Oleadas paralelas](docs/prompts/05-parallel-wave-dispatch.md) | Revisión especializada y ejecución independiente |
 | **Mantener el contexto** | [06 · Memoria](docs/prompts/06-memory-bootstrap.md) | Conservar conocimiento útil sin sobrecargar la sesión |
 
@@ -355,6 +356,7 @@ El [catálogo de herramientas](docs/tools/README.md) mantiene el índice complet
 | [Revisión diferencial de seguridad](docs/tools/20-security-review.md) | Un cambio afecta datos sensibles o límites de confianza |
 | [shadcn](docs/tools/21-shadcn-ui.md) | El proyecto usa o elige shadcn/ui |
 | [Sentry MCP](docs/tools/22-sentry-mcp.md) | Investigar errores y rendimiento de un servicio elegido con acceso autorizado |
+| [Harness2](docs/tools/23-harness2.md) | Comparar cambios del harness con evidencia, distinguiendo adaptación nativa, demo oficial y resultados de benchmarks |
 
 Evalúa todas las opciones durante la configuración; activa las que sirven al proyecto. Cada guía cubre requisitos, instalación, uso, verificación y mantenimiento.
 
